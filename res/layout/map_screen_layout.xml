@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:orientation="vertical">
+  <RelativeLayout 
+  	android:id="@+id/MAP_VIEW_HEADER" 
+  	android:layout_width="wrap_content" 
+  	android:layout_height="wrap_content">
+		<TextView 
+			android:text="Satellite Name" 
+			android:id="@+id/MAP_VIEW_SATELLITE_NAME" 
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:gravity="center_vertical|center_horizontal"> 
+		</TextView>
+		<TextView 
+			android:text="Satellite Latitude/Longitude" 
+			android:id="@+id/MAP_VIEW_SAT_LAT_LON" 
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:gravity="center_vertical|center_horizontal"
+			android:layout_below="@+id/MAP_VIEW_SATELLITE_NAME"> 
+		</TextView>
+		<TextView 
+			android:text="Observer Latitude/Longitude" 
+			android:id="@+id/MAP_VIEW_OBS_LAT_LON" 
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:gravity="center_vertical|center_horizontal"
+			android:layout_below="@+id/MAP_VIEW_SAT_LAT_LON"> 
+		</TextView>
+  		<FrameLayout 
+			android:id="@+id/MAP_VIEW_FRAME" 
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/MAP_VIEW_OBS_LAT_LON">
+		</FrameLayout>
+  </RelativeLayout>
+</LinearLayout>

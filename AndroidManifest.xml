@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="uk.me.g4dpz.HamSatDroid" android:versionName="1.0" android:versionCode="3">
+    <application 
+    	android:icon="@drawable/icon" 
+    	android:label="@string/app_name"
+    	android:allowBackup="true">
+        <activity android:name=".HamSatDroid"
+                  android:label="@string/app_name" android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+		<activity 
+			android:name="PrefHandling">
+		</activity>
+		<activity 
+			android:name="GroundView" android:screenOrientation="sensor">
+		</activity>
+		<activity 
+			android:name=".SkyView" 
+			android:screenOrientation="portrait">
+		</activity>
+	</application>
+    <uses-sdk 
+    	android:minSdkVersion="10"
+    	android:targetSdkVersion ="10"/>
+	<uses-permission 
+		android:name="android.permission.INTERNET">
+	</uses-permission>
+	<uses-permission 
+		android:name="android.permission.ACCESS_FINE_LOCATION">
+	</uses-permission>
+    <supports-screens
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="false"
+        android:xlargeScreens="true" />
+</manifest> 

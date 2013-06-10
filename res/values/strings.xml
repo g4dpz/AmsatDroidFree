@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AmsatDroid Free</string>
+    <string name="CalculatePass">Calculate Pass</string>
+    <string name="SetStartTime">Change Start Time</string>
+    <string name="SatellitePrompt">Available Satellites</string>
+    <string name="SetHomeLocation">Set Home Location</string>
+    <string name="About">About</string>
+    <string name="Load">Update Keps</string>
+    <string name="LoadElem">From SD Card (/nasabare.txt)</string>
+    <string name="DownloadAmsatElem">From Web (amsat.org)</string>
+    <string name="DownloadCelestrakElem">From Web (celestrak.com)</string>
+    <string name="TimeSelectorPrompt">Select Time Period</string>
+    <string name="GetNetworkLocation">From Network</string>
+    <string name="GetGPSLocation">From GPS</string>
+    <string name="EnterLocation">Enter Coordinates</string>
+    <string name="AboutString">
+	AmsatDroid: Amateur Radio Satellite Pass Calculator \n
+	 \n
+    HOMEPAGE \n
+    http://sites.google.com/site/hamsatdroid/ \n
+    \n
+	DISCLAIMER \n
+	\n
+	This software is provided \'as is\' with no explicit or implied warranties in respect of any properties, including, but not limited to, correctness and fitness for purpose.
+	</string>
+    <string name="Help">Help</string>
+    <string name="HelpString">
+	- After installation, the first time the application starts it will look for keplerian elements on the default location (root folder of the SD card). It expects a file named \"nasabare.txt\", in the same exact format as the \"Bare NASA 2-line format elements\", available from AMSAT\'s webpage. If this file can not be found, a default set of elements shipped with the application will be used. The keps can be manually updated later on (see below). \n
+	- To manually enter a location: Select \"Menu > Set Home Location > Enter Coordinates\" and enter the coordinates (in decimal degrees) for your location. Use negative numbers for South latitude and West longitude. If an invalid latitude or longitude is entered the value will be automatically set to zero.\n
+	- To use your current position: Select \"Menu > Set Home Location > From GPS\" to use the GPS receiver, or \"Menu > Set Home Location > From Network\" for a faster (but typically less accurate) fix from the network.\n
+	- Select the satellite you want to calculate passes for from the drop-down menu. All the satellites imported from the keps file are available here.\n
+	- Select the time period for your pass calculation from the drop down menu.  Passes will be calculated starting from the current time and for the period of time selected in this drop-down menu.\n
+	- Hit the \"Calculate\" button to start the calculation. Depending on your device and other factors, this process can take between a few seconds and a minute or two.\n
+	- Click on a pass to display a graphical view of that pass. Use your device\'s \"Back\" button to go back to the pass screen.\n
+	- Select \"Menu > Map View\" to display the currently selected satellite and home location on a world map. Use your device\'s \"Back\" button to go back to the pass screen.\n
+	- If your device is connected to the Internet, select \"Menu > Update Keps > From Web (amsat.org)\". If no error is displayed it means the operation was successful.\n
+	- Keps can also be update from a file in the SD card, by selecting \"Menu > Update Keps > From SD Card (/nasabare.txt)\". Please see the first item in this page for the expected location and format of this file. If no error is displayed it means the operation was successful.\n
+	</string>
+    
+</resources>

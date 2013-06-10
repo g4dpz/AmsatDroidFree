@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content" 
+  android:orientation="vertical">
+			<RelativeLayout 
+				android:id="@+id/SKY_VIEW_DETAILS" 
+				android:layout_width="fill_parent" 
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical|center_horizontal">
+				<TextView 
+					android:text="Satellite Name" 
+					android:id="@+id/SKY_VIEW_SATELLITE_NAME" 
+					android:layout_width="fill_parent" 
+					android:layout_height="wrap_content" 
+					android:gravity="center_vertical|center_horizontal"> 
+				</TextView>
+				<TextView 
+					android:text="Home Location (lat/lon/gridsquare): " 
+					android:id="@+id/SKY_VIEW_HOME_LOCATION" 
+					android:layout_width="fill_parent" 
+					android:layout_height="wrap_content" 
+					android:gravity="center_vertical|center_horizontal"
+					android:layout_below="@+id/SKY_VIEW_SATELLITE_NAME"> 
+				</TextView>
+				<TextView 
+					android:text="Pass Information" 
+					android:id="@+id/SKY_VIEW_PASS_DETAILS" 
+					android:layout_width="wrap_content" 
+					android:layout_height="wrap_content"
+					android:layout_alignParentLeft="true"
+					android:layout_below="@+id/SKY_VIEW_HOME_LOCATION">
+				</TextView>
+				<TextView 
+					android:text="Satellite Location" 
+					android:id="@+id/SKY_VIEW_SAT_DETAILS" 
+					android:layout_width="wrap_content" 
+					android:layout_height="wrap_content"
+					android:layout_alignParentRight="true"
+					android:layout_below="@+id/SKY_VIEW_HOME_LOCATION">
+				</TextView>
+			</RelativeLayout>
+		<FrameLayout 
+			android:id="@+id/SKY_VIEW_FRAME" 
+			android:layout_width="fill_parent" 
+			android:layout_height="fill_parent"
+			android:layout_below="@+id/SKY_VIEW_SAT_DETAILS"> 
+		</FrameLayout>
+</LinearLayout>

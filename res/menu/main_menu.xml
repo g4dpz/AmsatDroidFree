@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+	<item 
+		android:visible="true" 
+		android:enabled="true" 
+		android:id="@+id/MENU_HOME_LOCATION" 
+		android:title="@string/SetHomeLocation">
+	<menu>
+	<item android:id="@+id/MENU_GET_GPS_LOCATION" 
+		android:title="@string/GetGPSLocation">
+	</item>
+	<item android:id="@+id/MENU_GET_NETWORK_LOCATION" android:title="@string/GetNetworkLocation">
+	</item>
+	<item android:title="@string/EnterLocation" 
+		android:id="@+id/MENU_ENTER_LOCATION">
+	</item>
+</menu>
+</item>
+	<item 
+		android:id="@+id/MENU_LOAD" 
+		android:title="@string/Load" 
+		android:visible="true" 
+		android:enabled="true">
+		<menu>
+			<item 
+				android:visible="true" 
+				android:enabled="true" 
+				android:id="@+id/MENU_LOAD_ELEM" 
+				android:title="@string/LoadElem">
+			</item>
+			<item 
+				android:visible="true" 
+				android:enabled="true" 
+				android:id="@+id/MENU_DOWNLOAD_ELEM_AMSAT" 
+				android:title="@string/DownloadAmsatElem">
+			</item>
+			<item 
+				android:visible="true" 
+				android:enabled="true" 
+				android:id="@+id/MENU_DOWNLOAD_ELEM_CELESTRAK" 
+				android:title="@string/DownloadCelestrakElem">
+			</item>
+		</menu>
+	</item>
+	<item 
+		android:id="@+id/LAUNCH_GROUND_VIEW" 
+		android:title="Map View">
+	</item>
+	<item 
+		android:visible="true" 
+		android:enabled="true" 
+		android:id="@+id/MENU_HELP" 
+		android:title="@string/Help">
+	</item>
+	<item 
+		android:visible="true" 
+		android:enabled="true" 
+		android:id="@+id/MENU_ABOUT" 
+		android:title="@string/About">
+	</item>
+</menu>
