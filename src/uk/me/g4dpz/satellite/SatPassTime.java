@@ -128,7 +128,8 @@ public class SatPassTime implements Serializable {
 
 		final double duration = (endTime.getTime() - startTime.getTime()) / 60000.0;
 
-		return "Date: " + DATE_FORMAT.format(startTime) + NEW_LINE + "Start Time: " + TIME_FORMAT.format(startTime) + NEW_LINE
+		return "Date: " + DATE_FORMAT.format(startTime) + NEW_LINE + "Start Time: " + TIME_FORMAT.format(startTime) + " UTC"
+				+ NEW_LINE
 				+
 				// "End Time: " + mTimeFormatter.format(endDate_time) + "\n" +
 				String.format("Duration: %4.1f min.\n", duration) + "AOS Azimuth: " + aos + DEG_NL
