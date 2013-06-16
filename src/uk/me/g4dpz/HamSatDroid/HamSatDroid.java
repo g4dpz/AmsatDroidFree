@@ -426,7 +426,7 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 
 			HamSatDroid.setPassPredictor(new PassPredictor(myelem, HamSatDroid.getGroundStation()));
 
-			HamSatDroid.setPasses(getPassPredictor().getPasses(myCal.getTime(), hoursAhead, true));
+			HamSatDroid.setPasses(getPassPredictor().getPasses(myCal.getTime(), hoursAhead, false));
 		} catch (final InvalidTleException e) {
 			passHeader = "ERROR: Bad Keplerian Elements";
 		} catch (final SatNotFoundException e) {

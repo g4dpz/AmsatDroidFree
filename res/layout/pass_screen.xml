@@ -105,7 +105,9 @@
     <ListView
         android:id="@+id/PASS_LIST_VIEW"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:divider="#FFCC00"
+    	android:dividerHeight="2px" >
     </ListView>
 
 </LinearLayout>
