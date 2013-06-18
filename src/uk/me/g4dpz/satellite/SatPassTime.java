@@ -126,13 +126,20 @@ public class SatPassTime implements Serializable {
 	@Override
 	public String toString() {
 
-		final double duration = (endTime.getTime() - startTime.getTime()) / 60000.0;
+		return passDateTimeString() + NEW_LINE + passInfoString();
+	}
 
+	public String passDateTimeString() {
+
+		final double duration = (endTime.getTime() - startTime.getTime()) / 60000.0;
 		return "Date: " + DATE_FORMAT.format(startTime) + NEW_LINE + "Start Time: " + TIME_FORMAT.format(startTime) + " loc"
-				+ NEW_LINE
-				+
+				+ NEW_LINE +
 				// "End Time: " + mTimeFormatter.format(endDate_time) + "\n" +
-				String.format("Duration: %4.1f min.\n", duration) + "AOS Azimuth: " + aos + DEG_NL
-				+ String.format("Max Elevation: %4.1f\u00B0\n", maxEl) + "LOS Azimuth: " + los + "\u00B0";
+				String.format("Duration: %4.1f min.", duration);
+	}
+
+	public String passInfoString() {
+		return "AOS Azimuth: " + aos + DEG_NL + String.format("Max Elevation: %4.1f\u00B0\n", maxEl) + "LOS Azimuth: " + los
+				+ "\u00B0";
 	}
 }

@@ -14,6 +14,7 @@
     <string name="GetNetworkLocation">From Network</string>
     <string name="GetGPSLocation">From GPS</string>
     <string name="EnterLocation">Enter Coordinates</string>
+    <string name="ViewPass">View pass</string>
     <string name="AboutString">
 	AmsatDroid: Amateur Radio Satellite Pass Calculator \n
 	 \n
