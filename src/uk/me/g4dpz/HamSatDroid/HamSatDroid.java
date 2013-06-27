@@ -61,6 +61,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.GoogleAnalytics;
+
 public class HamSatDroid extends Activity implements HSDConstants, OnGestureListener {
 	// private static final String DEBUG_TAG = "HamSatDroidLogging";
 
@@ -117,6 +120,7 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 	// static final int DATEDIALOGID = 0;
 
 	private AlertDialog timePickerDialog;
+	private GoogleAnalytics mGaInstance;
 
 	// For SkyView
 	private static SatPassTime selectedPass;
@@ -132,6 +136,10 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// Get the GoogleAnalytics singleton. Note that the SDK uses
+		// the application context to avoid leaking the current context.
+		mGaInstance = GoogleAnalytics.getInstance(this);
 
 		gestureScanner = new GestureDetector(this);
 
@@ -222,6 +230,18 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 		// display the current time
 		updateStartTimeDisplay();
 
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		EasyTracker.getInstance().activityStart(this);
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		EasyTracker.getInstance().activityStop(this);
 	}
 
 	private class TimePickerDialogListener implements DialogInterface.OnClickListener {
@@ -399,7 +419,9 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 		});
 	}
 
-	public void recalcPass(final int hoursAhead) {
+	private void recalcPass(final int hoursAhead) {
+
+		EasyTracker.getTracker().constructEvent("AmsatDroid", "recalcPass", "", (long)hoursAhead);
 
 		// How long to go back/forward in time to find a passes (in hours)
 		final int calcRange = 24;
@@ -626,8 +648,11 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 		try {
 			final String kepSource = HamSatDroid.getKepsSource();
 			if (AMSAT.equals(kepSource)) {
+
+				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", "AMSAT", 0L);
 				url = new URL(ELEM_URL_AMSAT);
 			} else if (CELESTRAK.equals(kepSource)) {
+				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", "CELESTRAK", 0L);
 				url = new URL(ELEM_URL_CELESTRAK);
 			} else {
 				throw new IllegalArgumentException("Unknown keplerian source[" + kepSource + "]");
