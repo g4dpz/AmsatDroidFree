@@ -46,7 +46,7 @@ Standard checks
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
         <module name="LineLength">
-            <property name="max" value="120"/>
+            <property name="max" value="160"/>
 			<property name="ignorePattern" value="^\s*\*\s*\{?@"/>
         </module>
         <module name="MethodLength"/>

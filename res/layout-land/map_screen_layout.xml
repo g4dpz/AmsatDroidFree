@@ -5,7 +5,7 @@
   android:layout_height="wrap_content"
   android:orientation="vertical">
 	<TextView 
-		android:text="Satellite Name" 
+		android:text="@string/SatelliteName" 
 		android:id="@+id/MAP_VIEW_SATELLITE_NAME" 
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 

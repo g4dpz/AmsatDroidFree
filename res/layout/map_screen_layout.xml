@@ -9,14 +9,14 @@
   	android:layout_width="wrap_content" 
   	android:layout_height="wrap_content">
 		<TextView 
-			android:text="Satellite Name" 
+			android:text="@string/SatelliteName" 
 			android:id="@+id/MAP_VIEW_SATELLITE_NAME" 
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" 
 			android:gravity="center_vertical|center_horizontal"> 
 		</TextView>
 		<TextView 
-			android:text="Satellite Latitude/Longitude" 
+			android:text="@string/SatelliteLatitudeLongitude" 
 			android:id="@+id/MAP_VIEW_SAT_LAT_LON" 
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" 
@@ -24,7 +24,7 @@
 			android:layout_below="@+id/MAP_VIEW_SATELLITE_NAME"> 
 		</TextView>
 		<TextView 
-			android:text="Observer Latitude/Longitude" 
+			android:text="@string/ObserverLatitudeLongitude" 
 			android:id="@+id/MAP_VIEW_OBS_LAT_LON" 
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" 

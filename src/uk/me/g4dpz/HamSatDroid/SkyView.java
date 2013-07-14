@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import uk.me.g4dpz.satellite.SatPos;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -27,13 +26,10 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-public class SkyView extends Activity implements HSDConstants, SensorEventListener, OnGestureListener {
+public class SkyView extends ASDActivity implements SensorEventListener, OnGestureListener {
 
 	private static final float ORIENTATION = 0;
 	private TrackView sView;
-	private double hLat = 43;
-	private double hLon = -79;
-
 	private static Handler handler = new Handler();
 	private long startTime;
 	private int skyWidth = 480;
@@ -42,6 +38,7 @@ public class SkyView extends Activity implements HSDConstants, SensorEventListen
 	private static final int SWIPE_MINDISTANCE = 120;
 	private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 	private static final double PI_DIV_BY_TWO = Math.PI / 2.0;
+	private static final String DEG_UTF8 = "\u00B0";
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -54,9 +51,14 @@ public class SkyView extends Activity implements HSDConstants, SensorEventListen
 		setContentView(R.layout.sky_screen);
 		((FrameLayout)findViewById(R.id.SKY_VIEW_FRAME)).addView(sView);
 
+		// check if we have a groundstation, if not create one
+		if (HamSatDroid.getGroundStation() == null) {
+			setObserver();
+		}
+
 		// Get home lat/lon
-		hLat = HamSatDroid.getGroundStation().getLatitude();
-		hLon = HamSatDroid.getGroundStation().getLongitude();
+		setHomeLat(HamSatDroid.getGroundStation().getLatitude());
+		setHomeLon(HamSatDroid.getGroundStation().getLongitude());
 
 		// Set UI refresh timer
 		if (startTime == 0) {
@@ -70,9 +72,9 @@ public class SkyView extends Activity implements HSDConstants, SensorEventListen
 		((TextView)findViewById(R.id.SKY_VIEW_SATELLITE_NAME)).setText(HamSatDroid.getSelectedSatellite().getTLE().getName());
 		final NumberFormat numberFormatter = NumberFormat.getNumberInstance();
 		numberFormatter.setMaximumFractionDigits(4);
-		((TextView)findViewById(R.id.SKY_VIEW_HOME_LOCATION))
-				.setText("Home Lat/Lon: " + numberFormatter.format(hLat) + DEG_UTF8 + "/" + numberFormatter.format(hLon)
-						+ DEG_UTF8 + "\nHome Gridsquare: " + HamSatDroid.decLatLonToGrid(hLat, hLon));
+		((TextView)findViewById(R.id.SKY_VIEW_HOME_LOCATION)).setText("Home Lat/Lon: " + numberFormatter.format(getHomeLat())
+				+ DEG_UTF8 + "/" + numberFormatter.format(getHomeLon()) + DEG_UTF8 + "\nHome Gridsquare: "
+				+ HamSatDroid.decLatLonToGrid(getHomeLat(), getHomeLon()));
 		((TextView)findViewById(R.id.SKY_VIEW_PASS_DETAILS)).setText("Pass Information \n"
 				+ HamSatDroid.getSelectedPass().toString());
 

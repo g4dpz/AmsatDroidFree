@@ -4,15 +4,13 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
-import uk.me.g4dpz.satellite.GroundStationPosition;
 import uk.me.g4dpz.satellite.InvalidTleException;
 import uk.me.g4dpz.satellite.SatNotFoundException;
 import uk.me.g4dpz.satellite.SatPos;
 import uk.me.g4dpz.satellite.Satellite;
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,7 +21,6 @@ import android.graphics.Path;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
@@ -31,7 +28,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-public class GroundView extends Activity implements HSDConstants, OnGestureListener {
+public class GroundView extends ASDActivity implements OnGestureListener {
 
 	private static final String W_STRING = "W";
 	private static final String E_STRING = "E";
@@ -39,9 +36,8 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 	private static final String N_STRING = "N";
 	private static final int SWIPE_MINDISTANCE = 120;
 	private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+	private static final String DEG_UTF8 = "\u00B0";
 
-	private double hLat;
-	private double hLon;
 	private MapView mapView;
 	private static Handler handler = new Handler();
 	private long mStartTime;
@@ -73,8 +69,8 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 		}
 
 		// Get home lat/lon
-		hLat = HamSatDroid.getGroundStation().getLatitude();
-		hLon = HamSatDroid.getGroundStation().getLongitude();
+		setHomeLat(HamSatDroid.getGroundStation().getLatitude());
+		setHomeLon(HamSatDroid.getGroundStation().getLongitude());
 
 		// Set UI refresh timer
 		if (mStartTime == 0) {
@@ -93,9 +89,9 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 		final TextView observerText = (TextView)findViewById(R.id.MAP_VIEW_OBS_LAT_LON);
 
 		if (observerText != null) {
-			observerText.setText(formatGeoText("Home Latitude", hLat, N_STRING, S_STRING)
-					+ formatGeoText("Home Longitude", hLon, E_STRING, W_STRING) + "Home Gridsquare: "
-					+ HamSatDroid.decLatLonToGrid(hLat, hLon));
+			observerText.setText(formatGeoText("Home Latitude", getHomeLat(), N_STRING, S_STRING)
+					+ formatGeoText("Home Longitude", getHomeLon(), E_STRING, W_STRING) + "Home Gridsquare: "
+					+ HamSatDroid.decLatLonToGrid(getHomeLat(), getHomeLon()));
 		}
 	}
 
@@ -108,16 +104,6 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 		scaledMap = null;
 		homePic = null;
 		satPic = null;
-	}
-
-	/**
-	 * @throws NumberFormatException
-	 */
-	private void setObserver() throws NumberFormatException {
-		final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		final String shomeLat = sharedPref.getString(HOME_LAT, ZERO_STRING);
-		final String shomeLon = sharedPref.getString(HOME_LON, ZERO_STRING);
-		HamSatDroid.setGroundStation(new GroundStationPosition(Double.valueOf(shomeLat), Double.valueOf(shomeLon), 0));
 	}
 
 	private class TimerRunnable implements Runnable {
@@ -151,13 +137,44 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 	}
 
 	private String formatGeoText(final String elementName, final double value, final String posStr, final String negStr) {
-		return String.format("%s: %5.1f%s %s\n", elementName, Math.abs(value), DEG_UTF8, (value >= 0) ? posStr : negStr);
+		return String.format(Locale.ENGLISH, "%s: %5.1f%s %s\n", elementName, Math.abs(value), DEG_UTF8, (value >= 0) ? posStr
+				: negStr);
 	}
 
 	private class MapView extends View {
 
+		private final Paint passLinePaint;
+		private final Paint trackLinePaint;
+		private final Paint writingPaint;
+		private final Paint footprintLinePaint;
+		private int height;
+		private int width;
+
 		public MapView(final Context context) {
 			super(context);
+
+			passLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			passLinePaint.setColor(Color.YELLOW);
+			passLinePaint.setStyle(Paint.Style.STROKE);
+			passLinePaint.setPathEffect(new DashPathEffect(new float[] { 5, 5 }, 0));
+
+			trackLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			trackLinePaint.setColor(Color.YELLOW);
+			trackLinePaint.setStyle(Paint.Style.STROKE);
+
+			writingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+			footprintLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			footprintLinePaint.setColor(Color.RED);
+			footprintLinePaint.setStyle(Paint.Style.STROKE);
+		}
+
+		@Override
+		protected void onFinishInflate() {
+			super.onFinishInflate();
+
+			height = this.getHeight();
+			width = this.getWidth();
 		}
 
 		@Override
@@ -182,7 +199,8 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 					mapWidth *= scale;
 					mapHeight *= scale;
 				}
-			} else {
+			}
+			else {
 				if (mapHeight > canvasHeight) {
 					scale = scale * ((double)canvasHeight / (double)mapHeight);
 					mapWidth *= scale;
@@ -202,27 +220,12 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 
 			homePic = Bitmap.createScaledBitmap(obsBitmap, (int)Math.round(Math.floor(obsBitmap.getWidth() * scale)),
 					(int)Math.round(Math.floor(obsBitmap.getHeight() * scale)), false);
-			final int homeTop = (int)Math.round((90.0 - hLat) * (mapHeight / 180.0) - homePic.getHeight() / 2.0);
-			final int homeLeft = (int)Math.round((hLon + 180.0) * (mapWidth / 360.0) - homePic.getWidth() / 2.0);
+			final int homeTop = (int)Math.round((90.0 - getHomeLat()) * (mapHeight / 180.0) - homePic.getHeight() / 2.0);
+			final int homeLeft = (int)Math.round((getHomeLon() + 180.0) * (mapWidth / 360.0) - homePic.getWidth() / 2.0);
 			canvas.drawBitmap(homePic, homeLeft + getLeft(), homeTop + getTop(), null);
 
-			// Drawing info for satellite track plus / minus 1 orbit
-			final Paint passLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-			passLinePaint.setColor(Color.YELLOW);
-			passLinePaint.setStyle(Paint.Style.STROKE);
-			passLinePaint.setPathEffect(new DashPathEffect(new float[] { 5, 5 }, 0));
 			passLinePaint.setStrokeWidth((float)(2 * scale));
-
-			// Drawing info for next satellite pass
-			final Paint trackLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-			trackLinePaint.setColor(Color.YELLOW);
-			trackLinePaint.setStyle(Paint.Style.STROKE);
 			trackLinePaint.setStrokeWidth((float)(2 * scale));
-
-			// Drawing info for satellite footprint
-			final Paint footprintLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-			footprintLinePaint.setColor(Color.RED);
-			footprintLinePaint.setStyle(Paint.Style.STROKE);
 			footprintLinePaint.setStrokeWidth((float)(2 * scale));
 
 			try {
@@ -259,7 +262,8 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 
 				if (longitude > 180.0) {
 					longitude -= 180.0;
-				} else {
+				}
+				else {
 					longitude += 180.0;
 				}
 
@@ -267,18 +271,18 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 						- satPic.getHeight() / 2.0);
 				final int satLeft = (int)Math.round(longitude * (mapWidth / 360.0) - satPic.getWidth() / 2.0);
 				canvas.drawBitmap(satPic, satLeft + getLeft(), satTop + getTop(), null);
-				final Paint mWritingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-				mWritingPaint.setTextSize((float)(18 * scale));
-				final Typeface mType = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL);
-				mWritingPaint.setTypeface(mType);
-				mWritingPaint.setTextAlign(Paint.Align.CENTER);
-				mWritingPaint.setColor(Color.BLACK);
 
-			} catch (final InvalidTleException e) {
-				// TODO Auto-generated catch block
+				writingPaint.setTextSize((float)(18 * scale));
+				final Typeface mType = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL);
+				writingPaint.setTypeface(mType);
+				writingPaint.setTextAlign(Paint.Align.CENTER);
+				writingPaint.setColor(Color.BLACK);
+
+			}
+			catch (final InvalidTleException e) {
 				e.printStackTrace();
-			} catch (final SatNotFoundException e) {
-				// TODO Auto-generated catch block
+			}
+			catch (final SatNotFoundException e) {
 				e.printStackTrace();
 			}
 		}
@@ -299,7 +303,8 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 
 				if (pathX <= 180.0) {
 					pathX += 180;
-				} else {
+				}
+				else {
 					pathX -= 180;
 				}
 				pathX *= mapWidth / 360.0;
@@ -307,7 +312,8 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 				pathY = (int)Math.round((90.0 - points[i][0]) * (mapHeight / 180.0));
 				if (i == 0 || Math.abs(pathX - oldPathX) > 180) {
 					trackPath.moveTo(pathX, pathY);
-				} else {
+				}
+				else {
 					trackPath.lineTo(pathX, pathY);
 				}
 
@@ -330,7 +336,8 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 
 				if (pathX <= 180.0) {
 					pathX += 180;
-				} else {
+				}
+				else {
 					pathX -= 180;
 				}
 				pathX *= mapWidth / 360.0;
@@ -338,7 +345,8 @@ public class GroundView extends Activity implements HSDConstants, OnGestureListe
 				pathY = (int)Math.round((90.0 - GroundView.radToDeg(positions.get(i).getLatitude())) * (mapHeight / 180.0));
 				if (i == 0 || Math.abs(pathX - oldPathX) > 180) {
 					trackPath.moveTo(pathX, pathY);
-				} else {
+				}
+				else {
 					trackPath.lineTo(pathX, pathY);
 				}
 

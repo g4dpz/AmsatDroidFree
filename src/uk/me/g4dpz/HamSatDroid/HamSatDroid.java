@@ -22,7 +22,6 @@ import uk.me.g4dpz.satellite.SatPassTime;
 import uk.me.g4dpz.satellite.Satellite;
 import uk.me.g4dpz.satellite.SatelliteFactory;
 import uk.me.g4dpz.satellite.TLE;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -62,18 +61,10 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.GoogleAnalytics;
 
-public class HamSatDroid extends Activity implements HSDConstants, OnGestureListener {
-	// private static final String DEBUG_TAG = "HamSatDroidLogging";
+public class HamSatDroid extends ASDActivity implements OnGestureListener {
 
-	/**
-     * 
-     */
 	private static final String CELESTRAK = "CELESTRAK";
-	/**
-     * 
-     */
 	private static final String AMSAT = "AMSAT";
 	private static final String COLON_NL = ":\n";
 	private static final String FOR_THE_NEXT = ", for the next ";
@@ -86,6 +77,10 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 	private static final String CANCEL = "Cancel";
 	private static final String OK = "OK";
 	private static final String FILE = "File ";
+	private static final String ZERO_STRING = "0";
+	private static final String HOME_LON = "homeLon";
+	private static final String HOME_LAT = "homeLat";
+	private static final String KEPS_UPDATED = "Keps updated!";
 	private Context context;
 	// Filenames and URLs
 	private final String elemfile = Environment.getExternalStorageDirectory() + "/nasabare.txt";
@@ -116,11 +111,7 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 	private static final int SWIPE_MINDISTANCE = 120;
 	private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 
-	// static final int TIMEDIALOGID = 0;
-	// static final int DATEDIALOGID = 0;
-
 	private AlertDialog timePickerDialog;
-	private GoogleAnalytics mGaInstance;
 
 	// For SkyView
 	private static SatPassTime selectedPass;
@@ -129,17 +120,13 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 
 	private static PassPredictor passPredictor;
 
-	private static Satellite selectedSatellite = null;
+	private static Satellite selectedSatellite;
 
 	private static String kepsSource;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// Get the GoogleAnalytics singleton. Note that the SDK uses
-		// the application context to avoid leaking the current context.
-		mGaInstance = GoogleAnalytics.getInstance(this);
 
 		gestureScanner = new GestureDetector(this);
 
@@ -155,7 +142,8 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 		// Initialise passes header text view
 		if (passHeader != null) {
 			((TextView)findViewById(R.id.latlon_view)).setText(passHeader);
-		} else {
+		}
+		else {
 			((TextView)findViewById(R.id.latlon_view)).setText("");
 		}
 
@@ -188,11 +176,14 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 				final String selectedTime = (String)((Spinner)findViewById(R.id.TimeSelectorSpinner)).getSelectedItem();
 				if (selectedTime.equals("Next Pass Only")) {
 					new CalcPassTask().execute(0);
-				} else if (selectedTime.equals("6 hours")) {
+				}
+				else if (selectedTime.equals("6 hours")) {
 					new CalcPassTask().execute(6);
-				} else if (selectedTime.equals("12 hours")) {
+				}
+				else if (selectedTime.equals("12 hours")) {
 					new CalcPassTask().execute(12);
-				} else if (selectedTime.equals("24 hours")) {
+				}
+				else if (selectedTime.equals("24 hours")) {
 					new CalcPassTask().execute(24);
 				}
 			}
@@ -275,7 +266,8 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 		if (startTimeCalendar != null) {
 			timeDisplay.setText("Starting: "
 					+ DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(startTimeCalendar.getTime()));
-		} else {
+		}
+		else {
 			timeDisplay.setText("Starting: now");
 		}
 
@@ -324,13 +316,16 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 		try {
 			setObserver();
 			setSatellite();
-		} catch (IllegalArgumentException e1) {
+		}
+		catch (IllegalArgumentException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		} catch (InvalidTleException e1) {
+		}
+		catch (InvalidTleException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		} catch (SatNotFoundException e1) {
+		}
+		catch (SatNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
@@ -343,9 +338,11 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 				final ObjectOutputStream os = new ObjectOutputStream(fos);
 				os.writeObject(passes);
 				os.close();
-			} catch (final FileNotFoundException e) {
+			}
+			catch (final FileNotFoundException e) {
 				e.printStackTrace();
-			} catch (final IOException e) {
+			}
+			catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -375,11 +372,14 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 				bindPassView();
 			}
 			is.close();
-		} catch (final FileNotFoundException e) {
+		}
+		catch (final FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			e.printStackTrace();
-		} catch (final ClassNotFoundException e) {
+		}
+		catch (final ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
@@ -432,7 +432,8 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 		Calendar myCal;
 		if (startTimeCalendar != null) {
 			myCal = startTimeCalendar;
-		} else {
+		}
+		else {
 			// Get current GMT date and time
 			myCal = Calendar.getInstance();
 		}
@@ -449,9 +450,11 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 			HamSatDroid.setPassPredictor(new PassPredictor(myelem, HamSatDroid.getGroundStation()));
 
 			HamSatDroid.setPasses(getPassPredictor().getPasses(myCal.getTime(), hoursAhead, false));
-		} catch (final InvalidTleException e) {
+		}
+		catch (final InvalidTleException e) {
 			passHeader = "ERROR: Bad Keplerian Elements";
-		} catch (final SatNotFoundException e) {
+		}
+		catch (final SatNotFoundException e) {
 			passHeader = "ERROR: Unknown Satellite";
 		}
 
@@ -467,13 +470,15 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 			passHeader = "No passes found for satellite " + myelem.getName() + FOR_HOME_COORDINATES_LAT_LON_GRIDSQUARE
 					+ formatter.format(homeLat) + SLASH + formatter.format(homeLong) + SLASH
 					+ HamSatDroid.decLatLonToGrid(homeLat, homeLong) + " for the next " + calcRange + " hours.\n";
-		} else {
+		}
+		else {
 			if (hoursAhead == 0) {
 				passHeader = PASS_PREDICTIONS_FOR_SATELLITE + myelem.getName() + FOR_HOME_COORDINATES_LAT_LON_GRIDSQUARE
 						+ formatter.format(homeLat) + SLASH + formatter.format(homeLong) + SLASH
 						+ HamSatDroid.decLatLonToGrid(homeLat, homeLong) + FOR_THE_NEXT + "passes only" + ", starting "
 						+ DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(myCal.getTime()) + COLON_NL;
-			} else {
+			}
+			else {
 				passHeader = PASS_PREDICTIONS_FOR_SATELLITE + myelem.getName() + FOR_HOME_COORDINATES_LAT_LON_GRIDSQUARE
 						+ formatter.format(homeLat) + SLASH + formatter.format(homeLong) + SLASH
 						+ HamSatDroid.decLatLonToGrid(homeLat, homeLong) + FOR_THE_NEXT + hoursAhead + " hours, starting "
@@ -502,6 +507,7 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 	/**
 	 * @throws NumberFormatException
 	 */
+	@Override
 	public void setObserver() throws NumberFormatException {
 		final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		final String shomeLat = sharedPref.getString(HOME_LAT, ZERO_STRING);
@@ -521,7 +527,8 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 				Toast.makeText(context, "Please enable " + provider + " location in systems settings screen", Toast.LENGTH_LONG)
 						.show();
 				startActivity(intent);
-			} else {
+			}
+			else {
 				locMgr.requestLocationUpdates(provider, 0, 0, locationListener);
 				trackingLocation = true;
 				locationProgressDialog = new ProgressDialog(context);
@@ -547,7 +554,8 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 			if (location.hasAccuracy()) {
 				dialogString = LOCATION_SET_TO_LAT_LON + Double.toString(location.getLatitude()) + SLASH
 						+ Double.toString(location.getLongitude()) + ", location accuracy " + location.getAccuracy() + " meters";
-			} else {
+			}
+			else {
 				dialogString = LOCATION_SET_TO_LAT_LON + Double.toString(location.getLatitude()) + SLASH
 						+ Double.toString(location.getLongitude()) + ", unknown location accuracy";
 			}
@@ -621,9 +629,11 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 				HamSatDroid.setAllSatElems(elemTmp);
 			}
 			is.close();
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			e.printStackTrace();
-		} catch (final ClassNotFoundException e) {
+		}
+		catch (final ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
@@ -634,9 +644,11 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 			allSatElems = TLE.importSat(new FileInputStream(new File(elemfile)));
 			success = true;
 			bindSatList();
-		} catch (final FileNotFoundException e) {
+		}
+		catch (final FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return success;
@@ -649,12 +661,14 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 			final String kepSource = HamSatDroid.getKepsSource();
 			if (AMSAT.equals(kepSource)) {
 
-				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", "AMSAT", 0L);
+				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", AMSAT, 0L);
 				url = new URL(ELEM_URL_AMSAT);
-			} else if (CELESTRAK.equals(kepSource)) {
-				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", "CELESTRAK", 0L);
+			}
+			else if (CELESTRAK.equals(kepSource)) {
+				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", CELESTRAK, 0L);
 				url = new URL(ELEM_URL_CELESTRAK);
-			} else {
+			}
+			else {
 				throw new IllegalArgumentException("Unknown keplerian source[" + kepSource + "]");
 			}
 
@@ -665,11 +679,14 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 			}
 			allSatElems = tmpSatElems;
 			success = true;
-		} catch (final FileNotFoundException e) {
+		}
+		catch (final FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			e.printStackTrace();
-		} catch (final IllegalArgumentException e) {
+		}
+		catch (final IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 		return success;
@@ -678,9 +695,11 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 	void loadElemFromInternalFile() {
 		try {
 			allSatElems = TLE.importSat(getResources().openRawResource(R.raw.nasabare));
-		} catch (final FileNotFoundException e) {
+		}
+		catch (final FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -693,9 +712,11 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 				final ObjectOutputStream os = new ObjectOutputStream(fos);
 				os.writeObject(allSatElems);
 				os.close();
-			} catch (final FileNotFoundException e) {
+			}
+			catch (final FileNotFoundException e) {
 				e.printStackTrace();
-			} catch (final IOException e) {
+			}
+			catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -726,7 +747,8 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 				saveElemToFile();
 				bindSatList();
 				Toast.makeText(context, KEPS_UPDATED, Toast.LENGTH_LONG).show();
-			} else {
+			}
+			else {
 				new AlertDialog.Builder(context).setMessage("Could not download file from network. Kept existing element data.")
 						.setPositiveButton(OK, null).show();
 			}
@@ -774,7 +796,8 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 			if (loadElemFromFile()) {
 				saveElemToFile();
 				Toast.makeText(context, KEPS_UPDATED, Toast.LENGTH_LONG).show();
-			} else {
+			}
+			else {
 				new AlertDialog.Builder(context).setMessage(FILE + elemfile + " could not be found. Kept existing element data.")
 						.setPositiveButton(OK, null).show();
 			}
@@ -804,7 +827,8 @@ public class HamSatDroid extends Activity implements HSDConstants, OnGestureList
 						.setMessage(
 								"Version " + this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName
 										+ "\n\n" + getString(R.string.AboutString)).setPositiveButton("Dismiss", null).show();
-			} catch (final NameNotFoundException e) {
+			}
+			catch (final NameNotFoundException e) {
 				e.printStackTrace();
 			}
 			return true;

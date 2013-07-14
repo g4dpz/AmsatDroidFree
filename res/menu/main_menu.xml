@@ -45,7 +45,7 @@
 	</item>
 	<item 
 		android:id="@+id/LAUNCH_GROUND_VIEW" 
-		android:title="Map View">
+		android:title="@string/MapView">
 	</item>
 	<item 
 		android:visible="true" 

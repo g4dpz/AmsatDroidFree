@@ -40,6 +40,7 @@ package uk.me.g4dpz.satellite;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class SatPassTime implements Serializable {
 
@@ -56,8 +57,8 @@ public class SatPassTime implements Serializable {
 	private static final String NEW_LINE = "\n";
 	private static final String DEG_NL = "\u00B0\n";
 
-	private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMMMMM d, yyyy");
+	private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMMMMM d, yyyy", Locale.ENGLISH);
 
 	public SatPassTime(final Date startTime, final Date endTime, final String polePassed, final int aos, final int los,
 			final double maxEl) {
