@@ -15,8 +15,9 @@
     <string name="GetGPSLocation">From GPS</string>
     <string name="EnterLocation">Enter Coordinates</string>
     <string name="GettingLocation">Getting Location&#8230;</string>
-    <string name="MapView">MapView</string>
+    <string name="MapView">Map View</string>
     <string name="SatelliteName">Satellite Name</string>
+    <string name="Satellite">Satellite</string>
     <string name="SatelliteLatitudeLongitude">Satellite Latitude/Longitude</string>
     <string name="ObserverLatitudeLongitude">Observer Latitude/Longitude</string>
     <string name="AboutString">
