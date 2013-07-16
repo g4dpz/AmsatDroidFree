@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dip"
                 android:gravity="center_vertical|center_horizontal"
-                android:text="Calculate passes for the next" />
+                android:text="@string/CalculatePassesForTheNext" />
 
             <Spinner
                 android:id="@+id/TimeSelectorSpinner"
@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dip"
         android:gravity="center_vertical|center_horizontal"
-        android:text="Start Time" />
+        android:text="@string/StartTime" />
 
     <LinearLayout
         android:id="@+id/LinearLayout13"

@@ -17,9 +17,13 @@
     <string name="GettingLocation">Getting Location&#8230;</string>
     <string name="MapView">Map View</string>
     <string name="SatelliteName">Satellite Name</string>
+    <string name="SatelliteLocation">Satellite Location</string>
     <string name="Satellite">Satellite</string>
+    <string name="PassInformation">Pass Information</string>
     <string name="SatelliteLatitudeLongitude">Satellite Latitude/Longitude</string>
     <string name="ObserverLatitudeLongitude">Observer Latitude/Longitude</string>
+    <string name="CalculatePassesForTheNext">Calculate passes for the next</string>
+    <string name="StartTime">Start Time</string>
     <string name="AboutString">
 	AmsatDroid: Amateur Radio Satellite Pass Calculator \n
 	 \n
