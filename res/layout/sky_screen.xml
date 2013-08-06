@@ -10,7 +10,7 @@
 				android:layout_height="wrap_content"
 				android:layout_gravity="center_vertical|center_horizontal">
 				<TextView 
-					android:text="Satellite Name" 
+					android:text="@string/SatelliteName" 
 					android:id="@+id/SKY_VIEW_SATELLITE_NAME" 
 					android:layout_width="fill_parent" 
 					android:layout_height="wrap_content" 
@@ -25,7 +25,7 @@
 					android:layout_below="@+id/SKY_VIEW_SATELLITE_NAME"> 
 				</TextView>
 				<TextView 
-					android:text="Pass Information" 
+					android:text="@string/PassInformation" 
 					android:id="@+id/SKY_VIEW_PASS_DETAILS" 
 					android:layout_width="wrap_content" 
 					android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
 					android:layout_below="@+id/SKY_VIEW_HOME_LOCATION">
 				</TextView>
 				<TextView 
-					android:text="Satellite Location" 
+					android:text="@string/SatelliteLocation" 
 					android:id="@+id/SKY_VIEW_SAT_DETAILS" 
 					android:layout_width="wrap_content" 
 					android:layout_height="wrap_content"
@@ -44,7 +44,6 @@
 		<FrameLayout 
 			android:id="@+id/SKY_VIEW_FRAME" 
 			android:layout_width="fill_parent" 
-			android:layout_height="fill_parent"
-			android:layout_below="@+id/SKY_VIEW_SAT_DETAILS"> 
+			android:layout_height="fill_parent"> 
 		</FrameLayout>
 </LinearLayout>

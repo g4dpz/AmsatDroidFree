@@ -21,10 +21,12 @@ import android.graphics.Path;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -147,8 +149,11 @@ public class GroundView extends ASDActivity implements OnGestureListener {
 		private final Paint trackLinePaint;
 		private final Paint writingPaint;
 		private final Paint footprintLinePaint;
-		private int height;
-		private int width;
+		private final int displayHeight;
+		private final int displayWidth;
+		private final Display display;
+		private int mapWidth;
+		private int mapHeight;
 
 		public MapView(final Context context) {
 			super(context);
@@ -167,47 +172,37 @@ public class GroundView extends ASDActivity implements OnGestureListener {
 			footprintLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 			footprintLinePaint.setColor(Color.RED);
 			footprintLinePaint.setStyle(Paint.Style.STROKE);
-		}
 
-		@Override
-		protected void onFinishInflate() {
-			super.onFinishInflate();
+			display = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
-			height = this.getHeight();
-			width = this.getWidth();
-		}
+			displayHeight = display.getHeight();
+			displayWidth = display.getWidth();
 
-		@Override
-		protected void onDraw(final Canvas canvas) {
-
-			// Load and draw map
-			int mapWidth = mapBitmap.getWidth();
-			final int canvasWidth = canvas.getWidth();
-			int mapHeight = mapBitmap.getHeight();
-			final int canvasHeight = canvas.getHeight();
+			mapWidth = mapBitmap.getWidth();
+			mapHeight = mapBitmap.getHeight();
 			double scale = 1.0;
 
 			// we process differently if it's portrait or landscape
-			if (canvasHeight > canvasWidth) {
-				if (mapWidth > canvasWidth) {
-					scale = (double)canvasWidth / (double)mapWidth;
+			if (displayHeight > displayWidth) {
+				if (mapWidth > displayWidth) {
+					scale = (double)displayWidth / (double)mapWidth;
 					mapWidth *= scale;
 					mapHeight *= scale;
 				}
-				if (mapHeight > canvasHeight) {
-					scale = scale * ((double)canvasHeight / (double)mapHeight);
+				if (mapHeight > displayHeight) {
+					scale = scale * ((double)displayHeight / (double)mapHeight);
 					mapWidth *= scale;
 					mapHeight *= scale;
 				}
 			}
 			else {
-				if (mapHeight > canvasHeight) {
-					scale = scale * ((double)canvasHeight / (double)mapHeight);
+				if (mapHeight > displayHeight) {
+					scale = scale * ((double)displayHeight / (double)mapHeight);
 					mapWidth *= scale;
 					mapHeight *= scale;
 				}
-				if (mapWidth > canvasWidth) {
-					scale = (double)canvasWidth / (double)mapWidth;
+				if (mapWidth > displayWidth) {
+					scale = (double)displayWidth / (double)mapWidth;
 					mapWidth *= scale;
 					mapHeight *= scale;
 				}
@@ -215,18 +210,34 @@ public class GroundView extends ASDActivity implements OnGestureListener {
 
 			mapWidth = (int)Math.round(Math.floor(mapWidth));
 			mapHeight = (int)Math.round(Math.floor(mapHeight));
+
 			scaledMap = Bitmap.createScaledBitmap(mapBitmap, mapWidth, mapHeight, false);
-			canvas.drawBitmap(scaledMap, getLeft(), getTop(), null);
 
 			homePic = Bitmap.createScaledBitmap(obsBitmap, (int)Math.round(Math.floor(obsBitmap.getWidth() * scale)),
 					(int)Math.round(Math.floor(obsBitmap.getHeight() * scale)), false);
-			final int homeTop = (int)Math.round((90.0 - getHomeLat()) * (mapHeight / 180.0) - homePic.getHeight() / 2.0);
-			final int homeLeft = (int)Math.round((getHomeLon() + 180.0) * (mapWidth / 360.0) - homePic.getWidth() / 2.0);
-			canvas.drawBitmap(homePic, homeLeft + getLeft(), homeTop + getTop(), null);
 
 			passLinePaint.setStrokeWidth((float)(2 * scale));
 			trackLinePaint.setStrokeWidth((float)(2 * scale));
 			footprintLinePaint.setStrokeWidth((float)(2 * scale));
+
+			satPic = Bitmap.createScaledBitmap(satBitmap, (int)Math.round(Math.floor(satBitmap.getWidth() * scale)),
+					(int)Math.round(Math.floor(satBitmap.getHeight() * scale)), false);
+
+			writingPaint.setTextSize((float)(18 * scale));
+			final Typeface mType = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL);
+			writingPaint.setTypeface(mType);
+			writingPaint.setTextAlign(Paint.Align.CENTER);
+			writingPaint.setColor(Color.BLACK);
+
+		}
+
+		@Override
+		protected void onDraw(final Canvas canvas) {
+			canvas.drawBitmap(scaledMap, getLeft(), getTop(), null);
+
+			final int homeTop = (int)Math.round((90.0 - getHomeLat()) * (mapHeight / 180.0) - homePic.getHeight() / 2.0);
+			final int homeLeft = (int)Math.round((getHomeLon() + 180.0) * (mapWidth / 360.0) - homePic.getWidth() / 2.0);
+			canvas.drawBitmap(homePic, homeLeft + getLeft(), homeTop + getTop(), null);
 
 			try {
 
@@ -237,17 +248,13 @@ public class GroundView extends ASDActivity implements OnGestureListener {
 				// calculate the positions for the current orbit
 				List<SatPos> positions = HamSatDroid.getPassPredictor().getPositions(timeNow, 30, 0, orbitMinutes);
 
-				drawTrack(canvas, mapWidth, mapHeight, trackLinePaint, positions);
+				drawTrack(canvas, positions);
 
 				final Date endOfOrbit = new Date(timeNow.getTime() + orbitMinutes * 60 * 1000);
 
 				positions = HamSatDroid.getPassPredictor().getPositions(endOfOrbit, 30, 0, orbitMinutes * 2);
 
-				drawTrack(canvas, mapWidth, mapHeight, passLinePaint, positions);
-
-				// Load satellite pic
-				satPic = Bitmap.createScaledBitmap(satBitmap, (int)Math.round(Math.floor(satBitmap.getWidth() * scale)),
-						(int)Math.round(Math.floor(satBitmap.getHeight() * scale)), false);
+				drawTrack(canvas, positions);
 
 				// Get current GMT date and time and calc satellite position
 				final SatPos pos = HamSatDroid.getSelectedSatellite().getPosition(HamSatDroid.getGroundStation(),
@@ -271,12 +278,6 @@ public class GroundView extends ASDActivity implements OnGestureListener {
 						- satPic.getHeight() / 2.0);
 				final int satLeft = (int)Math.round(longitude * (mapWidth / 360.0) - satPic.getWidth() / 2.0);
 				canvas.drawBitmap(satPic, satLeft + getLeft(), satTop + getTop(), null);
-
-				writingPaint.setTextSize((float)(18 * scale));
-				final Typeface mType = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL);
-				writingPaint.setTypeface(mType);
-				writingPaint.setTextAlign(Paint.Align.CENTER);
-				writingPaint.setColor(Color.BLACK);
 
 			}
 			catch (final InvalidTleException e) {
@@ -322,8 +323,8 @@ public class GroundView extends ASDActivity implements OnGestureListener {
 			canvas.drawPath(trackPath, footprintLinePaint);
 		}
 
-		private void drawTrack(final Canvas canvas, final int mapWidth, final int mapHeight, final Paint trackLinePaint,
-				final List<SatPos> positions) throws InvalidTleException, SatNotFoundException {
+		private void drawTrack(final Canvas canvas, final List<SatPos> positions) throws InvalidTleException,
+				SatNotFoundException {
 
 			final Path trackPath = new Path();
 
