@@ -64,8 +64,10 @@ import com.google.analytics.tracking.android.EasyTracker;
 
 public class HamSatDroid extends ASDActivity implements OnGestureListener {
 
-	private static final String CELESTRAK = "CELESTRAK";
-	private static final String AMSAT = "AMSAT";
+	private static final String WEATHER_CELESTRAK = "WEATHER_CELESTRAK";
+	private static final String CUBESAT_CELESTRAK = "CUBESAT_CELESTRAK";
+	private static final String AMATEUR_CELESTRAK = "AMATEUR_CELESTRAK";
+	private static final String AMATEUR_AMSAT = "AMATEUR_AMSAT";
 	private static final String COLON_NL = ":\n";
 	private static final String FOR_THE_NEXT = ", for the next ";
 	private static final String PASS_PREDICTIONS_FOR_SATELLITE = "Pass predictions for satellite ";
@@ -86,8 +88,10 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 	private final String elemfile = Environment.getExternalStorageDirectory() + "/nasabare.txt";
 	private static final String BIN_PASS_FILENAME = "prefs.bin";
 	private static final String BIN_ELEM_FILENAME = "elems.bin";
-	private static final String ELEM_URL_AMSAT = "http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt";
-	private static final String ELEM_URL_CELESTRAK = "http://celestrak.com/NORAD/elements/amateur.txt";
+	private static final String ELEM_URL_AMATEUR_AMSAT = "http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt";
+	private static final String ELEM_URL_AMATEUR_CELESTRAK = "http://celestrak.com/NORAD/elements/amateur.txt";
+	private static final String ELEM_URL_WEATHER_CELESTRAK = "http://celestrak.com/NORAD/elements/noaa.txt";
+	private static final String ELEM_URL_CUBESAT_CELESTRAK = "http://celestrak.com/NORAD/elements/cubesat.txt";
 	// Various
 	private static List<TLE> allSatElems;
 	private int defaultSatIndex;
@@ -421,6 +425,8 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 
 	private void recalcPass(final int hoursAhead) {
 
+		EasyTracker.getInstance().setContext(this);
+
 		EasyTracker.getTracker().constructEvent("AmsatDroid", "recalcPass", "", (long)hoursAhead);
 
 		// How long to go back/forward in time to find a passes (in hours)
@@ -449,7 +455,7 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 
 			HamSatDroid.setPassPredictor(new PassPredictor(myelem, HamSatDroid.getGroundStation()));
 
-			HamSatDroid.setPasses(getPassPredictor().getPasses(myCal.getTime(), hoursAhead, false));
+			HamSatDroid.setPasses(getPassPredictor().getPasses(myCal.getTime(), hoursAhead, true));
 		}
 		catch (final InvalidTleException e) {
 			passHeader = "ERROR: Bad Keplerian Elements";
@@ -657,16 +663,25 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 	boolean loadElemFromNetwork() {
 		boolean success = false;
 		URL url;
+		EasyTracker.getInstance().setContext(this);
 		try {
 			final String kepSource = HamSatDroid.getKepsSource();
-			if (AMSAT.equals(kepSource)) {
+			if (AMATEUR_AMSAT.equals(kepSource)) {
 
-				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", AMSAT, 0L);
-				url = new URL(ELEM_URL_AMSAT);
+				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", AMATEUR_AMSAT, 0L);
+				url = new URL(ELEM_URL_AMATEUR_AMSAT);
 			}
-			else if (CELESTRAK.equals(kepSource)) {
-				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", CELESTRAK, 0L);
-				url = new URL(ELEM_URL_CELESTRAK);
+			else if (AMATEUR_CELESTRAK.equals(kepSource)) {
+				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", AMATEUR_CELESTRAK, 0L);
+				url = new URL(ELEM_URL_AMATEUR_CELESTRAK);
+			}
+			else if (WEATHER_CELESTRAK.equals(kepSource)) {
+				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", WEATHER_CELESTRAK, 0L);
+				url = new URL(ELEM_URL_WEATHER_CELESTRAK);
+			}
+			else if (CUBESAT_CELESTRAK.equals(kepSource)) {
+				EasyTracker.getTracker().constructEvent("AmsatDroid", "loadKeps", CUBESAT_CELESTRAK, 0L);
+				url = new URL(ELEM_URL_CUBESAT_CELESTRAK);
 			}
 			else {
 				throw new IllegalArgumentException("Unknown keplerian source[" + kepSource + "]");
@@ -802,13 +817,23 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 						.setPositiveButton(OK, null).show();
 			}
 			return true;
-		case R.id.MENU_DOWNLOAD_ELEM_AMSAT:
-			setKepsSource(AMSAT);
+		case R.id.MENU_DOWNLOAD_AMATEUR_AMSAT:
+			setKepsSource(AMATEUR_AMSAT);
 			updateKepsTask = new LoadElemNetTask();
 			updateKepsTask.execute(0);
 			return true;
-		case R.id.MENU_DOWNLOAD_ELEM_CELESTRAK:
-			setKepsSource(CELESTRAK);
+		case R.id.MENU_DOWNLOAD_AMATEUR_CELESTRAK:
+			setKepsSource(AMATEUR_CELESTRAK);
+			updateKepsTask = new LoadElemNetTask();
+			updateKepsTask.execute(0);
+			return true;
+		case R.id.MENU_DOWNLOAD_WEATHER_CELESTRAK:
+			setKepsSource(WEATHER_CELESTRAK);
+			updateKepsTask = new LoadElemNetTask();
+			updateKepsTask.execute(0);
+			return true;
+		case R.id.MENU_DOWNLOAD_CUBESAT_CELESTRAK:
+			setKepsSource(CUBESAT_CELESTRAK);
 			updateKepsTask = new LoadElemNetTask();
 			updateKepsTask.execute(0);
 			return true;

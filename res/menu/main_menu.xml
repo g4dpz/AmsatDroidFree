@@ -32,14 +32,26 @@
 			<item 
 				android:visible="true" 
 				android:enabled="true" 
-				android:id="@+id/MENU_DOWNLOAD_ELEM_AMSAT" 
-				android:title="@string/DownloadAmsatElem">
+				android:id="@+id/MENU_DOWNLOAD_AMATEUR_AMSAT" 
+				android:title="@string/DownloadAmateurAmsatElem">
 			</item>
 			<item 
 				android:visible="true" 
 				android:enabled="true" 
-				android:id="@+id/MENU_DOWNLOAD_ELEM_CELESTRAK" 
-				android:title="@string/DownloadCelestrakElem">
+				android:id="@+id/MENU_DOWNLOAD_AMATEUR_CELESTRAK" 
+				android:title="@string/DownloadAmateurCelestrakElem">
+			</item>
+			<item 
+				android:visible="true" 
+				android:enabled="true" 
+				android:id="@+id/MENU_DOWNLOAD_CUBESAT_CELESTRAK" 
+				android:title="@string/DownloadCubesatCelestrakElem">
+			</item>
+			<item 
+				android:visible="true" 
+				android:enabled="true" 
+				android:id="@+id/MENU_DOWNLOAD_WEATHER_CELESTRAK" 
+				android:title="@string/DownloadWeatherCelestrakElem">
 			</item>
 		</menu>
 	</item>
