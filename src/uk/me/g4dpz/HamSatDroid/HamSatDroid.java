@@ -64,6 +64,14 @@ import com.google.analytics.tracking.android.EasyTracker;
 
 public class HamSatDroid extends ASDActivity implements OnGestureListener {
 
+	/**
+	 * 
+	 */
+	private static final String PERIOD = ".";
+	/**
+	 * 
+	 */
+	private static final String COMMA = ",";
 	private static final String WEATHER_CELESTRAK = "WEATHER_CELESTRAK";
 	private static final String CUBESAT_CELESTRAK = "CUBESAT_CELESTRAK";
 	private static final String AMATEUR_CELESTRAK = "AMATEUR_CELESTRAK";
@@ -516,8 +524,10 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 	@Override
 	public void setObserver() throws NumberFormatException {
 		final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		final String shomeLat = sharedPref.getString(HOME_LAT, ZERO_STRING);
-		final String shomeLon = sharedPref.getString(HOME_LON, ZERO_STRING);
+		String shomeLat = sharedPref.getString(HOME_LAT, ZERO_STRING);
+		shomeLat = shomeLat.replace(COMMA, PERIOD);
+		String shomeLon = sharedPref.getString(HOME_LON, ZERO_STRING);
+		shomeLon = shomeLon.replace(COMMA, PERIOD);
 		HamSatDroid.setGroundStation(new GroundStationPosition(Double.valueOf(shomeLat), Double.valueOf(shomeLon), 0));
 	}
 

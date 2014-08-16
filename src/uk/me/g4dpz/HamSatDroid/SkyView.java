@@ -43,12 +43,22 @@ public class SkyView extends ASDActivity implements SensorEventListener, OnGestu
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.sky_screen);
+
+		// Set header and details
+		((TextView)findViewById(R.id.SKY_VIEW_SATELLITE_NAME)).setText(HamSatDroid.getSelectedSatellite().getTLE().getName());
+		final NumberFormat numberFormatter = NumberFormat.getNumberInstance();
+		numberFormatter.setMaximumFractionDigits(4);
+		((TextView)findViewById(R.id.SKY_VIEW_HOME_LOCATION)).setText("Home Lat/Lon: " + numberFormatter.format(getHomeLat())
+				+ DEG_UTF8 + "/" + numberFormatter.format(getHomeLon()) + DEG_UTF8 + "\nHome Gridsquare: "
+				+ HamSatDroid.decLatLonToGrid(getHomeLat(), getHomeLon()));
+		((TextView)findViewById(R.id.SKY_VIEW_PASS_DETAILS)).setText("Pass Information \n"
+				+ HamSatDroid.getSelectedPass().toString());
 
 		gestureScanner = new GestureDetector(this);
 
 		sView = new TrackView(this);
 		sView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		setContentView(R.layout.sky_screen);
 		((FrameLayout)findViewById(R.id.SKY_VIEW_FRAME)).addView(sView);
 
 		// check if we have a groundstation, if not create one
@@ -67,16 +77,6 @@ public class SkyView extends ASDActivity implements SensorEventListener, OnGestu
 			handler.removeCallbacks(timerRunnable);
 			handler.postDelayed(timerRunnable, 100);
 		}
-
-		// Set header and details
-		((TextView)findViewById(R.id.SKY_VIEW_SATELLITE_NAME)).setText(HamSatDroid.getSelectedSatellite().getTLE().getName());
-		final NumberFormat numberFormatter = NumberFormat.getNumberInstance();
-		numberFormatter.setMaximumFractionDigits(4);
-		((TextView)findViewById(R.id.SKY_VIEW_HOME_LOCATION)).setText("Home Lat/Lon: " + numberFormatter.format(getHomeLat())
-				+ DEG_UTF8 + "/" + numberFormatter.format(getHomeLon()) + DEG_UTF8 + "\nHome Gridsquare: "
-				+ HamSatDroid.decLatLonToGrid(getHomeLat(), getHomeLon()));
-		((TextView)findViewById(R.id.SKY_VIEW_PASS_DETAILS)).setText("Pass Information \n"
-				+ HamSatDroid.getSelectedPass().toString());
 
 	}
 
@@ -103,17 +103,21 @@ public class SkyView extends ASDActivity implements SensorEventListener, OnGestu
 
 			if (View.MeasureSpec.getMode(widthMeasureSpec) == View.MeasureSpec.AT_MOST) {
 				skyWidth = View.MeasureSpec.getSize(widthMeasureSpec);
-			} else if (View.MeasureSpec.getMode(widthMeasureSpec) == View.MeasureSpec.EXACTLY) {
+			}
+			else if (View.MeasureSpec.getMode(widthMeasureSpec) == View.MeasureSpec.EXACTLY) {
 				skyWidth = View.MeasureSpec.getSize(widthMeasureSpec);
-			} else if (View.MeasureSpec.getMode(widthMeasureSpec) == View.MeasureSpec.UNSPECIFIED) {
+			}
+			else if (View.MeasureSpec.getMode(widthMeasureSpec) == View.MeasureSpec.UNSPECIFIED) {
 				skyWidth = 320;
 			}
 
 			if (View.MeasureSpec.getMode(heightMeasureSpec) == View.MeasureSpec.AT_MOST) {
 				skyHeight = View.MeasureSpec.getSize(heightMeasureSpec);
-			} else if (View.MeasureSpec.getMode(heightMeasureSpec) == View.MeasureSpec.EXACTLY) {
+			}
+			else if (View.MeasureSpec.getMode(heightMeasureSpec) == View.MeasureSpec.EXACTLY) {
 				skyHeight = View.MeasureSpec.getSize(heightMeasureSpec);
-			} else if (View.MeasureSpec.getMode(heightMeasureSpec) == View.MeasureSpec.UNSPECIFIED) {
+			}
+			else if (View.MeasureSpec.getMode(heightMeasureSpec) == View.MeasureSpec.UNSPECIFIED) {
 				skyHeight = 320;
 			}
 
@@ -131,7 +135,8 @@ public class SkyView extends ASDActivity implements SensorEventListener, OnGestu
 			float radius = 0;
 			if (skyWidth < skyHeight) {
 				radius = skyWidth * 0.35f;
-			} else {
+			}
+			else {
 				radius = skyHeight * 0.35f;
 			}
 
@@ -188,7 +193,8 @@ public class SkyView extends ASDActivity implements SensorEventListener, OnGestu
 				if (t.compareTo(HamSatDroid.getSelectedPass().getStartTime()) == 0) {
 					canvas.drawText("AOS", pathX, pathY, writingPaint);
 					satPath.moveTo(pathX, pathY);
-				} else {
+				}
+				else {
 					satPath.lineTo(pathX, pathY);
 				}
 				t.setTime(t.getTime() + 5000);

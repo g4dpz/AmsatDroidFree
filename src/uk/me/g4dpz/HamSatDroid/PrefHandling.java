@@ -194,8 +194,8 @@ public class PrefHandling extends PreferenceActivity {
 
 	private static boolean validateLocator(final String locatorString) {
 
-		Pattern p = Pattern.compile("[a-rA-R]{2}[0-9]{2}[a-xA-X]{2}");
-		Matcher m = p.matcher(locatorString);
+		final Pattern p = Pattern.compile("[a-rA-R]{2}[0-9]{2}[a-xA-X]{2}");
+		final Matcher m = p.matcher(locatorString);
 
 		return m.find();
 	}

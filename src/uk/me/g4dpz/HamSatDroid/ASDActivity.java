@@ -17,6 +17,8 @@ abstract class ASDActivity extends Activity {
 	private static final String ZERO_STRING = "0";
 	private static final String HOME_LON = "homeLon";
 	private static final String HOME_LAT = "homeLat";
+	private static final CharSequence COMMA = ",";
+	private static final CharSequence PERIOD = ".";
 
 	private double homeLat = 43;
 	private double homeLon = -79;
@@ -42,8 +44,10 @@ abstract class ASDActivity extends Activity {
 	 */
 	protected void setObserver() throws NumberFormatException {
 		final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		final String shomeLat = sharedPref.getString(HOME_LAT, ZERO_STRING);
-		final String shomeLon = sharedPref.getString(HOME_LON, ZERO_STRING);
+		String shomeLat = sharedPref.getString(HOME_LAT, ZERO_STRING);
+		shomeLat = shomeLat.replace(COMMA, PERIOD);
+		String shomeLon = sharedPref.getString(HOME_LON, ZERO_STRING);
+		shomeLon = shomeLon.replace(COMMA, PERIOD);
 		HamSatDroid.setGroundStation(new GroundStationPosition(Double.valueOf(shomeLat), Double.valueOf(shomeLon), 0));
 	}
 
