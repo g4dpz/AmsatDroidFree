@@ -25,11 +25,12 @@
 
             <Spinner
                 android:id="@+id/SatelliteSelectorSpinner"
-                android:layout_width="130dp"
+                android:layout_width="190dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|left"
                 android:prompt="@string/SatellitePrompt" 
-                android:dropDownWidth="wrap_content">
+                android:dropDownWidth="wrap_content"
+                android:minWidth="200dp">
             </Spinner>
         </LinearLayout>
 

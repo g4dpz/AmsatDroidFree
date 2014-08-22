@@ -45,6 +45,10 @@ public class SkyView extends ASDActivity implements SensorEventListener, OnGestu
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.sky_screen);
 
+		// Get home lat/lon
+		setHomeLat(HamSatDroid.getGroundStation().getLatitude());
+		setHomeLon(HamSatDroid.getGroundStation().getLongitude());
+
 		// Set header and details
 		((TextView)findViewById(R.id.SKY_VIEW_SATELLITE_NAME)).setText(HamSatDroid.getSelectedSatellite().getTLE().getName());
 		final NumberFormat numberFormatter = NumberFormat.getNumberInstance();
@@ -65,10 +69,6 @@ public class SkyView extends ASDActivity implements SensorEventListener, OnGestu
 		if (HamSatDroid.getGroundStation() == null) {
 			setObserver();
 		}
-
-		// Get home lat/lon
-		setHomeLat(HamSatDroid.getGroundStation().getLatitude());
-		setHomeLon(HamSatDroid.getGroundStation().getLongitude());
 
 		// Set UI refresh timer
 		if (startTime == 0) {
