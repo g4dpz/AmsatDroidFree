@@ -53,6 +53,18 @@
 				android:id="@+id/MENU_DOWNLOAD_WEATHER_CELESTRAK" 
 				android:title="@string/DownloadWeatherCelestrakElem">
 			</item>
+			<item 
+				android:visible="true" 
+				android:enabled="true" 
+				android:id="@+id/MENU_DOWNLOAD_RESOURCES_CELESTRAK" 
+				android:title="@string/DownloadResourcesCelestrakElem">
+			</item>
+			<item 
+				android:visible="true" 
+				android:enabled="true" 
+				android:id="@+id/MENU_DOWNLOAD_NEW_CELESTRAK" 
+				android:title="@string/DownloadNewCelestrakElem">
+			</item>
 		</menu>
 	</item>
 	<item 

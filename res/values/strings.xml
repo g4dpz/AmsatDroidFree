@@ -12,6 +12,9 @@
     <string name="DownloadAmateurCelestrakElem">Amateur (celestrak.com)</string>
     <string name="DownloadCubesatCelestrakElem">Cubesat (celestrak.com)</string>
     <string name="DownloadWeatherCelestrakElem">Weather (celestrak.com)</string>
+    <string name="DownloadResourcesCelestrakElem">Resources (celestrak.com)</string>
+    <string name="DownloadNewCelestrakElem">New launches (celestrak.com)</string>
+    
     <string name="TimeSelectorPrompt">Select Time Period</string>
     <string name="GetNetworkLocation">From Network</string>
     <string name="GetGPSLocation">From GPS</string>
