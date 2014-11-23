@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import uk.me.g4dpz.HamSatDroid.utils.IaruLocator;
 import uk.me.g4dpz.satellite.GroundStationPosition;
 import uk.me.g4dpz.satellite.InvalidTleException;
 import uk.me.g4dpz.satellite.PassPredictor;
@@ -484,22 +485,24 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 		final double homeLat = HamSatDroid.getGroundStation().getLatitude();
 		final double homeLong = HamSatDroid.getGroundStation().getLongitude();
 
+		final IaruLocator locator = new IaruLocator(homeLat, homeLong);
+
 		if (passes.get(0).getMaxEl() == 0) {
 			passHeader = "No passes found for satellite " + myelem.getName() + FOR_HOME_COORDINATES_LAT_LON_GRIDSQUARE
-					+ formatter.format(homeLat) + SLASH + formatter.format(homeLong) + SLASH
-					+ HamSatDroid.decLatLonToGrid(homeLat, homeLong) + " for the next " + calcRange + " hours.\n";
+					+ formatter.format(homeLat) + SLASH + formatter.format(homeLong) + SLASH + locator.toMaidenhead()
+					+ " for the next " + calcRange + " hours.\n";
 		}
 		else {
 			if (hoursAhead == 0) {
 				passHeader = PASS_PREDICTIONS_FOR_SATELLITE + myelem.getName() + FOR_HOME_COORDINATES_LAT_LON_GRIDSQUARE
-						+ formatter.format(homeLat) + SLASH + formatter.format(homeLong) + SLASH
-						+ HamSatDroid.decLatLonToGrid(homeLat, homeLong) + FOR_THE_NEXT + "passes only" + ", starting "
+						+ formatter.format(homeLat) + SLASH + formatter.format(homeLong) + SLASH + locator.toMaidenhead()
+						+ FOR_THE_NEXT + "passes only" + ", starting "
 						+ DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(myCal.getTime()) + COLON_NL;
 			}
 			else {
 				passHeader = PASS_PREDICTIONS_FOR_SATELLITE + myelem.getName() + FOR_HOME_COORDINATES_LAT_LON_GRIDSQUARE
-						+ formatter.format(homeLat) + SLASH + formatter.format(homeLong) + SLASH
-						+ HamSatDroid.decLatLonToGrid(homeLat, homeLong) + FOR_THE_NEXT + hoursAhead + " hours, starting "
+						+ formatter.format(homeLat) + SLASH + formatter.format(homeLong) + SLASH + locator.toMaidenhead()
+						+ FOR_THE_NEXT + hoursAhead + " hours, starting "
 						+ DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(myCal.getTime()) + COLON_NL;
 			}
 		}
@@ -562,7 +565,7 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 
 	private class UserLocationListener implements LocationListener {
 
-		private static final String LOCATION_SET_TO_LAT_LON = "Location set to lat/lon ";
+		private static final String LOCATION_SET_TO_LAT_LON = "IaruLocator set to lat/lon ";
 
 		@Override
 		public void onLocationChanged(final Location location) {
@@ -966,36 +969,6 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 	 */
 	public static final void setSelectedPass(final SatPassTime selectedPass) {
 		HamSatDroid.selectedPass = selectedPass;
-	}
-
-	public static String decLatLonToGrid(final double latDec, final double lonDec) {
-
-		double e = lonDec;
-		double n = latDec;
-
-		int t1;
-		e = e + 180.0;
-		t1 = (int)(e / 20);
-		final String g1 = Character.toString(Character.toChars(t1 + 65)[0]);
-		e -= t1 * 20.0;
-		t1 = (int)e / 2;
-		final String g3 = Integer.toString(t1);
-		e -= t1 * 2.0;
-		final String g5 = Character.toString(Character.toChars(((int)(e * 12.0)) + 97)[0]);
-
-		n = n + 90.0;
-		t1 = (int)(n / 10.0);
-		final String g2 = Character.toString(Character.toChars(t1 + 65)[0]);
-		n -= t1 * 10.0;
-		final String g4 = Integer.toString((int)n);
-		n -= (int)n;
-		n *= 24.0;
-		final String g6 = Character.toString(Character.toChars(((int)(n)) + 97)[0]);
-
-		final String retstring = g1 + g2 + g3 + g4 + g5 + g6;
-
-		return retstring;
-
 	}
 
 	/**

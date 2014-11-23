@@ -1,9 +1,9 @@
 package uk.me.g4dpz.HamSatDroid;
 
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import uk.me.g4dpz.HamSatDroid.utils.IaruLocator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -77,7 +77,7 @@ public class PrefHandling extends PreferenceActivity {
 		/**
 		 * 
 		 */
-		private static final String FORMAT_9_4F = "%9.4f";
+		private static final String FORMAT_10_5F = "%10.5f";
 
 		@Override
 		public boolean onPreferenceChange(final Preference changedPref, final Object newValue) {
@@ -114,62 +114,32 @@ public class PrefHandling extends PreferenceActivity {
 			else {
 				if (changedPref.getKey().equals(HOME_LAT)) {
 					final String longitude = changedPref.getSharedPreferences().getString(HOME_LON, ZERO_STRING);
-					final String grid = HamSatDroid.decLatLonToGrid(Double.parseDouble(newString), Double.parseDouble(longitude));
+					final IaruLocator locator = new IaruLocator(Double.parseDouble(newString), Double.parseDouble(longitude));
+					String grid = locator.toMaidenhead();
 					changedPref.getEditor().putString(HOME_LOCATOR, grid).commit();
 					locatorPref.setText(grid);
 				}
 				else if (changedPref.getKey().equals(HOME_LON)) {
 					final String latitude = changedPref.getSharedPreferences().getString(HOME_LAT, ZERO_STRING);
-					final String grid = HamSatDroid.decLatLonToGrid(Double.parseDouble(latitude), Double.parseDouble(newString));
+					final IaruLocator locator = new IaruLocator(Double.parseDouble(latitude), Double.parseDouble(newString));
+					String grid = locator.toMaidenhead();
 					changedPref.getEditor().putString(HOME_LOCATOR, grid).commit();
 					locatorPref.setText(grid);
 				}
 				else if (changedPref.getKey().equals(HOME_LOCATOR)) {
-					final String[] latLong = getLatLongFromLocator(newString);
-					changedPref.getEditor().putString(HOME_LAT, latLong[0]).commit();
-					latPref.setText(latLong[0]);
-					changedPref.getEditor().putString(HOME_LON, latLong[1]).commit();
-					lonPref.setText(latLong[1]);
+
+					final IaruLocator iaruLocator = new IaruLocator(newString);
+					final String latitude = String.format(FORMAT_10_5F, iaruLocator.getLatitude().toDegrees());
+					final String longitude = String.format(FORMAT_10_5F, iaruLocator.getLongitude().toDegrees());
+
+					changedPref.getEditor().putString(HOME_LAT, latitude).commit();
+					latPref.setText(latitude);
+					changedPref.getEditor().putString(HOME_LON, longitude).commit();
+					lonPref.setText(longitude);
 				}
 			}
 
 			return acceptInput;
-		}
-
-		private String[] getLatLongFromLocator(final String grid) {
-
-			final String[] latLong = new String[2];
-
-			if (grid != null && !grid.isEmpty() && (grid.length() == 4 || grid.length() == 6)) {
-
-				final String lcGrid = grid.toLowerCase(Locale.ENGLISH);
-
-				final int rightField = lcGrid.charAt(0) - 'a';
-				final int upField = lcGrid.charAt(1) - 'a';
-
-				final int rightSquare = lcGrid.charAt(2) - '0';
-				final int upSquare = lcGrid.charAt(3) - '0';
-
-				int rightSub;
-				int upSub;
-				if (lcGrid.length() > 4) {
-					rightSub = lcGrid.charAt(4) - 'a';
-					upSub = lcGrid.charAt(5) - 'a';
-				}
-				else {
-					rightSub = 11;
-					upSub = 11;
-				}
-
-				latLong[0] = String.format(FORMAT_9_4F, 10.0 * upField + 1.0 * upSquare + 2.5 * upSub / 60.0 - 90.0);
-				latLong[1] = String.format(FORMAT_9_4F, 20.0 * rightField + 2.0 * rightSquare + 5.0 * rightSub / 60.0 - 180.0);
-
-			}
-			else {
-				throw new IllegalArgumentException("Locator was null, empty or incorrect length");
-			}
-
-			return latLong;
 		}
 
 	}

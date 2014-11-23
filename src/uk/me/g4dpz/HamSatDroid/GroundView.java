@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
+import uk.me.g4dpz.HamSatDroid.utils.IaruLocator;
 import uk.me.g4dpz.satellite.InvalidTleException;
 import uk.me.g4dpz.satellite.SatNotFoundException;
 import uk.me.g4dpz.satellite.SatPos;
@@ -91,9 +92,12 @@ public class GroundView extends ASDActivity implements OnGestureListener {
 		final TextView observerText = (TextView)findViewById(R.id.MAP_VIEW_OBS_LAT_LON);
 
 		if (observerText != null) {
+
+			final IaruLocator locator = new IaruLocator(getHomeLat(), getHomeLon());
+
 			observerText.setText(formatGeoText("Home Latitude", getHomeLat(), N_STRING, S_STRING)
 					+ formatGeoText("Home Longitude", getHomeLon(), E_STRING, W_STRING) + "Home Gridsquare: "
-					+ HamSatDroid.decLatLonToGrid(getHomeLat(), getHomeLon()));
+					+ locator.toMaidenhead());
 		}
 	}
 

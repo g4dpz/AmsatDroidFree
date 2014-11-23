@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import uk.me.g4dpz.HamSatDroid.utils.IaruLocator;
 import uk.me.g4dpz.satellite.SatPos;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -53,9 +54,12 @@ public class SkyView extends ASDActivity implements SensorEventListener, OnGestu
 		((TextView)findViewById(R.id.SKY_VIEW_SATELLITE_NAME)).setText(HamSatDroid.getSelectedSatellite().getTLE().getName());
 		final NumberFormat numberFormatter = NumberFormat.getNumberInstance();
 		numberFormatter.setMaximumFractionDigits(4);
+
+		final IaruLocator locator = new IaruLocator(getHomeLat(), getHomeLon());
+
 		((TextView)findViewById(R.id.SKY_VIEW_HOME_LOCATION)).setText("Home Lat/Lon: " + numberFormatter.format(getHomeLat())
 				+ DEG_UTF8 + "/" + numberFormatter.format(getHomeLon()) + DEG_UTF8 + "\nHome Gridsquare: "
-				+ HamSatDroid.decLatLonToGrid(getHomeLat(), getHomeLon()));
+				+ locator.toMaidenhead());
 		((TextView)findViewById(R.id.SKY_VIEW_PASS_DETAILS)).setText("Pass Information \n"
 				+ HamSatDroid.getSelectedPass().toString());
 
@@ -85,7 +89,7 @@ public class SkyView extends ASDActivity implements SensorEventListener, OnGestu
 		public void run() {
 			sView.invalidate();
 			// Recalc current position & update UI
-			((TextView)findViewById(R.id.SKY_VIEW_SAT_DETAILS)).setText("Satellite Location \n"
+			((TextView)findViewById(R.id.SKY_VIEW_SAT_DETAILS)).setText("Satellite IaruLocator \n"
 					+ HamSatDroid.getSelectedSatellite()
 							.getPosition(HamSatDroid.getGroundStation(), new GregorianCalendar().getTime()).toShortString());
 			handler.postDelayed(this, 5000);
