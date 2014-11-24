@@ -6,7 +6,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-import com.google.analytics.tracking.android.EasyTracker;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 
 /**
  * @author g4dpz
@@ -22,6 +23,8 @@ abstract class ASDActivity extends Activity {
 
 	private double homeLat = 43;
 	private double homeLon = -79;
+
+	protected Tracker mTracker = null;
 
 	protected final double getHomeLat() {
 		return homeLat;
@@ -59,13 +62,23 @@ abstract class ASDActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		EasyTracker.getInstance().activityStart(this);
+		mTracker = getTracker();
+		GoogleAnalytics.getInstance(this).reportActivityStart(this);
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		EasyTracker.getInstance().activityStop(this);
+		GoogleAnalytics.getInstance(this).reportActivityStop(this);
+	}
+
+	synchronized protected Tracker getTracker() {
+		if (mTracker == null) {
+			GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+			mTracker = analytics.newTracker(R.xml.analytics);
+		}
+
+		return mTracker;
 	}
 
 }
