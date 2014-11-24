@@ -35,8 +35,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
@@ -96,7 +96,8 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 	private static final String KEPS_UPDATED = "Keps updated!";
 	private Context context;
 	// Filenames and URLs
-	private final String elemfile = Environment.getExternalStorageDirectory() + "/nasabare.txt";
+	private final String elemfile = android.os.Environment.getExternalStorageDirectory().getAbsolutePath()
+			+ "/Download/nasabare.txt";
 	private static final String BIN_PASS_FILENAME = "prefs.bin";
 	private static final String BIN_ELEM_FILENAME = "elems.bin";
 	private static final String ELEM_URL_AMATEUR_AMSAT = "http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt";
@@ -813,9 +814,16 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
+
 		// Inflate the menu XML resource.
 		final MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
+
+		final int androidVersion = Build.VERSION.SDK_INT;
+
+		if (androidVersion > 17 /* Build.VERSION_CODES.JELLY_BEAN_MR1 */) {
+			menu.findItem(R.id.MENU_LOAD_ELEM).setVisible(false);
+		}
 		return true;
 	}
 
