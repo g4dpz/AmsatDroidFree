@@ -1,13 +1,11 @@
 package uk.me.g4dpz.HamSatDroid;
 
-import uk.me.g4dpz.satellite.GroundStationPosition;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Tracker;
+import uk.me.g4dpz.satellite.GroundStationPosition;
 
 /**
  * @author g4dpz
@@ -23,8 +21,6 @@ abstract class ASDActivity extends Activity {
 
 	private double homeLat = 43;
 	private double homeLon = -79;
-
-	protected Tracker mTracker = null;
 
 	protected final double getHomeLat() {
 		return homeLat;
@@ -62,23 +58,11 @@ abstract class ASDActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		mTracker = getTracker();
-		GoogleAnalytics.getInstance(this).reportActivityStart(this);
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		GoogleAnalytics.getInstance(this).reportActivityStop(this);
-	}
-
-	synchronized protected Tracker getTracker() {
-		if (mTracker == null) {
-			GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-			mTracker = analytics.newTracker(R.xml.analytics);
-		}
-
-		return mTracker;
 	}
 
 }

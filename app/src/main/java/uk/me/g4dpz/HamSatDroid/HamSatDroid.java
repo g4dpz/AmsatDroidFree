@@ -61,8 +61,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-
 public class HamSatDroid extends ASDActivity implements OnGestureListener {
 
 	/**
@@ -437,9 +435,6 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 
 	private void recalcPass(final int hoursAhead) {
 
-		mTracker.send(new HitBuilders.EventBuilder().setCategory("AmsatDroid").setAction("recalcPass").setLabel("")
-				.setValue(hoursAhead).build());
-
 		// How long to go back/forward in time to find a passes (in hours)
 		final int calcRange = 24;
 
@@ -455,7 +450,7 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 			myCal = Calendar.getInstance();
 		}
 
-		Log.d("HamSatDroid initial time: ", myCal.toString());
+		Log.d("HamSatDroid time: ", myCal.toString());
 
 		TLE myelem = null;
 
@@ -683,27 +678,21 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 			final String kepSource = HamSatDroid.getKepsSource();
 			if (AMATEUR_AMSAT.equals(kepSource)) {
 
-				sendTrackingInfo("loadKeps", AMATEUR_AMSAT);
 				url = new URL(ELEM_URL_AMATEUR_AMSAT);
 			}
 			else if (AMATEUR_CELESTRAK.equals(kepSource)) {
-				sendTrackingInfo("loadKeps", AMATEUR_CELESTRAK);
 				url = new URL(ELEM_URL_AMATEUR_CELESTRAK);
 			}
 			else if (WEATHER_CELESTRAK.equals(kepSource)) {
-				sendTrackingInfo("loadKeps", WEATHER_CELESTRAK);
 				url = new URL(ELEM_URL_WEATHER_CELESTRAK);
 			}
 			else if (CUBESAT_CELESTRAK.equals(kepSource)) {
-				sendTrackingInfo("loadKeps", CUBESAT_CELESTRAK);
 				url = new URL(ELEM_URL_CUBESAT_CELESTRAK);
 			}
 			else if (RESOURCES_CELESTRAK.equals(kepSource)) {
-				sendTrackingInfo("loadKeps", RESOURCES_CELESTRAK);
 				url = new URL(ELEM_URL_RESOURCES_CELESTRAK);
 			}
 			else if (NEW_CELESTRAK.equals(kepSource)) {
-				sendTrackingInfo("loadKeps", NEW_CELESTRAK);
 				url = new URL(ELEM_URL_NEW_CELESTRAK);
 			}
 			else {
@@ -728,11 +717,6 @@ public class HamSatDroid extends ASDActivity implements OnGestureListener {
 			e.printStackTrace();
 		}
 		return success;
-	}
-
-	private void sendTrackingInfo(String action, String label) {
-		mTracker.send(new HitBuilders.EventBuilder().setCategory("AmsatDroid").setAction(action).setLabel(label).setValue(0L)
-				.build());
 	}
 
 	void loadElemFromInternalFile() {
