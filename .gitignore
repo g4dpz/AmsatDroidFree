@@ -1,4 +1,12 @@
-/bin
-/gen
-/AmsatDroid.apk
-/AmsatDroidFree.apk
+.idea
+.gradle
+AmsatDroidFree.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+app/build
+/captures
+.externalNativeBuild
+/build
