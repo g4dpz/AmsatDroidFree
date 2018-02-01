@@ -1,28 +1,5 @@
 package uk.me.g4dpz.HamSatDroid;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-import uk.me.g4dpz.HamSatDroid.utils.IaruLocator;
-import uk.me.g4dpz.satellite.GroundStationPosition;
-import uk.me.g4dpz.satellite.InvalidTleException;
-import uk.me.g4dpz.satellite.PassPredictor;
-import uk.me.g4dpz.satellite.SatNotFoundException;
-import uk.me.g4dpz.satellite.SatPassTime;
-import uk.me.g4dpz.satellite.Satellite;
-import uk.me.g4dpz.satellite.SatelliteFactory;
-import uk.me.g4dpz.satellite.TLE;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -60,6 +37,30 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import uk.me.g4dpz.HamSatDroid.utils.IaruLocator;
+import uk.me.g4dpz.satellite.GroundStationPosition;
+import uk.me.g4dpz.satellite.InvalidTleException;
+import uk.me.g4dpz.satellite.PassPredictor;
+import uk.me.g4dpz.satellite.SatNotFoundException;
+import uk.me.g4dpz.satellite.SatPassTime;
+import uk.me.g4dpz.satellite.Satellite;
+import uk.me.g4dpz.satellite.SatelliteFactory;
+import uk.me.g4dpz.satellite.TLE;
 
 public class HamSatDroid extends ASDActivity implements OnGestureListener {
 
