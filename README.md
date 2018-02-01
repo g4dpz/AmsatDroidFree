@@ -1,2 +1,0 @@
-AmsatDroid Free
-===============
