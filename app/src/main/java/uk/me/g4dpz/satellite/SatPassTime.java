@@ -58,7 +58,7 @@ public class SatPassTime implements Serializable {
 	private static final String DEG_NL = "\u00B0\n";
 
 	private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMMMMM d, yyyy", Locale.ENGLISH);
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM dd, yyyy", Locale.ENGLISH);
 
 	public SatPassTime(final Date startTime, final Date endTime, final String polePassed, final int aos, final int los,
 			final double maxEl) {
