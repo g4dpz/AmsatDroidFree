@@ -2,7 +2,7 @@
 .gradle
 AmsatDroidFree.iml
 .gradle
-/local.properties
+local.properties
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
