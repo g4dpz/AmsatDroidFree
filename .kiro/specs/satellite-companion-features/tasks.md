@@ -185,13 +185,18 @@ Order: data layer, then Compose migration (parity first), then features on the n
     - On the SM-T225 (geomagnetic rotation vector, no gyroscope). Done so far: compass rotates the chart, aim panel shows bearings and deltas, accuracy and warning shown. Left to verify properly: heading accuracy against a known bearing, the calibration hint when accuracy drops, portrait vs landscape and flat vs upright, and aiming at a satellite that is actually up (needs a live pass). Note the compass had been toggled off in testing; its stored default is on.
 
 - [ ] 11. Doppler
-  - [ ] 11.1 `DopplerMath` with `DopplerMathTest` (agrees with `PassPredictor`, signs, extremes)
+  - [x] 11.1 `DopplerMath` with `DopplerMathTest` (agrees with `PassPredictor`, signs, extremes)
+    - Done: the library's first-order formulas (c = 2.99792458E8, range rate in km/s). 5 tests, including one that checks `DopplerMath` equals `PassPredictor.getDownlinkFreq`/`getUplinkFreq` for AO-07 at a golden time, using the range rate from the same `SatPos` the sky screen computes.
     - _Requirements: 15.2, 15.3, 7.4_
-  - [ ] 11.2 `FrequencyEntry`, `FrequencyStore` with `FrequencyStoreTest`
+  - [x] 11.2 `FrequencyEntry`, `FrequencyStore` with `FrequencyStoreTest`
+    - Done: `FrequencyEntry(catnum, label, downlinkHz, uplinkHz?)`, `FrequencyStore` (`frequencies.json` via `FileStore`; put replaces by satellite+label, remove, forSatellite sorted; corrupt file reads empty). `FrequencyText` parses MHz (dot or comma) to whole Hz and formats fixed-locale; 7 + 5 tests. The app bundles no frequencies (A11).
     - _Requirements: 15.1, 15.8_
-  - [ ] 11.3 Sky screen Doppler card: entry picker, add/edit/delete dialog with fixed-locale parsing, nominal versus corrected downlink and uplink, shift, below-horizon note, 1 s refresh while shown
+  - [x] 11.3 Sky screen Doppler card: entry picker, add/edit/delete dialog with fixed-locale parsing, nominal versus corrected downlink and uplink, shift, below-horizon note, 1 s refresh while shown
+    - Done: a card under the satellite position with an entry picker, an add/edit dialog (label, downlink, optional uplink in MHz, decimal keyboard, Save disabled until valid), delete, and the add prompt when empty. It shows nominal, corrected (tune/transmit) and shift for downlink and uplink, with the below-horizon note. The sky position refresh is now 1 s (cheap, one prediction step) so the figures stay live. Verified on the emulator with an SSB entry on AO-07 (receding): downlink tune 145,948,942 Hz (shift -1,058 Hz), uplink transmit 435,103,152 Hz (shift +3,152 Hz) - correct signs and the 70 cm shift about 3x the 2 m shift.
+    - The entry was set via the store file for the check, because driving the dialog's text fields over adb was unreliable (soft keyboard); the dialog itself renders and validates correctly.
     - _Requirements: 15.1, 15.2, 15.4, 15.5, 15.6, 15.7_
   - [ ] 11.4 Checkpoint: manual checks "Doppler"
+    - On the SM-T225. Left to verify on the device: adding/editing/deleting through the dialog by hand, the corrected downlink falling then rising across a real pass (sign against another tool), comma-decimal entry, and that the figures update each second and stop when the screen is left.
 
 - [ ] 12. Widget
   - [ ] 12.1 Persist the selected satellite; implement `WidgetUpdater.compute` and `WidgetState`, with tests for the state logic

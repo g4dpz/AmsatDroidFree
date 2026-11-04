@@ -218,6 +218,24 @@
     <string name="settings_pointing_axis">Aiming points along</string>
     <string name="pointing_top_edge">The top edge</string>
     <string name="pointing_back">The back of the device</string>
+    <!-- Doppler -->
+    <string name="doppler_title">Frequencies (Doppler)</string>
+    <string name="doppler_add">Add frequency</string>
+    <string name="doppler_edit">Edit</string>
+    <string name="doppler_delete">Delete</string>
+    <string name="doppler_none">No frequencies for this satellite. Add one to see the Doppler-corrected values.</string>
+    <string name="doppler_label">Label</string>
+    <string name="doppler_downlink_mhz">Downlink (MHz)</string>
+    <string name="doppler_uplink_mhz">Uplink (MHz, optional)</string>
+    <string name="doppler_downlink">Downlink (receive)</string>
+    <string name="doppler_uplink">Uplink (transmit)</string>
+    <string name="doppler_nominal">Nominal: %1$s Hz</string>
+    <string name="doppler_corrected">Tune: %1$s Hz</string>
+    <string name="doppler_corrected_tx">Transmit: %1$s Hz</string>
+    <string name="doppler_shift">Shift: %1$s Hz</string>
+    <string name="doppler_not_visible">The satellite is not above the horizon; these are the values it would need now.</string>
+    <string name="doppler_label_needed">Enter a label and a valid downlink frequency.</string>
+    <string name="action_save">Save</string>
 
     <!-- Map view -->
     <string name="map_home_latitude">Home latitude</string>

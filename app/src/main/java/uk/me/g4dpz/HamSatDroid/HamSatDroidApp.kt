@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import uk.me.g4dpz.HamSatDroid.alert.AlertNotifier
 import uk.me.g4dpz.HamSatDroid.alert.PassAlertStore
 import uk.me.g4dpz.HamSatDroid.data.FileStore
+import uk.me.g4dpz.HamSatDroid.data.FrequencyStore
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.data.SharedPreferencesStore
 import uk.me.g4dpz.HamSatDroid.keps.KepsScheduler
@@ -23,6 +24,9 @@ class HamSatDroidApp : Application() {
 
     /** The pass alerts the user has set. Shared so the UI and the broadcast receivers see the same list. */
     val passAlertStore: PassAlertStore by lazy { PassAlertStore(FileStore(filesDir)) }
+
+    /** The user's per-satellite frequency entries, for Doppler. */
+    val frequencyStore: FrequencyStore by lazy { FrequencyStore(FileStore(filesDir)) }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
