@@ -166,17 +166,23 @@ Order: data layer, then Compose migration (parity first), then features on the n
     - On the SM-T225 for checking. Left to verify on the device: a real alert arriving at the set time, the countdown, tapping it opens the sky view, survival across a reboot and a clock change, spoken announcements (and ducking), and behaviour when notifications are denied. Note Samsung's background limits may delay a late-running announcement.
 
 - [ ] 10. Compass and aiming aid
-  - [ ] 10.1 `HeadingMath` and `HeadingMathTest` (wrap-around, declination, flat/upright selection with hysteresis)
+  - [x] 10.1 `HeadingMath` and `HeadingMathTest` (wrap-around, declination, flat/upright selection with hysteresis)
+    - Done: circular smoothing and signed delta across 0/360, true heading from declination, flat/upright from gravity with a hysteresis dead band. 6 tests.
     - _Requirements: 4.2, 4.4, 4.10, 7.4_
-  - [ ] 10.2 `CompassProvider` as a `Flow` emitting `Orientation`: source fallback chain (rotation vector, geomagnetic rotation vector, accelerometer + magnetometer), display rotation, declination, smoothing per source, accuracy
+  - [x] 10.2 `CompassProvider` as a `Flow` emitting `Orientation`: source fallback chain, display rotation, declination, smoothing per source, accuracy
+    - Done: source chosen in order (rotation vector, geomagnetic rotation vector, accelerometer + magnetometer); `getRotationMatrixFromVector` or `getRotationMatrix`, `remapCoordinateSystem` for the display rotation, `GeomagneticField` declination, per-source smoothing (less for the rotation vector, more for the noisier sources). Emits the matrix, true heading, accuracy and source; registers only while collected. Confirmed on the SM-T225 it uses the geomagnetic rotation vector (the device has no rotation-vector sensor and no gyroscope).
     - _Requirements: 4.1, 4.2, 4.3, 4.5, 4.6, 4.7, 4.8_
-  - [ ] 10.3 Wire into `SkyScreen`/`SkyChart`: rotation, lifecycle-bound collection, toggle (default on), persisted setting, calibration hint, hidden when no usable source
+  - [x] 10.3 Wire into `SkyScreen`/`SkyChart`: rotation, lifecycle-bound collection, toggle (default on), persisted setting, calibration hint, hidden when no usable source
+    - Done: `rememberCompassOrientation` collects with `repeatOnLifecycle(STARTED)`; a Compass chip (default on, persisted) rotates the chart via `SkyChart(rotationDegrees)`; a calibration hint shows while accuracy is low; the chips are hidden when no source is available. Verified on the SM-T225: turning on Compass rotated the chart to the device heading (N moved off top); the satellite maths are unchanged.
     - _Requirements: 4.1, 4.5, 4.7, 4.8, 4.9, 4.11, 8.11_
-  - [ ] 10.4 `PointingMath` and `AimState` with `PointingMathTest` and `AimStateTest`
+  - [x] 10.4 `PointingMath` and `AimState` with `PointingMathTest` and `AimStateTest`
+    - Done: `PointingMath` turns the world-from-device matrix and the chosen axis (top edge +Y, back -Z) into true-north az/el, flagging a near-vertical axis as azimuth-invalid; `AimState` gives the signed az/el deltas and an OnTarget/Aiming/BelowHorizon status (5° tolerance). 13 tests.
     - _Requirements: 17.3, 17.4, 17.5, 17.9, 7.4_
-  - [ ] 10.5 Aim mode on the sky screen: bearings, deltas as text and arrows, on-target state, below-horizon message, accuracy and magnet warning, pointing-axis setting
+  - [x] 10.5 Aim mode on the sky screen: bearings, deltas as text and arrows, on-target state, below-horizon message, accuracy and magnet warning, pointing-axis setting
+    - Done: an Aim chip (off by default) shows the pointing and satellite bearings, "turn left/right" and "raise/lower" as text, an OnTarget state with an icon and text (not colour alone), a below-horizon message, the compass accuracy and the magnet/metal warning. Pointing-axis setting (top edge / back) in Settings > Display. Verified on the SM-T225: the panel showed live pointing az/el from the geomagnetic sensor and the below-horizon message for a satellite under the horizon.
     - _Requirements: 17.1 to 17.8_
   - [ ] 10.6 Checkpoint: manual checks "Compass" and "Aiming aid"
+    - On the SM-T225 (geomagnetic rotation vector, no gyroscope). Done so far: compass rotates the chart, aim panel shows bearings and deltas, accuracy and warning shown. Left to verify properly: heading accuracy against a known bearing, the calibration hint when accuracy drops, portrait vs landscape and flat vs upright, and aiming at a satellite that is actually up (needs a live pass). Note the compass had been toggled off in testing; its stored default is on.
 
 - [ ] 11. Doppler
   - [ ] 11.1 `DopplerMath` with `DopplerMathTest` (agrees with `PassPredictor`, signs, extremes)

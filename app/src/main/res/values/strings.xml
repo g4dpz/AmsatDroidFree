@@ -196,6 +196,28 @@
     <string name="compass_east">E</string>
     <string name="compass_south">S</string>
     <string name="compass_west">W</string>
+    <string name="compass_toggle">Compass</string>
+    <string name="compass_calibrate">Move the device in a figure of eight to calibrate the compass.</string>
+    <string name="aim_toggle">Aim</string>
+    <string name="aim_pointing">Pointing: az %1$s° el %2$s°</string>
+    <string name="aim_target">Satellite: az %1$s° el %2$s°</string>
+    <string name="aim_turn_right">Turn right %1$d°</string>
+    <string name="aim_turn_left">Turn left %1$d°</string>
+    <string name="aim_raise">Raise %1$d°</string>
+    <string name="aim_lower">Lower %1$d°</string>
+    <string name="aim_on_target">On target</string>
+    <string name="aim_below_horizon">%1$s is below the horizon. It rises at %2$s, azimuth %3$d°.</string>
+    <string name="aim_below_horizon_unknown">%1$s is below the horizon.</string>
+    <string name="aim_magnet_warning">Keep magnets and metal, including radios, away from the device: they disturb the compass.</string>
+    <string name="aim_no_compass">This device has no compass, so aiming is not available.</string>
+    <string name="aim_accuracy">Compass accuracy: %1$s</string>
+    <string name="accuracy_high">high</string>
+    <string name="accuracy_medium">medium</string>
+    <string name="accuracy_low">low</string>
+    <string name="accuracy_unreliable">unreliable</string>
+    <string name="settings_pointing_axis">Aiming points along</string>
+    <string name="pointing_top_edge">The top edge</string>
+    <string name="pointing_back">The back of the device</string>
 
     <!-- Map view -->
     <string name="map_home_latitude">Home latitude</string>

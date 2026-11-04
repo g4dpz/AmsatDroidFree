@@ -57,6 +57,7 @@ import uk.me.g4dpz.HamSatDroid.data.KepsSource
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.domain.LocatorSync
 import uk.me.g4dpz.HamSatDroid.location.LocationFetcher
+import uk.me.g4dpz.HamSatDroid.aim.PointingAxis
 import uk.me.g4dpz.HamSatDroid.night.ThemeMode
 import uk.me.g4dpz.HamSatDroid.night.labelRes
 import uk.me.g4dpz.HamSatDroid.ui.components.DropdownField
@@ -97,6 +98,7 @@ fun SettingsScreen(
     val keepScreenOn by settings.keepScreenOn.state.collectAsStateWithLifecycle()
     val alertLead by settings.alertLeadMinutes.state.collectAsStateWithLifecycle()
     val spokenAlerts by settings.spokenAlerts.state.collectAsStateWithLifecycle()
+    val pointingAxis by settings.pointingAxis.state.collectAsStateWithLifecycle()
     val themeMode by settings.themeMode.state.collectAsStateWithLifecycle()
     val autoRedNight by settings.autoRedNight.state.collectAsStateWithLifecycle()
 
@@ -305,6 +307,14 @@ fun SettingsScreen(
                 label = stringResource(R.string.settings_keep_screen_on),
                 checked = keepScreenOn,
                 onCheckedChange = { settings.keepScreenOn.value = it },
+            )
+            DropdownField(
+                label = stringResource(R.string.settings_pointing_axis),
+                options = PointingAxis.entries,
+                selected = pointingAxis,
+                optionLabel = { stringResource(if (it == PointingAxis.TOP_EDGE) R.string.pointing_top_edge else R.string.pointing_back) },
+                onSelected = { settings.pointingAxis.value = it },
+                modifier = Modifier.fillMaxWidth(),
             )
 
             HorizontalDivider()
