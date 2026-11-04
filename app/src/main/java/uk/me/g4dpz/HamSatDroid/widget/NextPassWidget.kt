@@ -89,7 +89,7 @@ class NextPassWidget : GlanceAppWidget() {
         )
         Spacer(GlanceModifier.height(2.dp))
         Text(
-            context.getString(R.string.widget_aos_at, clockTime(pass.start)) + "  " + relativeTime(context, pass.start),
+            context.getString(R.string.widget_next_pass_line, context.getString(R.string.widget_aos_at, clockTime(pass.start)), relativeTime(context, pass.start)),
             style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 14.sp),
         )
         if (showDetail) {

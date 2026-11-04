@@ -3,6 +3,7 @@ package uk.me.g4dpz.HamSatDroid.ui
 import android.content.Intent
 import android.location.LocationManager
 import android.net.Uri
+import android.os.Build
 import android.os.CancellationSignal
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -168,12 +169,13 @@ fun SettingsScreen(
                 is LocationFetcher.Outcome.Found -> {
                     val location = LocatorSync.fromCoordinates(outcome.latitude, outcome.longitude)
                     save(location)
-                    val accuracy = outcome.accuracyMeters?.let { resources.getString(R.string.location_accuracy, it.toInt()) }
+                    val accuracy = outcome.accuracyMeters
+                        ?.let { resources.getQuantityString(R.plurals.location_accuracy, it.toInt(), it.toInt()) }
                         ?: unknownAccuracy
-                    LocationUi.Message(
-                        resources.getString(R.string.location_set, location.latitude, location.longitude, location.locator) +
-                            " " + accuracy
+                    val set = resources.getString(
+                        R.string.location_set, location.latitude, location.longitude, location.locator,
                     )
+                    LocationUi.Message(resources.getString(R.string.location_set_with_accuracy, set, accuracy))
                 }
                 LocationFetcher.Outcome.ProviderDisabled ->
                     LocationUi.Message(
@@ -316,6 +318,14 @@ fun SettingsScreen(
                 onSelected = { settings.pointingAxis.value = it },
                 modifier = Modifier.fillMaxWidth(),
             )
+            // Per-app language is an Android 13+ feature; hidden on older versions.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                OutlinedButton(onClick = {
+                    context.startActivity(
+                        Intent(Settings.ACTION_APP_LOCALE_SETTINGS, Uri.fromParts("package", context.packageName, null))
+                    )
+                }) { Text(stringResource(R.string.settings_language)) }
+            }
 
             HorizontalDivider()
             SectionTitle(R.string.settings_section_alerts)

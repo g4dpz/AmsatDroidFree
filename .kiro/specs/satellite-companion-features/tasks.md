@@ -2,12 +2,12 @@
 
 Run `./gradlew :app:assembleDebug :app:testDebugUnitTest` after each task. The golden regression test must stay green (Requirement 7.1) and every task must leave the app building and runnable (Requirement 7.5).
 
-Order: data layer, then Compose migration (parity first), then features on the new UI, then widget and localisation clean-up. Nothing is built twice. Primary device: Galaxy Tab A11 SM-X130.
+Order: data layer, then Compose migration (parity first), then features on the new UI, then widget and localisation clean-up. Nothing is built twice. Primary device: Galaxy Tab A7 Lite SM-T225 (the spec's original stated target, the Tab A11 SM-X130, was changed to the tablet actually used). The emulator AVD is still named `TabA11_API35`.
 
 - [x] 1. Foundations
   - [x] 1.1 Add pinned dependencies (WorkManager, coroutines, test-scoped `org.json` and coroutines-test) and manifest permissions
     - _Requirements: 3.5, 5.1, 7.3_
-  - [x] 1.2 Create a test environment matching the target: an emulator profile at 1340 x 800 px, about 179 ppi, plus note which system images are installed; record the real dp width and Android version when the Tab A11 is available
+  - [x] 1.2 Create a test environment matching the target: an emulator profile at 1340 x 800 px, about 179 ppi, plus note which system images are installed; record the real dp width and Android version when the device is available
     - Done: AVD `TabA11_API35` (Android 15, google_apis arm64-v8a, 800 x 1340, 213 dpi = 601 dp portrait / 1007 dp landscape, 4 GB RAM, light and magnetic sensors, no proximity). Start it with `emulator -avd TabA11_API35` and try other densities with `adb shell wm density 160|213|240` (reset with `adb shell wm density reset`).
     - Limitation: the emulator still reports a gyroscope, which the real tablet lacks. The no-gyroscope compass path is covered by unit tests of the source selection and by a debug override in the app (task 10.2), and is confirmed on the real tablet.
     - Installed system images relevant to testing: android-35 google_apis arm64-v8a (used), android-30/34 images in the SDK are x86 and do not run on this Apple Silicon Mac.
@@ -136,7 +136,7 @@ Order: data layer, then Compose migration (parity first), then features on the n
     - Long-press to set an alert (16.8) is deferred to task 9, which adds the alert store; noted there.
     - Fixed a pre-existing bug this exposed: at start-up `onStart` could reload the keps before the first load set the selection, resetting it to the first satellite. It now falls back to the saved `selectedCatnum`. Checked over 8 restarts.
     - _Requirements: 16.1, 16.2, 16.3, 16.7, 16.8_
-  - [x] 8.3 Measure and record calculation time on the Tab A11 (and the emulator); adjust defaults if too slow
+  - [x] 8.3 Measure and record calculation time on the SM-T225 (and the emulator); adjust defaults if too slow
     - Emulator (Tab A11 AVD, Android 15, swiftshader): 98 satellites, first run 12 h about 4.0 s (cold, JIT warming up), then 24 h about 0.4 s. Fast enough; defaults left at 12 h / 0 degrees. Not yet measured on the physical SM-T225 (checklist item left open).
     - _Requirements: 16.10_
 
@@ -212,11 +212,16 @@ Order: data layer, then Compose migration (parity first), then features on the n
     - On the SM-T225. The provider registers and the Glance compose path runs without error on the emulator, but a widget cannot be placed or rendered from the shell, so it must be checked by hand: add it from the launcher, confirm the states (no location, no satellite, next pass with the detail at a larger size), tap to open, change satellite and refresh keps to see it update, resize it, check light/dark, and remove the last one to stop the periodic work.
 
 - [ ] 13. Localisation and wrap-up
-  - [ ] 13.1 String audit: remove remaining literals and concatenations from UI, notification, spoken and widget code; plurals where needed
+  - [x] 13.1 String audit: remove remaining literals and concatenations from UI, notification, spoken and widget code; plurals where needed
+    - Done: removed the last concatenations and literals (settings accuracy line, sky-chart "45" ring label, aim "turn/raise" joiner, widget AOS line) into resources with placeholders; made the five remaining count strings plurals (location accuracy, keps updated, about-keps count, the two prediction headers). Lint reports zero HardcodedText. Verified with the en-XA pseudolocale on the emulator: every label is bracketed and accented, only genuine data (satellite names, numbers, coordinates) stays plain, and no raw %d leaks.
+    - Enabled `isPseudoLocalesEnabled` for the debug build only, so the pseudolocale audit can be repeated.
     - _Requirements: 13.1, 13.2, 13.3, 13.5_
-  - [ ] 13.2 Add `locales_config.xml`, `android:localeConfig`, and the Settings language row (API 33+)
+  - [x] 13.2 Add `locales_config.xml`, `android:localeConfig`, and the Settings language row (API 33+)
+    - Done: `res/xml/locales_config.xml` (English only for now), `android:localeConfig` on the application, and an "App language" button in Settings > Display that opens `ACTION_APP_LOCALE_SETTINGS`, shown only on API 33+.
     - _Requirements: 13.4_
-  - [ ] 13.3 Zero Kotlin compiler warnings; run lint and fix or consciously suppress new findings
+  - [x] 13.3 Zero Kotlin compiler warnings; run lint and fix or consciously suppress new findings
+    - Done: clean build has no Kotlin compiler warnings. Lint is down from 10 to 5 warnings: the 5 PluralsCandidate are fixed; the remaining 4 are IconLocation on the original bundled images (home/icon/saticon/world, out of scope to move) and 1 is the deliberate AGP-version note (documented in app/lint.xml).
     - _Requirements: 7.3_
-  - [ ] 13.4 Run the full manual checklist on a Galaxy Tab A11 (and an emulator for the rest) and record results, including the Samsung-specific section
+  - [ ] 13.4 Run the full manual checklist on the Galaxy Tab A7 Lite SM-T225 (and an emulator for the rest) and record results, including the Samsung-specific section
+    - This is David's end-to-end pass on the hardware. All feature code is complete, builds clean (289 tests), and is installed on the SM-T225. The checklist (and the per-feature checkpoints 7.4, 8.3, 9.8, 10.6, 11.4, 12.4) remain for a device run, including the Samsung-specific section. (The emulator AVD is named `TabA11_API35` for historical reasons; it is configured to match the SM-T225's 800 x 1340 at 213 dpi, not an actual Tab A11.)
     - _Requirements: all_

@@ -45,7 +45,11 @@
     <string name="error_invalid_longitude">Invalid longitude, set to 0</string>
     <string name="error_invalid_locator">Invalid locator, set to %1$s</string>
     <string name="location_set">Location set to %1$s, %2$s (%3$s).</string>
-    <string name="location_accuracy">Accuracy: %1$d meters.</string>
+    <string name="location_set_with_accuracy">%1$s %2$s</string>
+    <plurals name="location_accuracy">
+        <item quantity="one">Accuracy: %1$d metre.</item>
+        <item quantity="other">Accuracy: %1$d metres.</item>
+    </plurals>
     <string name="location_accuracy_unknown">Accuracy unknown.</string>
     <string name="location_provider_disabled">Please turn on %1$s location in the system settings.</string>
     <string name="location_provider_gps">GPS</string>
@@ -146,8 +150,14 @@
 
     <!-- Pass header (text above the list) -->
     <string name="header_predictions_next_pass">Pass predictions for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next passes only, starting %5$s:</string>
-    <string name="header_predictions_hours">Pass predictions for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next %6$d hours, starting %5$s:</string>
-    <string name="header_no_passes">No passes found for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next %5$d hours.</string>
+    <plurals name="header_predictions_hours">
+        <item quantity="one">Pass predictions for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next %6$d hour, starting %5$s:</item>
+        <item quantity="other">Pass predictions for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next %6$d hours, starting %5$s:</item>
+    </plurals>
+    <plurals name="header_no_passes">
+        <item quantity="one">No passes found for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next %5$d hour.</item>
+        <item quantity="other">No passes found for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next %5$d hours.</item>
+    </plurals>
     <string name="header_bad_elements">The orbital elements for this satellite could not be used.</string>
     <string name="header_unknown_satellite">This satellite never rises above the horizon at your location.</string>
     <string name="header_invalid_location">Your home latitude or longitude is not a valid number. Please check the settings.</string>
@@ -163,13 +173,19 @@
     <string name="pass_los_azimuth">LOS azimuth: %1$d°</string>
 
     <!-- Keps messages -->
-    <string name="keps_updated">Keps updated (%1$d satellites)</string>
+    <plurals name="keps_updated">
+        <item quantity="one">Keps updated (%1$d satellite)</item>
+        <item quantity="other">Keps updated (%1$d satellites)</item>
+    </plurals>
     <string name="keps_too_soon">Keps are already up to date. Fetched %1$s. They can be downloaded again after %2$s.</string>
     <string name="keps_too_soon_no_time">Keps cannot be downloaded again yet. Try again after %1$s.</string>
     <string name="keps_failed">Could not download keps (%1$s). Kept existing element data.</string>
     <string name="about_version">Version %1$s</string>
     <string name="about_keps_bundled">Keps: bundled with the app (may be out of date)</string>
-    <string name="about_keps_downloaded">Keps: %1$s, fetched %2$s (%3$d satellites)</string>
+    <plurals name="about_keps_downloaded">
+        <item quantity="one">Keps: %1$s, fetched %2$s (%3$d satellite)</item>
+        <item quantity="other">Keps: %1$s, fetched %2$s (%3$d satellites)</item>
+    </plurals>
     <string name="about_keps_failure">Last download problem (%1$s): %2$s</string>
     <string name="about_dismiss">Dismiss</string>
 
@@ -206,6 +222,9 @@
     <string name="aim_raise">Raise %1$d°</string>
     <string name="aim_lower">Lower %1$d°</string>
     <string name="aim_on_target">On target</string>
+    <string name="aim_move">%1$s   %2$s</string>
+    <string name="sky_elevation_ring">45\u00B0</string>
+    <string name="widget_next_pass_line">%1$s  %2$s</string>
     <string name="aim_below_horizon">%1$s is below the horizon. It rises at %2$s, azimuth %3$d°.</string>
     <string name="aim_below_horizon_unknown">%1$s is below the horizon.</string>
     <string name="aim_magnet_warning">Keep magnets and metal, including radios, away from the device: they disturb the compass.</string>
@@ -216,6 +235,7 @@
     <string name="accuracy_low">low</string>
     <string name="accuracy_unreliable">unreliable</string>
     <string name="settings_pointing_axis">Aiming points along</string>
+    <string name="settings_language">App language</string>
     <string name="pointing_top_edge">The top edge</string>
     <string name="pointing_back">The back of the device</string>
     <!-- Doppler -->

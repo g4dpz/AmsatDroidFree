@@ -17,6 +17,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Build the en-XA / ar-XB pseudolocales so a string audit can switch to them; debug only.
+            isPseudoLocalesEnabled = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.txt")

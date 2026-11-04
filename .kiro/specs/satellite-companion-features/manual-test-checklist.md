@@ -108,7 +108,7 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [ ] Overview opens from the menu; "Now" shows satellites currently up with az/el
 - [ ] Upcoming list is sorted by AOS and rows appear progressively while it calculates
 - [ ] 6, 12 and 24 hour windows and the minimum-elevation filter work
-- [ ] Record the time to complete a full 24 hour calculation on the Tab A11: ______ seconds (emulator: about 4 s first run, 0.4 s after)
+- [ ] Record the time to complete a full 24 hour calculation on the SM-T225: ______ seconds (emulator: about 4 s first run, 0.4 s after)
 - [ ] UI stays responsive while calculating; leaving the screen cancels the work
 - [ ] Tapping a row opens the sky view for that pass; long-press toggles an alert
 - [ ] Results agree with calculating the same satellite on the Passes screen
@@ -126,7 +126,7 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [ ] Spoken language follows the app language
 
 ## Landscape dashboard
-- [ ] Landscape on the Tab A11 shows the list, sky chart and map together
+- [ ] Landscape on the SM-T225 shows the list, sky chart and map together
 - [ ] The map keeps a 2:1 shape; charts update live
 - [ ] Split-screen at half width falls back to the two-pane or single-pane layout without losing state
 
@@ -146,21 +146,20 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [ ] A comma-decimal locale does not break latitude/longitude parsing or storage
 - [ ] Per-app language row opens the system setting on Android 13+; hidden on older versions
 
-## Galaxy Tab A11 specifics
-- [ ] Record: model number (SM-X130 Wi-Fi expected), Android and One UI version, window width in dp (portrait and landscape), and whether `FEATURE_LOCATION_GPS` is present (Samsung and GSMArena disagree)
+## Galaxy Tab A7 Lite (SM-T225) specifics
+- [ ] Record: model number (SM-T225), Android and One UI version, window width in dp (portrait and landscape), and whether `FEATURE_LOCATION_GPS` is present
 - [ ] Portrait and landscape both show the two-pane layout
 - [ ] Samsung split-screen and pop-up window: layout adapts live; no lost state
-- [ ] DeX (if available): app is resizable and usable with mouse and keyboard
 - [ ] If the device reports no GPS: "Use GPS" hidden or disabled with an explanation; entering a locator works
-- [ ] If the device reports GPS: an outdoor fix sets the location (note time to fix); Wi-Fi-only means network location may be poor or empty indoors
+- [ ] GPS: an outdoor fix sets the location (note time to fix); indoors, network location may be poor or empty
 - [ ] Sensors: confirm with a sensor app that only accelerometer, magnetometer and light are present (no gyroscope)
 - [ ] Compass without a gyroscope: heading stable enough to use; flat on a table and held upright both correct; hint appears when uncalibrated; check the source in use in a debug build
 - [ ] Alerts with the screen off for several hours and battery usage left at the default: note whether they arrive on time
 - [ ] Alerts after setting battery usage to Unrestricted via the settings shortcut: arrive on time
 - [ ] Keps auto refresh runs overnight with the default battery setting; note result
-- [ ] Android 15: standard ongoing notification; after the Android 16 update: Live Update behaviour on One UI 8
+- [ ] Android 12: standard ongoing notification (the Android 16 Live Update path cannot be exercised on this device)
 - [ ] Widget on the tablet home screen: resizes between compact and large layouts
-- [ ] 90 Hz display: compass-driven rotation is smooth, no dropped frames; with nothing moving the app is idle (low CPU in a profiler)
+- [ ] 60 Hz display: compass-driven rotation is smooth, no dropped frames; with nothing moving the app is idle (low CPU in a profiler)
 
 ## Regression
 - [ ] `./gradlew :app:testDebugUnitTest` green (golden test unchanged)

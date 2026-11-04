@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The languages the app ships. English only for now; add more <locale> lines as translations arrive, and the
+     per-app language picker (Android 13+) will offer them. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+</locale-config>

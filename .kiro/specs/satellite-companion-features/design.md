@@ -52,18 +52,18 @@ flowchart TB
   Sky --> Comp[CompassProvider] --> HM[HeadingMath]
 ```
 
-## Target device: Galaxy Tab A11
+## Target device: Galaxy Tab A7 Lite (SM-T225)
 
 Design consequences of the target device (see requirements for the facts and sources):
 
-- **Layout**: portrait is somewhere between about 533 and 800 dp wide depending on the density Samsung uses (213 dpi gives 601 dp, only just over the threshold). The two-pane threshold is 600 dp, not 840 dp, and the dashboard threshold is 960 dp. Both live in one place (`LayoutThresholds`), the real dp widths are measured on the device, and the thresholds are adjusted if the device falls on the wrong side. The layout must also look acceptable just below each threshold.
-- **No gyroscope** (accelerometer, geomagnetic and light sensors only): the compass uses a fallback chain and stronger smoothing (below).
-- **GPS availability is disputed by sources** for the Wi-Fi model (Samsung lists it, GSMArena says cellular only): the location UI is feature-gated at run time and the locator field is the primary path.
-- **Often offline outdoors**: keps are refreshed while online; the About dialog shows their age. (A stale-keps warning is a possible follow-up, not in this spec.)
+- **Layout**: portrait is 600 dp wide at 213 dpi, exactly on the two-pane threshold; landscape is about 1116 dp, over the 960 dp dashboard threshold. Both thresholds live in one place (`LayoutThresholds`), the real dp widths are measured on the device, and the thresholds are adjusted if the device falls on the wrong side. The layout must also look acceptable just below each threshold.
+- **No gyroscope** (accelerometer, magnetometer and light sensors; the rotation-vector sensors are software-fused without a gyro): the compass uses a fallback chain and stronger smoothing (below).
+- **GPS present** (`FEATURE_LOCATION_GPS`): the location UI is still feature-gated at run time, and the locator field remains a reliable path, so the app also runs on devices without GPS.
+- **Often offline outdoors**: keps are refreshed while online; the About dialog shows their age, and a stale-elements warning is shown when they are over 30 days old.
 - **Samsung background restrictions** can defer alarms and WorkManager. A settings note and button explain how to exempt the app; alerts do not depend on the app being in memory.
-- **Modest GPU (Mali-G57 MC2) and 4 GB RAM** in the base model: charts must not allocate per frame (already required), and the world map bitmap is decoded once at a size matching the canvas.
-- **Multi-window/DeX**: all layouts respond to live size changes; no code assumes fullscreen.
-- **Eight cores (2 x A76, 6 x A55), 90 Hz display, light sensor, stereo speakers, 8 GB RAM**: used for the parallel all-satellite overview, smooth compass rotation, automatic red night mode and spoken alerts.
+- **Modest GPU and RAM**: charts must not allocate per frame (already required), and the world map bitmap is decoded once at a size matching the canvas.
+- **Multi-window/pop-up**: all layouts respond to live size changes; no code assumes fullscreen.
+- **MediaTek Helio P35 (mt6765), eight A53 cores, 60 Hz display, light sensor**: used for the parallel all-satellite overview, compass rotation, automatic red night mode and spoken alerts.
 
 ## Dependencies and build changes
 
@@ -148,7 +148,7 @@ Unit tests compare `SkyGeometry` and `MapProjection` outputs to the formulas in 
 
 `calculateWindowSizeClass(activity)` gives the width class.
 
-- **Two-pane** (≥ 600 dp, `LayoutThresholds.TWO_PANE_MIN_WIDTH_DP`): `Row` with `PassesScreen` on the left (about 40%) and a detail pane on the right showing `SkyScreen` for `selectedPass` (or a hint when none). The map stays a separate destination. On the Tab A11 this applies in both portrait and landscape, and in wide split-screen windows.
+- **Two-pane** (≥ 600 dp, `LayoutThresholds.TWO_PANE_MIN_WIDTH_DP`): `Row` with `PassesScreen` on the left (about 40%) and a detail pane on the right showing `SkyScreen` for `selectedPass` (or a hint when none). The map stays a separate destination. On the SM-T225 this applies in both portrait and landscape, and in wide split-screen windows.
 - **Single pane** (< 600 dp): navigation as above.
 
 - **Dashboard** (≥ 960 dp, `LayoutThresholds.DASHBOARD_MIN_WIDTH_DP`): left pane is the pass list (about 30%); the remaining area shows `SkyChart` and `WorldMap`. `DashboardLayout.choose(widthDp, heightDp)` (pure, unit tested) returns `SideBySide` when the area can give each chart a useful size (both at least about 300 dp square, map kept 2:1) and `Stacked` otherwise (map above, sky below). Both charts use the same `AppViewModel` state and lifecycle-bound refresh as the single screens.
@@ -272,7 +272,7 @@ On the first "set alert": request `POST_NOTIFICATIONS` (API ≥ 33) with the Com
 
 `HeadingMath` (pure, unit tested): `smooth(prev, new, alpha)` using the shortest signed difference, `trueHeading(magnetic, declination)`.
 
-`CompassProvider` chooses a source in order (the Tab A11 SM-X130 lists accelerometer and geomagnetic sensors but no gyroscope, so the first option may be absent or low quality):
+`CompassProvider` chooses a source in order (the SM-T225 has accelerometer, magnetometer and software-fused rotation-vector sensors but no gyroscope, so the first option is present but lower quality):
 
 1. `TYPE_ROTATION_VECTOR` (`getRotationMatrixFromVector`),
 2. `TYPE_GEOMAGNETIC_ROTATION_VECTOR` (same conversion; accelerometer-free, lower accuracy),
@@ -356,7 +356,7 @@ JVM unit tests (JUnit, same setup as the golden test):
 - `KepsDownloadPolicyTest` (2-hour window boundaries, classification of 200/301/403/404/429/500/IOException/200-with-error-text, bounded retries).
 - `KepsRepositoryTest` (empty input rejected, failed store keeps old file, corrupt file falls back to bundled, atomic write, inside-window request returns `UpToDate` without a network call, uses an injected fake downloader), `PassStoreTest` (JSON round trip).
 - `SkyGeometryTest`, `MapProjectionTest` (compared with the legacy formulas, antimeridian splitting).
-- `NightModeControllerTest` (hysteresis, timing, no flicker), `DashboardLayoutTest` (side by side versus stacked at representative sizes including the Tab A11 landscape and split-screen), `DopplerMathTest` (agrees with `PassPredictor`, sign conventions, large and zero range rate), `FrequencyStoreTest` (JSON round trip, corrupt file), `PointingMathTest` (known matrices: flat facing north gives az 0 el 0 for the top edge; upright facing east; vertical axis; declination), `AimStateTest` (wrap-around, on-target, below horizon), `OverviewCalculatorTest` (parallel equals sequential, skipping never-visible satellites, cancellation).
+- `NightModeControllerTest` (hysteresis, timing, no flicker), `DashboardLayoutTest` (side by side versus stacked at representative sizes including the SM-T225 landscape and split-screen), `DopplerMathTest` (agrees with `PassPredictor`, sign conventions, large and zero range rate), `FrequencyStoreTest` (JSON round trip, corrupt file), `PointingMathTest` (known matrices: flat facing north gives az 0 el 0 for the top edge; upright facing east; vertical axis; declination), `AimStateTest` (wrap-around, on-target, below horizon), `OverviewCalculatorTest` (parallel equals sequential, skipping never-visible satellites, cancellation).
 - `AppViewModelTest` with `kotlinx-coroutines-test`: calculate passes, selection retained across keps reload.
 
 Manual checks are in `manual-test-checklist.md`. The golden regression test runs after every task.

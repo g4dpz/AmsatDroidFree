@@ -112,7 +112,7 @@ fun HomeScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is UiEvent.KepsUpdated ->
-                    snackbar.showSnackbar(resources.getString(R.string.keps_updated, event.satelliteCount))
+                    snackbar.showSnackbar(resources.getQuantityString(R.plurals.keps_updated, event.satelliteCount, event.satelliteCount))
                 is UiEvent.KepsTooSoon -> kepsDialog = KepsDialog(
                     if (event.lastSuccessMillis != null) {
                         resources.getString(
@@ -481,8 +481,8 @@ fun AboutDialog(keps: KepsInfo?, formats: DisplayFormats, onDismiss: () -> Unit)
                         } else {
                             val source = KepsSource.entries.firstOrNull { it.key == keps.source }
                                 ?.let { stringResource(it.labelRes) } ?: keps.source
-                            stringResource(
-                                R.string.about_keps_downloaded,
+                            pluralStringResource(
+                                R.plurals.about_keps_downloaded, keps.satelliteCount,
                                 source, keps.fetchedAtMillis?.let { formats.dateTime(it) } ?: "", keps.satelliteCount,
                             )
                         },

@@ -49,6 +49,7 @@ fun SkyChart(
     val west = stringResource(R.string.compass_west)
     val aos = stringResource(R.string.sky_label_aos)
     val los = stringResource(R.string.sky_label_los)
+    val elevationRing = stringResource(R.string.sky_elevation_ring)
     val description = stringResource(R.string.sky_chart_description)
 
     Box(
@@ -96,7 +97,7 @@ fun SkyChart(
                             text.color = colors.west.toArgb()
                             canvas.drawText(west, -radius - fontSize / 2, fontSize / 2, text)
                             text.color = colors.elevationLabel.toArgb()
-                            canvas.drawText("45\u00B0", fontSize, -radius / 2 - fontSize / 2, text)
+                            canvas.drawText(elevationRing, fontSize, -radius / 2 - fontSize / 2, text)
                             text.color = colors.south.toArgb()
                             canvas.drawText(south, 0f, radius + fontSize, text)
                             text.color = colors.north.toArgb()

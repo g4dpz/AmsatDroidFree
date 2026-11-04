@@ -22,16 +22,16 @@ AmsatDroid Free (HamSatDroid) is now a Kotlin app targeting Android 16 (API 36) 
 
 ### Target device
 
-Primary target: **Samsung Galaxy Tab A11 8.7", UK Wi-Fi model SM-X130 (128 GB, 8 GB RAM, microSD slot)**. The cellular variants (SM-X133 / SM-X135 / SM-X135F) must also work. Facts, from Samsung UK's specification page for SM-X130 unless stated:
+Primary target: **Samsung Galaxy Tab A7 Lite 8.7", model SM-T225 (LTE)**, the tablet used for development. Facts measured on the device unless stated:
 
-- 1340 x 800 px TFT, 8.7", 90 Hz; GSMArena gives about 179 ppi. The real dp width depends on Samsung's density setting and must be measured on the device (Samsung does not publish the Android density bucket. The physical density of about 179 ppi could be reported as 160, 213 or 240 dpi, giving about 800, 601 or 533 dp wide in portrait and about 1340, 1007 or 893 dp in landscape. The 600 dp and 960 dp layout thresholds therefore may or may not be reached in some orientations, and are confirmed on the device).
-- Sensors listed: **accelerometer, geomagnetic sensor, light sensor**. There is **no gyroscope**, so the fused rotation-vector sensor may be missing or noisy. (GSMArena also lists a proximity sensor; Samsung does not. The app does not use it.)
-- Location technology: Samsung's page for this Wi-Fi model lists GPS, GLONASS, BeiDou, Galileo and QZSS, but GSMArena says GPS is on the cellular model only. **These sources disagree.** The app therefore detects GPS at run time (`FEATURE_LOCATION_GPS`) and must work either way. Which is true for your tablet is recorded during device testing.
-- Android: shipped with Android 15 (One UI 7); Samsung publishes an Android 16 user manual for it, so an update to Android 16 is available. Both versions must be supported.
-- MediaTek Helio G99 (Mali-G57 MC2); One UI split-screen, pop-up windows and DeX; Samsung battery management can restrict background work.
-- Likely used outdoors for portable operation, possibly with no data connection (Wi-Fi model has no mobile data).
+- 1340 x 800 px TFT, 8.7", 60 Hz; reported at 213 dpi, which gives **600 dp wide in portrait** (exactly on the two-pane threshold) and about 1116 dp in landscape. The 600 dp two-pane threshold is reached; the 960 dp dashboard threshold is reached only in landscape. Other density settings would move these, so the thresholds live in one place and are confirmed on the device.
+- Sensors: **accelerometer, magnetometer, light sensor**. There is **no gyroscope**; the platform still exposes fused rotation-vector, game-rotation-vector and geomagnetic-rotation-vector sensors (software-fused without a gyro), so the compass works but with lower accuracy and more smoothing.
+- Location: GPS is present (`FEATURE_LOCATION_GPS`), along with network location. The app still detects GPS at run time so it also runs on devices without it.
+- Android: ships with Android 12 (One UI 4, API 31). The app targets API 36 and supports API 30+. The Android 16 Live Update path therefore cannot be exercised on this device.
+- MediaTek Helio P35 (mt6765); One UI split-screen and pop-up windows; Samsung battery management can restrict background work.
+- Likely used outdoors for portable operation, possibly with no data connection.
 
-The app must work well on this device, and still run on any Android 11+ phone or tablet.
+The spec's original stated target was the Galaxy Tab A11 (SM-X130); it was changed to the SM-T225 actually used. The app must work well on this device, and still run on any Android 11+ phone or tablet.
 
 ### Decisions already made
 
@@ -48,7 +48,7 @@ The app must work well on this device, and still run on any Android 11+ phone or
 - A3. The settings screen is built in Compose on top of `SharedPreferences`, **not the AndroidX Preference library**, because that library is View-based and would be the one remaining non-Compose screen. The goal (no deprecated `android.preference`) is met either way. Existing preference keys are kept.
 - A4. The widget shows the next pass for the satellite last selected in the app, with no widget configuration screen.
 - A5. This spec delivers translation *support* (all strings externalised, locale configuration, in-app picker). Which languages to ship, and who translates them, is open. English is the only language delivered unless you nominate others.
-- A7. The Tab A11 in portrait is treated as a "medium or larger" window, so the two-pane layout starts at 600 dp, not 840 dp. The real dp widths are verified on the device.
+- A7. The SM-T225 in portrait (600 dp) is treated as a "medium or larger" window, so the two-pane layout starts at 600 dp, not 840 dp. The real dp widths are verified on the device.
 - A8. Automatic red night mode (by light sensor) is **off by default**; the user can choose the theme manually, and can switch the automatic mode on.
 - A9. Spoken alerts are **off by default**.
 - A10. Keep-screen-on while the sky or map screen is visible is **on by default**, because the screen is being watched during a pass; it can be turned off.
@@ -175,7 +175,7 @@ The app must work well on this device, and still run on any Android 11+ phone or
 3. The build SHALL complete with no Kotlin compiler warnings.
 4. New logic that does not touch Android APIs (alert timing, heading maths, keps parsing and validation, download policy, TLE and JSON element conversion, chart geometry, map projection, JSON storage) SHALL have JVM unit tests. Converting a TLE to orbital elements and back SHALL reproduce every field the prediction code uses.
 5. Each task SHALL leave the app building and runnable.
-6. The app SHALL be verified on a Galaxy Tab A11 SM-X130 (or an emulator configured with 1340 x 800 px at about 179 ppi, plus a no-gyroscope sensor profile if available) before the work is considered done.
+6. The app SHALL be verified on a Galaxy Tab A7 Lite SM-T225 (or an emulator configured with 1340 x 800 px at 213 dpi, plus a no-gyroscope sensor profile if available) before the work is considered done.
 
 ### Requirement 8: Jetpack Compose UI
 
@@ -193,7 +193,7 @@ The app must work well on this device, and still run on any Android 11+ phone or
 8. Long-running work (pass calculation, keps download) SHALL run in coroutines off the main thread and survive configuration changes via a ViewModel.
 9. Shared mutable statics (selected satellite, passes, ground station, predictor) SHALL be replaced by state held in ViewModels.
 10. The old Activities (`ASDActivity`, `SkyView`, `GroundView`, `PrefHandling`) and layout XML files SHALL be removed once replaced.
-11. Screens SHALL redraw only when their inputs change, so the app uses little power when nothing is moving, and animated content (compass-driven rotation, aiming display) SHALL render smoothly at the display's refresh rate (90 Hz on the Tab A11) without dropped frames.
+11. Screens SHALL redraw only when their inputs change, so the app uses little power when nothing is moving, and animated content (compass-driven rotation, aiming display) SHALL render smoothly at the display's refresh rate (60 Hz on the SM-T225) without dropped frames.
 
 ### Requirement 9: Modern storage
 
@@ -221,7 +221,7 @@ The app must work well on this device, and still run on any Android 11+ phone or
 5. Numeric values SHALL be stored and parsed with a fixed locale so a comma-decimal device locale cannot break them.
 6. No class from the deprecated `android.preference` package SHALL remain in the app.
 7. The current "use GPS / use network location" actions SHALL be kept and SHALL use single-shot location.
-8. WHERE the device has no GPS (`FEATURE_LOCATION_GPS` absent) THEN the GPS action SHALL be hidden or disabled with an explanation, and the app SHALL point the user to entering the locator or coordinates. This applies whichever way the Tab A11 Wi-Fi model turns out.
+8. WHERE the device has no GPS (`FEATURE_LOCATION_GPS` absent) THEN the GPS action SHALL be hidden or disabled with an explanation, and the app SHALL point the user to entering the locator or coordinates. The SM-T225 reports GPS; the app must also run on a device without it.
 9. IF network location is unavailable or returns nothing THEN the app SHALL say so and suggest entering the locator.
 10. Entering the IARU locator SHALL be the most prominent way to set the location in settings, since many devices will have no usable automatic fix.
 
@@ -246,7 +246,7 @@ The app must work well on this device, and still run on any Android 11+ phone or
 
 #### Acceptance criteria
 
-1. WHERE the window is at least 600 dp wide (medium or expanded width class) THEN the app SHALL show the pass list and the selected pass's sky view side by side. This includes the Tab A11 in portrait and landscape.
+1. WHERE the window is at least 600 dp wide (medium or expanded width class) THEN the app SHALL show the pass list and the selected pass's sky view side by side. This includes the SM-T225 in portrait and landscape.
 2. WHERE the window is narrower than 600 dp THEN the app SHALL show one screen at a time with navigation.
 3. The app SHALL NOT lock screen orientation in the manifest and SHALL work in portrait, landscape and resized windows.
 4. Rotating or resizing SHALL NOT lose the selected satellite, the calculated passes or the selected pass.
@@ -312,7 +312,7 @@ The app must work well on this device, and still run on any Android 11+ phone or
 7. Results SHALL be recalculated when the keps, location, time window or filter change, and the user SHALL be able to refresh manually.
 8. Tapping a row SHALL select that satellite and pass and open the sky view; long-pressing a row SHALL toggle a pass alert (Requirement 1).
 9. The calculation SHALL be cancellable and SHALL be cancelled when the screen is left.
-10. The time taken for a full calculation on the Tab A11 SHALL be measured and recorded.
+10. The time taken for a full calculation on the SM-T225 SHALL be measured and recorded.
 
 ### Requirement 17: Aiming aid
 

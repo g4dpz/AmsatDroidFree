@@ -3,6 +3,7 @@ package uk.me.g4dpz.HamSatDroid.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import uk.me.g4dpz.HamSatDroid.R
 import uk.me.g4dpz.HamSatDroid.domain.PassHeader
@@ -67,14 +68,14 @@ fun PassHeader.text(formats: DisplayFormats): String = when (this) {
                 satName, formats.coordinate(latitude), formats.coordinate(longitude), locator, formats.dateTime(startTime),
             )
         } else {
-            stringResource(
-                R.string.header_predictions_hours,
+            pluralStringResource(
+                R.plurals.header_predictions_hours, hoursAhead,
                 satName, formats.coordinate(latitude), formats.coordinate(longitude), locator,
                 formats.dateTime(startTime), hoursAhead,
             )
         }
-    is PassHeader.NoPasses -> stringResource(
-        R.string.header_no_passes,
+    is PassHeader.NoPasses -> pluralStringResource(
+        R.plurals.header_no_passes, searchedHours,
         satName, formats.coordinate(latitude), formats.coordinate(longitude), locator, searchedHours,
     )
     PassHeader.BadElements -> stringResource(R.string.header_bad_elements)

@@ -417,7 +417,7 @@ private fun AimPanel(
                     val el = status.deltaElDeg.roundToInt()
                     val azText = if (az >= 0) stringResource(R.string.aim_turn_right, az) else stringResource(R.string.aim_turn_left, -az)
                     val elText = if (el >= 0) stringResource(R.string.aim_raise, el) else stringResource(R.string.aim_lower, -el)
-                    Text("$azText   $elText", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.aim_move, azText, elText), style = MaterialTheme.typography.titleMedium)
                 }
                 AimStatus.BelowHorizon -> Text(
                     belowHorizonText(pass, satelliteName, formats),
