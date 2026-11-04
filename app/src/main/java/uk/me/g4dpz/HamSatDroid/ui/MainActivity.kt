@@ -19,6 +19,7 @@ import uk.me.g4dpz.HamSatDroid.night.ThemeMode
 import uk.me.g4dpz.HamSatDroid.night.effectiveThemeMode
 import uk.me.g4dpz.HamSatDroid.night.rememberAmbientNight
 import uk.me.g4dpz.HamSatDroid.ui.theme.isDark
+import uk.me.g4dpz.HamSatDroid.widget.WidgetRefresh
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -39,7 +40,10 @@ class MainActivity : ComponentActivity() {
         viewModelFactory {
             initializer {
                 val app = application as HamSatDroidApp
-                AppViewModel(createKepsRepository(app), PassStore(FileStore(app.filesDir)), app.settings)
+                AppViewModel(
+                    createKepsRepository(app), PassStore(FileStore(app.filesDir)), app.settings,
+                    onDataChanged = { WidgetRefresh.updateAll(app) },
+                )
             }
         }
     }

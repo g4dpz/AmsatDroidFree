@@ -57,6 +57,18 @@
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
+
+        <!-- Next-pass home-screen widget (Glance). -->
+        <receiver
+            android:name=".widget.NextPassWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/next_pass_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

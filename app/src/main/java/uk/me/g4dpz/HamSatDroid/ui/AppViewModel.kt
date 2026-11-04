@@ -52,6 +52,8 @@ class AppViewModel(
     private val calculator: PassCalculator = PassCalculator(),
     private val clock: () -> Long = System::currentTimeMillis,
     private val workDispatcher: CoroutineDispatcher = Dispatchers.Default,
+    /** Called when the keps or the selected satellite change, so the widget can be redrawn. Default no-op (tests). */
+    private val onDataChanged: suspend () -> Unit = {},
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AppUiState(hoursAhead = settings.calcHoursAhead.value))
@@ -80,6 +82,7 @@ class AppViewModel(
         if (_tles.value.none { it.catnum == catnum }) return
         settings.selectedCatnum.value = catnum
         _state.update { it.copy(selectedCatnum = catnum) }
+        viewModelScope.launch { onDataChanged() }
     }
 
     /** @param hours 0 for "next pass only", otherwise 6, 12 or 24 */
@@ -270,6 +273,7 @@ class AppViewModel(
     }
 
     private fun apply(loaded: LoadedKeps, preferred: Int?) {
+        viewModelScope.launch { onDataChanged() }
         _tles.value = loaded.tles
         val items = loaded.tles
             .map { SatelliteItem(it.catnum, it.name, ElementAge.epochMillis(it)) }

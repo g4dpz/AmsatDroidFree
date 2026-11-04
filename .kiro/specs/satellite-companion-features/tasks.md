@@ -199,13 +199,17 @@ Order: data layer, then Compose migration (parity first), then features on the n
     - On the SM-T225. Left to verify on the device: adding/editing/deleting through the dialog by hand, the corrected downlink falling then rising across a real pass (sign against another tool), comma-decimal entry, and that the figures update each second and stop when the screen is left.
 
 - [ ] 12. Widget
-  - [ ] 12.1 Persist the selected satellite; implement `WidgetUpdater.compute` and `WidgetState`, with tests for the state logic
+  - [x] 12.1 Persist the selected satellite; implement `WidgetUpdater.compute` and `WidgetState`, with tests for the state logic
+    - Done: the selected satellite was already persisted (`selectedCatnum`). `WidgetState` (NoLocation / NoSatellite / Ready / Error); `WidgetUpdater.decide` is a pure state chooser (`WidgetUpdaterTest`, 5 tests) and `compute` loads the keps and runs `PassPredictor.nextSatPass` with the same prediction code as the app.
     - _Requirements: 11.1, 11.2, 11.6, 7.4_
-  - [ ] 12.2 `NextPassWidget` (Glance, responsive compact and large layouts) and receiver, resizable provider XML, tap to open app
+  - [x] 12.2 `NextPassWidget` (Glance, responsive compact and large layouts) and receiver, resizable provider XML, tap to open app
+    - Done: Glance 1.2.0 widget with `SizeMode.Responsive` (compact = name + AOS; large adds max elevation and azimuths), `GlanceTheme` for light/dark and dynamic colour, tap opens the app. `NextPassWidgetReceiver`, resizable provider XML (`resizeMode`, min size, API 31 target cells and preview with a fallback initial layout).
     - _Requirements: 11.1, 11.5, 11.7, 11.8_
-  - [ ] 12.3 `WidgetRefreshWorker` and update triggers (keps refresh, satellite/location change, enable/disable)
+  - [x] 12.3 `WidgetRefreshWorker` and update triggers (keps refresh, satellite/location change, enable/disable)
+    - Done: `WidgetRefreshScheduler` starts a unique ~30 min periodic `WidgetRefreshWorker` in the receiver's `onEnabled` and cancels it in `onDisabled`; `WidgetRefresh.updateAll` is called from `AppViewModel` after a keps reload and when the satellite changes (wired through `onDataChanged`, so the ViewModel stays context-free and tests keep the no-op default).
     - _Requirements: 11.3, 11.4_
   - [ ] 12.4 Checkpoint: manual checks "Widget"
+    - On the SM-T225. The provider registers and the Glance compose path runs without error on the emulator, but a widget cannot be placed or rendered from the shell, so it must be checked by hand: add it from the launcher, confirm the states (no location, no satellite, next pass with the detail at a larger size), tap to open, change satellite and refresh keps to see it update, resize it, check light/dark, and remove the last one to stop the periodic work.
 
 - [ ] 13. Localisation and wrap-up
   - [ ] 13.1 String audit: remove remaining literals and concatenations from UI, notification, spoken and widget code; plurals where needed

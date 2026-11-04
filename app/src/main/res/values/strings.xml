@@ -236,6 +236,16 @@
     <string name="doppler_not_visible">The satellite is not above the horizon; these are the values it would need now.</string>
     <string name="doppler_label_needed">Enter a label and a valid downlink frequency.</string>
     <string name="action_save">Save</string>
+    <!-- Widget -->
+    <string name="widget_description">Shows the next pass of your selected satellite.</string>
+    <string name="widget_set_location">Set your home location in AmsatDroid</string>
+    <string name="widget_no_satellite">Choose a satellite in AmsatDroid</string>
+    <string name="widget_error">Pass could not be calculated</string>
+    <string name="widget_aos_at">AOS %1$s</string>
+    <string name="widget_in_minutes">in %1$d min</string>
+    <string name="widget_now">now</string>
+    <string name="widget_max_el">Max el %1$d°</string>
+    <string name="widget_az">AOS az %1$d° · LOS az %2$d°</string>
 
     <!-- Map view -->
     <string name="map_home_latitude">Home latitude</string>

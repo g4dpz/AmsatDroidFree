@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- targetCell* and previewLayout are API 31+; on API 30 the system falls back to minWidth/minHeight and
+     initialLayout, so naming them is deliberate. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:targetApi="31"
+    android:minWidth="140dp"
+    android:minHeight="48dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:description="@string/widget_description"
+    android:previewLayout="@layout/next_pass_widget_preview"
+    android:initialLayout="@layout/next_pass_widget_preview" />
