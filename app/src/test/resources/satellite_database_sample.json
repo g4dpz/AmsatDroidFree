@@ -1,0 +1,65 @@
+[
+  {
+    "name": "AO-07",
+    "norad_id": "07530",
+    "modes": [
+      {
+        "type": "Mode B",
+        "downlink": 145950,
+        "uplink": 432146,
+        "downlink_mode": "USB",
+        "uplink_mode": "LSB",
+        "doppler": "REV"
+      },
+      {
+        "type": "CW Beacon",
+        "downlink": 145970,
+        "uplink": 0,
+        "downlink_mode": "CW",
+        "uplink_mode": "CW",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "ISS",
+    "norad_id": "25544",
+    "modes": [
+      {
+        "type": "Cross band repeater",
+        "downlink": 437800,
+        "uplink": 145990,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR",
+        "ctcss": 67.0,
+        "sstv_modes": ["PD120"]
+      }
+    ]
+  },
+  {
+    "name": "RS-44",
+    "norad_id": "44909",
+    "modes": [
+      {
+        "type": "SSB Transponder",
+        "downlink": 435850.45,
+        "uplink": 145952.65,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "REV"
+      }
+    ]
+  },
+  {
+    "name": "No modes sat",
+    "norad_id": "99999",
+    "modes": []
+  },
+  {
+    "name": "Missing norad",
+    "modes": [
+      { "type": "FM", "downlink": 145800, "uplink": 437800 }
+    ]
+  }
+]

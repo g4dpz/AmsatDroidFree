@@ -495,6 +495,7 @@ fun AboutDialog(keps: KepsInfo?, formats: DisplayFormats, onDismiss: () -> Unit)
                         )
                     }
                 }
+                Text(stringResource(R.string.about_transponder_db), style = MaterialTheme.typography.bodySmall)
             }
         },
     )

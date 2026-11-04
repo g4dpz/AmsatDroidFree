@@ -16,13 +16,8 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextButton
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -51,10 +46,10 @@ import uk.me.g4dpz.HamSatDroid.aim.AimTarget
 import uk.me.g4dpz.HamSatDroid.aim.Orientation
 import uk.me.g4dpz.HamSatDroid.aim.PointingAxis
 import uk.me.g4dpz.HamSatDroid.aim.PointingMath
-import uk.me.g4dpz.HamSatDroid.data.FrequencyEntry
+import uk.me.g4dpz.HamSatDroid.data.DopplerDirection
+import uk.me.g4dpz.HamSatDroid.data.TransponderMode
 import uk.me.g4dpz.HamSatDroid.domain.AzEl
 import uk.me.g4dpz.HamSatDroid.domain.DopplerMath
-import uk.me.g4dpz.HamSatDroid.domain.FrequencyText
 import uk.me.g4dpz.HamSatDroid.ui.components.DropdownField
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
 import uk.me.g4dpz.HamSatDroid.domain.SkyGeometry
@@ -215,9 +210,9 @@ fun SkyContent(viewModel: AppViewModel, state: AppUiState, keepScreenOn: Boolean
 
         val catnum = tle?.catnum
         if (catnum != null) {
+            val database = (LocalContext.current.applicationContext as HamSatDroidApp).transponderDatabase
             DopplerCard(
-                store = settings.let { (LocalContext.current.applicationContext as HamSatDroidApp).frequencyStore },
-                catnum = catnum,
+                modes = remember(database, catnum) { database.modesForNoradId(catnum) },
                 reading = reading,
             )
         }
@@ -225,139 +220,86 @@ fun SkyContent(viewModel: AppViewModel, state: AppUiState, keepScreenOn: Boolean
 }
 
 /**
- * The Doppler card: a picker of the user's frequency entries for this satellite, an add/edit/delete dialog, and the
- * nominal and Doppler-corrected downlink and uplink with the shift, refreshed each second from the live range rate.
- * Below the horizon the values are shown with a note. The app bundles no frequencies; the user adds them.
+ * The Doppler card: a picker of the satellite's transponder modes from the OscarWatch database, and the nominal and
+ * Doppler-corrected downlink and uplink with the shift, refreshed each second from the live range rate. A beacon or
+ * receive-only mode shows only the downlink. Below the horizon the values are shown with a note. The database is
+ * read-only; when the satellite has no modes the card says so. Frequencies are not entered by the user.
  */
 @Composable
-private fun DopplerCard(store: uk.me.g4dpz.HamSatDroid.data.FrequencyStore, catnum: Int, reading: SkyReading?) {
+private fun DopplerCard(modes: List<TransponderMode>, reading: SkyReading?) {
     val formats = rememberDisplayFormats()
-    var entries by remember(catnum) { mutableStateOf(store.forSatellite(catnum)) }
-    var selectedLabel by rememberSaveable(catnum) { mutableStateOf<String?>(null) }
-    var editing by remember { mutableStateOf<FrequencyEntry?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
-
-    val selected = entries.firstOrNull { it.label == selectedLabel } ?: entries.firstOrNull()
-
-    fun reload() {
-        entries = store.forSatellite(catnum)
-    }
+    var selectedType by rememberSaveable(modes) { mutableStateOf<String?>(null) }
+    val selected = modes.firstOrNull { it.type == selectedType } ?: modes.firstOrNull()
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(stringResource(R.string.doppler_title), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-            TextButton(onClick = { editing = null; showDialog = true }) { Text(stringResource(R.string.doppler_add)) }
-        }
+        Text(stringResource(R.string.doppler_title), style = MaterialTheme.typography.titleSmall)
 
-        if (entries.isEmpty()) {
+        if (modes.isEmpty()) {
             Text(stringResource(R.string.doppler_none), style = MaterialTheme.typography.bodyMedium)
         } else {
             DropdownField(
-                label = stringResource(R.string.doppler_title),
-                options = entries,
+                label = stringResource(R.string.doppler_mode),
+                options = modes,
                 selected = selected,
-                optionLabel = { it.label },
-                onSelected = { selectedLabel = it.label },
+                optionLabel = { it.type },
+                onSelected = { selectedType = it.type },
                 modifier = Modifier.fillMaxWidth(),
             )
-            selected?.let { entry ->
-                val rangeRate = reading?.rangeRateKmS
+            selected?.let { mode ->
                 if (reading != null && reading.elevationDeg < 0) {
                     Text(stringResource(R.string.doppler_not_visible), style = MaterialTheme.typography.bodySmall)
                 }
-                FrequencyLines(entry, rangeRate, formats)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextButton(onClick = { editing = entry; showDialog = true }) { Text(stringResource(R.string.doppler_edit)) }
-                    TextButton(onClick = {
-                        store.remove(catnum, entry.label)
-                        if (selectedLabel == entry.label) selectedLabel = null
-                        reload()
-                    }) { Text(stringResource(R.string.doppler_delete)) }
-                }
+                FrequencyLines(mode, reading?.rangeRateKmS, formats)
             }
         }
-    }
-
-    if (showDialog) {
-        FrequencyDialog(
-            initial = editing,
-            onDismiss = { showDialog = false },
-            onSave = { label, downHz, upHz ->
-                store.put(FrequencyEntry(catnum, label, downHz, upHz))
-                selectedLabel = label
-                showDialog = false
-                reload()
-            },
-        )
     }
 }
 
 @Composable
-private fun FrequencyLines(entry: FrequencyEntry, rangeRateKmS: Double?, formats: DisplayFormats) {
+private fun FrequencyLines(mode: TransponderMode, rangeRateKmS: Double?, formats: DisplayFormats) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(stringResource(R.string.doppler_downlink), style = MaterialTheme.typography.labelLarge)
-        Text(stringResource(R.string.doppler_nominal, FrequencyText.hzGrouped(entry.downlinkHz)), style = MaterialTheme.typography.bodyMedium)
+        // Downlink (always present).
+        Text(
+            if (mode.downlinkMode.isBlank()) stringResource(R.string.doppler_downlink)
+            else stringResource(R.string.doppler_downlink_mode, mode.downlinkMode),
+            style = MaterialTheme.typography.labelLarge,
+        )
+        Text(stringResource(R.string.doppler_nominal, formats.groupedInteger(mode.downlinkHz)), style = MaterialTheme.typography.bodyMedium)
         if (rangeRateKmS != null) {
-            val tuned = DopplerMath.downlinkHz(entry.downlinkHz, rangeRateKmS)
-            Text(stringResource(R.string.doppler_corrected, FrequencyText.hzGrouped(tuned)), style = MaterialTheme.typography.bodyMedium)
+            val tuned = DopplerMath.downlinkHz(mode.downlinkHz, rangeRateKmS)
+            Text(stringResource(R.string.doppler_corrected, formats.groupedInteger(tuned)), style = MaterialTheme.typography.bodyMedium)
             Text(
-                stringResource(R.string.doppler_shift, FrequencyText.hzGrouped(tuned - entry.downlinkHz)),
+                stringResource(R.string.doppler_shift, formats.groupedInteger(tuned - mode.downlinkHz)),
                 style = MaterialTheme.typography.bodySmall,
             )
         }
-        entry.uplinkHz?.let { up ->
-            Text(stringResource(R.string.doppler_uplink), style = MaterialTheme.typography.labelLarge)
-            Text(stringResource(R.string.doppler_nominal, FrequencyText.hzGrouped(up)), style = MaterialTheme.typography.bodyMedium)
+
+        // Uplink (absent for a beacon or receive-only mode).
+        mode.uplinkHz?.let { up ->
+            Text(
+                if (mode.uplinkMode.isBlank()) stringResource(R.string.doppler_uplink)
+                else stringResource(R.string.doppler_uplink_mode, mode.uplinkMode),
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Text(stringResource(R.string.doppler_nominal, formats.groupedInteger(up)), style = MaterialTheme.typography.bodyMedium)
             if (rangeRateKmS != null) {
-                val tx = DopplerMath.uplinkHz(up, rangeRateKmS)
-                Text(stringResource(R.string.doppler_corrected_tx, FrequencyText.hzGrouped(tx)), style = MaterialTheme.typography.bodyMedium)
+                val tx = DopplerMath.uplinkHz(up, rangeRateKmS, inverting = mode.doppler == DopplerDirection.REV)
+                Text(stringResource(R.string.doppler_corrected_tx, formats.groupedInteger(tx)), style = MaterialTheme.typography.bodyMedium)
                 Text(
-                    stringResource(R.string.doppler_shift, FrequencyText.hzGrouped(tx - up)),
+                    stringResource(R.string.doppler_shift, formats.groupedInteger(tx - up)),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
+            if (mode.doppler == DopplerDirection.REV) {
+                Text(stringResource(R.string.doppler_inverting), style = MaterialTheme.typography.bodySmall)
+            }
+            mode.ctcssHz?.let { tone ->
+                Text(stringResource(R.string.doppler_ctcss, formats.oneDecimal(tone)), style = MaterialTheme.typography.bodySmall)
+            }
+        } ?: run {
+            Text(stringResource(R.string.doppler_beacon_only), style = MaterialTheme.typography.bodySmall)
         }
     }
-}
-
-@Composable
-private fun FrequencyDialog(initial: FrequencyEntry?, onDismiss: () -> Unit, onSave: (String, Long, Long?) -> Unit) {
-    var label by rememberSaveable { mutableStateOf(initial?.label ?: "") }
-    var downlink by rememberSaveable { mutableStateOf(initial?.let { FrequencyText.hzToMegahertzText(it.downlinkHz) } ?: "") }
-    var uplink by rememberSaveable { mutableStateOf(initial?.uplinkHz?.let { FrequencyText.hzToMegahertzText(it) } ?: "") }
-
-    val downHz = FrequencyText.megahertzToHz(downlink)
-    val upHz = if (uplink.isBlank()) null else FrequencyText.megahertzToHz(uplink)
-    val valid = label.isNotBlank() && downHz != null && (uplink.isBlank() || upHz != null)
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(enabled = valid, onClick = { onSave(label.trim(), downHz!!, upHz) }) {
-                Text(stringResource(R.string.action_save))
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = label, onValueChange = { label = it },
-                    label = { Text(stringResource(R.string.doppler_label)) }, singleLine = true,
-                )
-                OutlinedTextField(
-                    value = downlink, onValueChange = { downlink = it },
-                    label = { Text(stringResource(R.string.doppler_downlink_mhz)) }, singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                )
-                OutlinedTextField(
-                    value = uplink, onValueChange = { uplink = it },
-                    label = { Text(stringResource(R.string.doppler_uplink_mhz)) }, singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                )
-                if (!valid) Text(stringResource(R.string.doppler_label_needed), style = MaterialTheme.typography.bodySmall)
-            }
-        },
-    )
 }
 
 /**

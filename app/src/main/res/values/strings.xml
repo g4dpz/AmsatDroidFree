@@ -187,6 +187,7 @@
         <item quantity="other">Keps: %1$s, fetched %2$s (%3$d satellites)</item>
     </plurals>
     <string name="about_keps_failure">Last download problem (%1$s): %2$s</string>
+    <string name="about_transponder_db">Transponder frequencies: OscarWatch database by Peter Goodhall (MM9SQL), synced from tle.oscarwatch.org.</string>
     <string name="about_dismiss">Dismiss</string>
 
     <!-- Date and time pickers -->
@@ -240,22 +241,20 @@
     <string name="pointing_back">The back of the device</string>
     <!-- Doppler -->
     <string name="doppler_title">Frequencies (Doppler)</string>
-    <string name="doppler_add">Add frequency</string>
-    <string name="doppler_edit">Edit</string>
-    <string name="doppler_delete">Delete</string>
-    <string name="doppler_none">No frequencies for this satellite. Add one to see the Doppler-corrected values.</string>
-    <string name="doppler_label">Label</string>
-    <string name="doppler_downlink_mhz">Downlink (MHz)</string>
-    <string name="doppler_uplink_mhz">Uplink (MHz, optional)</string>
+    <string name="doppler_mode">Transponder mode</string>
+    <string name="doppler_none">No transponder data for this satellite.</string>
     <string name="doppler_downlink">Downlink (receive)</string>
     <string name="doppler_uplink">Uplink (transmit)</string>
+    <string name="doppler_downlink_mode">Downlink (receive, %1$s)</string>
+    <string name="doppler_uplink_mode">Uplink (transmit, %1$s)</string>
     <string name="doppler_nominal">Nominal: %1$s Hz</string>
     <string name="doppler_corrected">Tune: %1$s Hz</string>
     <string name="doppler_corrected_tx">Transmit: %1$s Hz</string>
     <string name="doppler_shift">Shift: %1$s Hz</string>
     <string name="doppler_not_visible">The satellite is not above the horizon; these are the values it would need now.</string>
-    <string name="doppler_label_needed">Enter a label and a valid downlink frequency.</string>
-    <string name="action_save">Save</string>
+    <string name="doppler_beacon_only">Beacon or receive-only: nothing to transmit.</string>
+    <string name="doppler_inverting">Inverting transponder: the uplink follows the downlink (tune lower as it recedes).</string>
+    <string name="doppler_ctcss">Uplink CTCSS tone: %1$s Hz</string>
     <!-- Widget -->
     <string name="widget_description">Shows the next pass of your selected satellite.</string>
     <string name="widget_set_location">Set your home location in AmsatDroid</string>

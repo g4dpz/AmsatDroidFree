@@ -31,9 +31,13 @@ class DisplayFormats(val locale: Locale, val zone: ZoneId = ZoneId.systemDefault
 
     private val integer = NumberFormat.getNumberInstance(locale).apply { maximumFractionDigits = 0 }
     private val twoDecimals = NumberFormat.getNumberInstance(locale).apply { maximumFractionDigits = 2 }
+    private val groupedInteger = NumberFormat.getIntegerInstance(locale)
 
     /** A whole number, such as a degree of azimuth or a range in kilometres. */
     fun integer(value: Double): String = integer.format(value)
+
+    /** A whole number with locale grouping, such as a frequency in hertz ("435,120,000"). */
+    fun groupedInteger(value: Long): String = groupedInteger.format(value)
 
     /** A number with up to two decimals, such as a latitude. */
     fun twoDecimals(value: Double): String = twoDecimals.format(value)

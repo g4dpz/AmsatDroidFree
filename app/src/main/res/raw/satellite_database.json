@@ -1,0 +1,1105 @@
+[
+  {
+    "name": "AO-07",
+    "norad_id": "07530",
+    "modes": [
+      {
+        "type": "Mode B",
+        "downlink": 145950,
+        "uplink": 432146,
+        "downlink_mode": "USB",
+        "uplink_mode": "LSB",
+        "doppler": "REV"
+      },
+      {
+        "type": "Mode A",
+        "downlink": 29450,
+        "uplink": 145900,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      },
+      {
+        "type": "CW",
+        "downlink": 145970,
+        "uplink": 0,
+        "downlink_mode": "CW",
+        "uplink_mode": "CW",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "AO-27",
+    "norad_id": "22825",
+    "modes": [
+      {
+        "type": "FM",
+        "downlink": 436795,
+        "uplink": 145850,
+        "downlink_mode": "FMN",
+        "uplink_mode": "FMN",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "AO-73",
+    "norad_id": "39444",
+    "modes": [
+      {
+        "type": "Voice U/V",
+        "downlink": 145960,
+        "uplink": 435148,
+        "downlink_mode": "USB",
+        "uplink_mode": "LSB",
+        "doppler": "REV"
+      },
+      {
+        "type": "1200bps BPSK Telemetry",
+        "downlink": 145935,
+        "uplink": 0,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "AO-91",
+    "norad_id": "43017",
+    "modes": [
+      {
+        "type": "Voice U/V",
+        "downlink": 145960,
+        "uplink": 435250,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "ISS",
+    "norad_id": "25544",
+    "modes": [
+      {
+        "type": "Cross band repeater",
+        "downlink": 437800,
+        "uplink": 145990,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR",
+        "ctcss": 67.0
+      },
+      {
+        "type": "Voice Region 1",
+        "downlink": 145800,
+        "uplink": 145200,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "Packet",
+        "downlink": 145825,
+        "uplink": 145825,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "UHF Packet",
+        "downlink": 437550,
+        "uplink": 437550,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "SSTV (VHF)",
+        "downlink": 145800,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR",
+        "sstv_modes": ["Pd120", "Pd180", "Robot36"]
+      },
+      {
+        "type": "SSTV (UHF)",
+        "downlink": 437550,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR",
+        "sstv_modes": ["Pd120", "Pd180", "Robot36"]
+      }
+    ]
+  },
+  {
+    "name": "PO-101",
+    "norad_id": "43678",
+    "modes": [
+      {
+        "type": "FM",
+        "downlink": 145900,
+        "uplink": 437500,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "FO-29",
+    "norad_id": "24278",
+    "modes": [
+      {
+        "type": "SSB Transponder",
+        "downlink": 435850.45,
+        "uplink": 145952.65,
+        "downlink_mode": "USB",
+        "uplink_mode": "LSB",
+        "doppler": "REV"
+      },
+      {
+        "type": "CW Beacon",
+        "downlink": 435795,
+        "uplink": 0,
+        "downlink_mode": "CW",
+        "uplink_mode": "CW",
+        "doppler": "REV"
+      }
+    ]
+  },
+  {
+    "name": "IO-117",
+    "norad_id": "53106",
+    "modes": [
+      {
+        "type": "Digipeater",
+        "downlink": 435309.3,
+        "uplink": 435309.3,
+        "downlink_mode": "DATA-USB",
+        "uplink_mode": "DATA-USB",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "JO-97",
+    "norad_id": "43803",
+    "modes": [
+      {
+        "type": "SSB Transponder",
+        "downlink": 145865,
+        "uplink": 435110.1,
+        "downlink_mode": "USB",
+        "uplink_mode": "LSB",
+        "doppler": "REV"
+      },
+      {
+        "type": "CW Transponder",
+        "downlink": 145865,
+        "uplink": 435110.1,
+        "downlink_mode": "USB",
+        "uplink_mode": "CW",
+        "doppler": "REV"
+      },
+      {
+        "type": "Beacon",
+        "downlink": 145840,
+        "uplink": 0,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      },
+      {
+        "type": "FT4",
+        "downlink": 145857,
+        "uplink": 435118,
+        "downlink_mode": "DATA-USB",
+        "uplink_mode": "DATA-LSB",
+        "doppler": "REV"
+      }
+    ]
+  },
+  {
+    "name": "RADFXSAT (FOX-1B)",
+    "norad_id": "43017",
+    "modes": [
+      {
+        "type": "Voice U/V",
+        "downlink": 145960,
+        "uplink": 435250,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "RS-44",
+    "norad_id": "44909",
+    "modes": [
+      {
+        "type": "SSB Transponder",
+        "downlink": 435667,
+        "uplink": 145937.61,
+        "downlink_mode": "USB",
+        "uplink_mode": "LSB",
+        "doppler": "REV"
+      },
+      {
+        "type": "FT4",
+        "downlink": 435611,
+        "uplink": 145993.61,
+        "downlink_mode": "DATA-USB",
+        "uplink_mode": "DATA-LSB",
+        "doppler": "REV"
+      },
+      {
+        "type": "CW TLM",
+        "downlink": 435605,
+        "uplink": 0,
+        "downlink_mode": "CW",
+        "uplink_mode": "CW",
+        "doppler": "REV"
+      }
+    ]
+  },
+  {
+    "name": "SO-50",
+    "norad_id": "27607",
+    "modes": [
+      {
+        "type": "FM VOICE",
+        "downlink": 436795,
+        "uplink": 145850,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR",
+        "ctcss": 67.0,
+        "ctcss_arm": 74.4
+      }
+    ]
+  },
+  {
+    "name": "CSS",
+    "norad_id": "48274",
+    "modes": [
+      {
+        "type": "Cross Band Repeater V/U",
+        "downlink": 145875,
+        "uplink": 436510,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "Cross Band Repeater U/V",
+        "downlink": 435075,
+        "uplink": 145985,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "MO-122",
+    "norad_id": "60209",
+    "modes": [
+      {
+        "type": "SSB Transponder",
+        "downlink": 435825.6,
+        "uplink": 145925,
+        "downlink_mode": "USB",
+        "uplink_mode": "LSB",
+        "doppler": "REV"
+      }
+    ]
+  },
+  {
+    "name": "AO-123",
+    "norad_id": "61781",
+    "modes": [
+      {
+        "type": "FM Voice",
+        "downlink": 435400,
+        "uplink": 145850,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR",
+        "ctcss": 67.0
+      },
+      {
+        "type": "SSDV 9k6 BPSK",
+        "downlink": 436210,
+        "uplink": 0,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "SONATE-2",
+    "norad_id": "59112",
+    "modes": [
+      {
+        "type": "SSTV",
+        "downlink": 145880,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "APRS",
+        "downlink": 145825,
+        "uplink": 145825,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "Telemetry GMSK9k6",
+        "downlink": 437025,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "CW Beacon",
+        "downlink": 145840,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "TEVEL2-1",
+    "norad_id": "63217",
+    "modes": [
+      {
+        "type": "Voice",
+        "downlink": 436400,
+        "uplink": 145970,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "TEVEL2-2",
+    "norad_id": "63219",
+    "modes": [
+      {
+        "type": "Voice",
+        "downlink": 436400,
+        "uplink": 145970,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "TEVEL2-3",
+    "norad_id": "63218",
+    "modes": [
+      {
+        "type": "Voice",
+        "downlink": 436400,
+        "uplink": 145970,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "TEVEL2-4",
+    "norad_id": "63213",
+    "modes": [
+      {
+        "type": "Voice",
+        "downlink": 436400,
+        "uplink": 145970,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "TEVEL2-5",
+    "norad_id": "63214",
+    "modes": [
+      {
+        "type": "Voice",
+        "downlink": 436400,
+        "uplink": 145970,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "TEVEL2-6",
+    "norad_id": "63215",
+    "modes": [
+      {
+        "type": "Voice",
+        "downlink": 436400,
+        "uplink": 145970,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "TEVEL2-7",
+    "norad_id": "63238",
+    "modes": [
+      {
+        "type": "Voice",
+        "downlink": 436400,
+        "uplink": 145970,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "TEVEL2-8",
+    "norad_id": "63239",
+    "modes": [
+      {
+        "type": "Voice",
+        "downlink": 436400,
+        "uplink": 145970,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "TEVEL2-9",
+    "norad_id": "63237",
+    "modes": [
+      {
+        "type": "Voice",
+        "downlink": 436400,
+        "uplink": 145970,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "PARUS-T2",
+    "norad_id": "64560",
+    "modes": [
+      {
+        "type": "Voice",
+        "downlink": 435250,
+        "uplink": 145980,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "QO-100",
+    "norad_id": "43700",
+    "modes": [
+      {
+        "type": "Narrowband Transponder",
+        "downlink": 10489745,
+        "uplink": 2400245,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      },
+      {
+        "type": "Wideband DATV",
+        "downlink": 10495000,
+        "uplink": 2405500,
+        "downlink_mode": "DATA-USB",
+        "uplink_mode": "DATA-USB",
+        "doppler": "NOR"
+      },
+      {
+        "type": "Lower CW Beacon",
+        "downlink": 10489500,
+        "uplink": 0,
+        "downlink_mode": "CW",
+        "uplink_mode": "CW",
+        "doppler": "NOR"
+      },
+      {
+        "type": "BPSK Beacon",
+        "downlink": 10489750,
+        "uplink": 0,
+        "downlink_mode": "DATA-USB",
+        "uplink_mode": "DATA-USB",
+        "doppler": "NOR"
+      },
+      {
+        "type": "Upper CW Beacon",
+        "downlink": 10490000,
+        "uplink": 0,
+        "downlink_mode": "CW",
+        "uplink_mode": "CW",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "QMR-KWT-2",
+    "norad_id": "67291",
+    "modes": [
+      {
+        "type": "FM VOICE",
+        "downlink": 436950,
+        "uplink": 145920,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR",
+        "ctcss": 67.0
+      },
+      {
+        "type": "SSTV",
+        "downlink": 436950,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "Lobachevsky",
+    "norad_id": "67284",
+    "modes": [
+      {
+        "type": "FM VOICE",
+        "downlink": 145910,
+        "uplink": 435500,
+        "downlink_mode": "FMN",
+        "uplink_mode": "FMN",
+        "doppler": "NOR"
+      },
+      {
+        "type": "SSTV / SSDV",
+        "downlink": 436320,
+        "uplink": 0,
+        "downlink_mode": "FMN",
+        "uplink_mode": "FMN",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "BOTAN",
+    "norad_id": "65942",
+    "modes": [
+      {
+        "type": "Packet",
+        "downlink": 145825,
+        "uplink": 145825,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "TEN-KOH2",
+    "norad_id": "88780",
+    "modes": [
+      {
+        "type": "SSB Transponder",
+        "downlink": 435895,
+        "uplink": 145915,
+        "downlink_mode": "USB",
+        "uplink_mode": "LSB",
+        "doppler": "REV"
+      }
+    ]
+  },
+  {
+    "name": "ArcticSat-1",
+    "norad_id": "61762",
+    "modes": [
+      {
+        "type": "SSTV",
+        "downlink": 435890,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "Monitor-3",
+    "norad_id": "57180",
+    "modes": [
+      {
+        "type": "SSTV",
+        "downlink": 435290,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "Monitor-4",
+    "norad_id": "57182",
+    "modes": [
+      {
+        "type": "SSTV",
+        "downlink": 436080,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "UmKA-1",
+    "norad_id": "57172",
+    "modes": [
+      {
+        "type": "SSTV",
+        "downlink": 437625,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR",
+        "sstv_modes": ["Robot36"]
+      }
+    ]
+  },
+  {
+    "name": "VIZARD-meteo",
+    "norad_id": "57189",
+    "modes": [
+      {
+        "type": "SSTV",
+        "downlink": 437825,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "SAKHACUBE-CHOLBON",
+    "norad_id": "67290",
+    "modes": [
+      {
+        "type": "SSTV",
+        "downlink": 437350,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR",
+        "sstv_modes": ["Robot36"]
+      }
+    ]
+  },
+  {
+    "name": "GALAPAGOS-UTE-SWSU",
+    "norad_id": "67279",
+    "modes": [
+      {
+        "type": "SSTV",
+        "downlink": 437050,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "NO-44",
+    "norad_id": "26931",
+    "modes": [
+      {
+        "type": "APRS",
+        "downlink": 145825,
+        "uplink": 145825,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "LASARsat",
+    "norad_id": "62391",
+    "modes": [
+      {
+        "type": "Packet (9k6 GFSK/G3RUH)",
+        "downlink": 436925,
+        "uplink": 436925,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "KNACKSAT-2",
+    "norad_id": "67683",
+    "modes": [
+      {
+        "type": "Packet (9k6 APRS)",
+        "downlink": 145825,
+        "uplink": 145825,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "IO-86",
+    "norad_id": "40931",
+    "modes": [
+      {
+        "type": "Voice FM",
+        "downlink": 435880,
+        "uplink": 145880,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "APRS",
+        "downlink": 145825,
+        "uplink": 145825,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "SSDV 1k2 IL2P",
+        "downlink": 145880,
+        "uplink": 0,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "GRBBeta",
+    "norad_id": "60237",
+    "modes": [
+      {
+        "type": "Packet (9k6 GMSK/Skylink)",
+        "downlink": 437125,
+        "uplink": 437125,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "CroCube",
+    "norad_id": "62394",
+    "modes": [
+      {
+        "type": "Packet (9k6 GFSK/G3RUH)",
+        "downlink": 436775,
+        "uplink": 436775,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "HADES-L",
+    "norad_id": "100909",
+    "modes": [
+      {
+        "type": "Voice A/U",
+        "downlink": 436665,
+        "uplink": 29472,
+        "downlink_mode": "FM",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      },
+      {
+        "type": "800bps FSK Telemetry",
+        "downlink": 436665,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "Erminaz-2U",
+    "norad_id": "100915",
+    "modes": [
+      {
+        "type": "Digipeater (9k6 FSK)",
+        "downlink": 435900,
+        "uplink": 435900,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "9k6 GMSK Telemetry / SSDV",
+        "downlink": 435900,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "CW",
+        "downlink": 435900,
+        "uplink": 0,
+        "downlink_mode": "CW",
+        "uplink_mode": "CW",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "JAMX01",
+    "norad_id": "100470",
+    "modes": [
+      {
+        "type": "FM Digipeater",
+        "downlink": 435175,
+        "uplink": 145950,
+        "downlink_mode": "DATA-FM",
+        "uplink_mode": "DATA-FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "SSTV",
+        "downlink": 435175,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "CW",
+        "downlink": 435175,
+        "uplink": 0,
+        "downlink_mode": "CW",
+        "uplink_mode": "CW",
+        "doppler": "NOR"
+      },
+      {
+        "type": "9k6 BPSK Beacon",
+        "downlink": 435075,
+        "uplink": 0,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      },
+      {
+        "type": "9k6 BPSK Telemetry",
+        "downlink": 435500,
+        "uplink": 0,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "BY70-4",
+    "norad_id": "100469",
+    "modes": [
+      {
+        "type": "9k6 BPSK Telemetry",
+        "downlink": 437443,
+        "uplink": 0,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      },
+      {
+        "type": "SSDV 9k6 BPSK",
+        "downlink": 437443,
+        "uplink": 0,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "UNNE-1B",
+    "norad_id": "100948",
+    "modes": [
+      {
+        "type": "FM Repeater",
+        "downlink": 436888,
+        "uplink": 145925,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      },
+      {
+        "type": "200bps FSK Telemetry",
+        "downlink": 436888,
+        "uplink": 0,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      },
+      {
+        "type": "CW",
+        "downlink": 436888,
+        "uplink": 0,
+        "downlink_mode": "CW",
+        "uplink_mode": "CW",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "UTMN-2",
+    "norad_id": "57203",
+    "modes": [
+      {
+        "type": "SSTV",
+        "downlink": 436125,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "Marina",
+    "norad_id": "69920",
+    "modes": [
+      {
+        "type": "SSDV",
+        "downlink": 436680,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "239Alferov",
+    "norad_id": "64881",
+    "modes": [
+      {
+        "type": "SSDV 9k6 GFSK",
+        "downlink": 436270,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "Luca",
+    "norad_id": "67287",
+    "modes": [
+      {
+        "type": "SSDV 2k4 GMSK",
+        "downlink": 437180,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "Geoscan-2",
+    "norad_id": "64890",
+    "modes": [
+      {
+        "type": "SSDV 9k6 GFSK",
+        "downlink": 436160,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "Geoscan-4",
+    "norad_id": "64892",
+    "modes": [
+      {
+        "type": "SSDV 9k6 GFSK",
+        "downlink": 435335,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "Geoscan-5",
+    "norad_id": "64891",
+    "modes": [
+      {
+        "type": "SSDV 9k6 GFSK",
+        "downlink": 436660,
+        "uplink": 0,
+        "downlink_mode": "FM",
+        "uplink_mode": "FM",
+        "doppler": "NOR"
+      }
+    ]
+  },
+  {
+    "name": "SO-127",
+    "norad_id": "68446",
+    "modes": [
+      {
+        "type": "SSDV",
+        "downlink": 436875,
+        "uplink": 0,
+        "downlink_mode": "USB",
+        "uplink_mode": "USB",
+        "doppler": "NOR"
+      }
+    ]
+  }
+]

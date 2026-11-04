@@ -63,4 +63,19 @@ class DopplerMathTest {
         val shift = DopplerMath.downlinkShiftHz(435_000_000L, 3.0)
         assertTrue("shift was $shift", Math.abs(shift) in 3_000..6_000)
     }
+
+    @Test
+    fun `an inverting transponder follows the downlink direction on the uplink`() {
+        val nominal = 145_900_000L
+        val receding = 6.0
+        // Normal: uplink raised while receding. Inverting: uplink lowered instead, matching the downlink direction.
+        assertEquals(DopplerMath.uplinkHz(nominal, receding), DopplerMath.uplinkHz(nominal, receding, inverting = false))
+        assertEquals(DopplerMath.downlinkHz(nominal, receding), DopplerMath.uplinkHz(nominal, receding, inverting = true))
+        assertTrue(DopplerMath.uplinkHz(nominal, receding, inverting = true) < nominal)
+        // The magnitude of the shift is the same either way; only the direction differs (within 1 Hz, as the normal
+        // and inverting corrections truncate to a whole hertz independently).
+        val normalShift = DopplerMath.uplinkHz(nominal, receding, inverting = false) - nominal
+        val invertedShift = DopplerMath.uplinkHz(nominal, receding, inverting = true) - nominal
+        assertTrue("normal $normalShift vs inverted $invertedShift", Math.abs(normalShift + invertedShift) <= 1)
+    }
 }

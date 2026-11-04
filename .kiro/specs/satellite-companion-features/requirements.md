@@ -52,7 +52,7 @@ The spec's original stated target was the Galaxy Tab A11 (SM-X130); it was chang
 - A8. Automatic red night mode (by light sensor) is **off by default**; the user can choose the theme manually, and can switch the automatic mode on.
 - A9. Spoken alerts are **off by default**.
 - A10. Keep-screen-on while the sky or map screen is visible is **on by default**, because the screen is being watched during a pass; it can be turned off.
-- A11. Doppler needs satellite frequencies, which are not in the keps. They are **entered by the user** and stored on the device. No frequency list is bundled, because frequencies change and I cannot verify one.
+- A11. Doppler needs satellite frequencies, which are not in the keps. These come from the **OscarWatch transponder database** (`satellite_database.json`): a copy is **bundled with the app** as the fallback, and the app **syncs the published copy** from `https://tle.oscarwatch.org/satellite_database.json`. The database is **read-only in the app** — there is no in-app frequency editor and the user does not enter frequencies. Entries are matched to satellites by NORAD id. This replaces the earlier plan where the user entered and stored frequencies themselves. The database carries, per satellite, one or more transponder modes with downlink/uplink frequencies, downlink/uplink modulation modes (USB/LSB/CW/FM/FMN), a Doppler direction (NOR/REV, REV for inverting transponders), and an optional FM uplink CTCSS tone.
 - A12. The aiming aid points along the device's **top edge** by default (as if the tablet is strapped to an antenna boom or held like a Yagi), with the back of the device as an option.
 - A13. Out of scope: Bluetooth or USB radio and rotator control, and microSD or USB-C features. A "clock last synced" warning for offline use is a possible follow-up, not in this spec.
 - A14. **Default keps source (decided).** The default is **Celestrak amateur, downloaded as JSON**. AMSAT stays available as an option. Reason: AMSAT's file is TLE-only, so it can never contain objects numbered above 99999 (checked: it has 97 satellites, highest catalogue number 71922, and no AO-129 or AO-130), while Celestrak's amateur group has 98 including three with 6-digit numbers. The two lists also differ by about 48 satellites each way, so switching source changes which satellites are listed.
@@ -288,14 +288,16 @@ The spec's original stated target was the Galaxy Tab A11 (SM-X130); it was chang
 
 #### Acceptance criteria
 
-1. The user SHALL be able to add, edit and delete named frequency entries (label, downlink in Hz, optional uplink in Hz) per satellite, stored on the device.
-2. WHILE the sky screen shows a satellite with entries THEN it SHALL show, for the selected entry, the nominal frequencies, the Doppler-corrected downlink to tune and the corrected uplink to transmit, and the shift in Hz, updated every second.
-3. The corrected values SHALL use the same formulas as `PassPredictor.getDownlinkFreq` and `getUplinkFreq` (range rate in km/s, first-order Doppler), and a unit test SHALL confirm the two agree.
-4. Frequencies SHALL be shown with 1 Hz resolution in a locale-appropriate format and entered with a fixed-locale parser.
-5. WHEN the satellite is below the horizon THEN the screen SHALL show the values with a note that the satellite is not currently visible.
-6. IF a satellite has no entries THEN the screen SHALL offer to add one and SHALL otherwise behave as before.
-7. The app SHALL NOT bundle a frequency list (see A11).
-8. The stored data SHALL be JSON written atomically.
+1. Satellite transponder characteristics SHALL come from the OscarWatch transponder database (`satellite_database.json`): the app SHALL load a bundled copy as the fallback, sync the published copy from the remote URL, and prefer the synced copy when present (synced → bundled). The database is read-only; the app SHALL NOT provide a frequency editor and the user SHALL NOT enter frequencies.
+2. Each satellite's characteristics SHALL comprise one or more transponder modes, each with a type label, a downlink frequency, an optional uplink frequency (absent or zero for a beacon / receive-only mode), downlink and uplink modulation modes (USB/LSB/CW/FM/FMN), a Doppler direction (NOR or REV, REV for an inverting transponder), and an optional FM uplink CTCSS tone. Database entries SHALL be matched to the app's satellites by NORAD id.
+3. WHILE the sky screen shows a satellite that has one or more modes in the database THEN it SHALL show, for the selected mode, the mode type and modulation modes, the nominal frequencies, the Doppler-corrected downlink to tune and the corrected uplink to transmit, and the shift in Hz, updated every second. For a beacon / receive-only mode only the downlink SHALL be shown.
+4. The corrected values SHALL use the same formulas as `PassPredictor.getDownlinkFreq` and `getUplinkFreq` (range rate in km/s, first-order Doppler), and a unit test SHALL confirm the two agree. For a REV (inverting) mode the correction direction of the uplink relative to the downlink SHALL reflect the inversion.
+5. Frequencies SHALL be shown with 1 Hz resolution in a locale-appropriate format.
+6. WHEN the satellite is below the horizon THEN the screen SHALL show the values with a note that the satellite is not currently visible.
+7. IF a satellite has no modes in the database THEN the screen SHALL say so and SHALL otherwise behave as before.
+8. The sync SHALL follow the same download safeguards as the keps refresh (https only, no redirects, a response size cap and timeouts, a User-Agent naming the app and version, and a minimum interval between fetches shared by automatic and manual runs). A failed or invalid sync SHALL keep the existing database (synced copy if present, otherwise bundled) and record the failure; a successful sync that parses to at least one satellite SHALL replace the synced copy atomically.
+9. The app SHALL NOT edit, merge field-by-field, or let the user override the database; a sync SHALL replace the synced copy wholesale. (This is simpler than OscarWatch's own merge-and-conflict editor, which is out of scope here.)
+10. Loading a missing, corrupt or wrong-schema database (bundled or synced) SHALL fall back to the other copy or to no characteristics, never a crash.
 
 ### Requirement 16: All-satellite pass overview
 
