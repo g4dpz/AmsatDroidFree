@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="uk.me.g4dpz.HamSatDroid"
-    android:versionCode="17"
-    android:versionName="1.0.14" >
-
-    <uses-sdk
-        android:minSdkVersion="15"
-        android:targetSdkVersion="21" />
+    xmlns:tools="http://schemas.android.com/tools"
+>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Pass alerts: notifications (runtime permission on Android 13+), exact alarms (opt-in via system settings),
+         Live Update promotion on Android 16, and rescheduling alerts after a reboot. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <supports-screens
         android:largeScreens="true"
@@ -20,40 +22,41 @@
         android:xlargeScreens="true" />
 
     <application
+        android:name=".HamSatDroidApp"
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="33"
         android:allowBackup="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
+        <!-- The Compose UI: one activity hosting every screen. It follows the device orientation and window size. -->
         <activity
-            android:name=".HamSatDroid"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden|uiMode|density"
+            android:theme="@style/Theme.HamSatDroid">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="PrefHandling" >
-        </activity>
-        <activity
-            android:name="GroundView"
-            android:screenOrientation="sensor" >
-        </activity>
-        <activity
-            android:name=".SkyView"
-            android:screenOrientation="portrait" >
-        </activity>
 
-        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
-
+        <!-- Fires at each stage of a pass to show the notification and (optionally) speak. Not exported: only our
+             own alarms trigger it. -->
         <receiver
-            android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
-            android:exported="true" >
+            android:name=".alert.PassAlertReceiver"
+            android:exported="false" />
+
+        <!-- Re-registers alarms after a reboot, an app update, or a clock or time-zone change. -->
+        <receiver
+            android:name=".alert.AlertRescheduleReceiver"
+            android:exported="true">
             <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
-        
     </application>
 
 </manifest>

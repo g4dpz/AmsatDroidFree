@@ -1,34 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AmsatDroid Free</string>
-    <string name="CalculatePass">Calculate Pass</string>
-    <string name="SetStartTime">Change Start Time</string>
-    <string name="SatellitePrompt">Available Satellites</string>
-    <string name="SetHomeLocation">Set Home Location</string>
-    <string name="About">About</string>
-    <string name="Load">Update Keps</string>
-    <string name="LoadElem">From SD Card (/nasabare.txt)</string>
     <string name="DownloadAmateurAmsatElem">Amateur (amsat.org)</string>
-    <string name="DownloadAmateurCelestrakElem">Amateur (celestrak.com)</string>
-    <string name="DownloadCubesatCelestrakElem">Cubesat (celestrak.com)</string>
-    <string name="DownloadWeatherCelestrakElem">Weather (celestrak.com)</string>
-    <string name="DownloadResourcesCelestrakElem">Resources (celestrak.com)</string>
-    <string name="DownloadNewCelestrakElem">New launches (celestrak.com)</string>
+    <string name="DownloadAmateurCelestrakElem">Amateur (celestrak.org)</string>
+    <string name="DownloadCubesatCelestrakElem">Cubesat (celestrak.org)</string>
+    <string name="DownloadWeatherCelestrakElem">Weather (celestrak.org)</string>
+    <string name="DownloadResourcesCelestrakElem">Resources (celestrak.org)</string>
+    <string name="DownloadNewCelestrakElem">New launches (celestrak.org)</string>
     
-    <string name="TimeSelectorPrompt">Select Time Period</string>
-    <string name="GetNetworkLocation">From Network</string>
-    <string name="GetGPSLocation">From GPS</string>
-    <string name="EnterLocation">Enter Coordinates</string>
-    <string name="GettingLocation">Getting Location&#8230;</string>
-    <string name="MapView">Map View</string>
-    <string name="SatelliteName">Satellite Name</string>
-    <string name="SatelliteLocation">Satellite Location</string>
-    <string name="Satellite">Satellite</string>
-    <string name="PassInformation">Pass Information</string>
-    <string name="SatelliteLatitudeLongitude">Satellite Latitude/Longitude</string>
-    <string name="ObserverLatitudeLongitude">Observer Latitude/Longitude</string>
-    <string name="CalculatePassesForTheNext">Calculate passes for the next</string>
-    <string name="StartTime">Start Time</string>
     <string name="AboutString">
 	AmsatDroid: Amateur Radio Satellite Pass Calculator \n
 	 \n
@@ -39,18 +18,191 @@
 	\n
 	This software is provided \'as is\' with no explicit or implied warranties in respect of any properties, including, but not limited to, correctness and fitness for purpose.
 	</string>
-    <string name="Help">Help</string>
-    <string name="HelpString">
-	- After installation, the first time the application starts it will look for keplerian elements on the default location (root folder of the SD card). It expects a file named \"nasabare.txt\", in the same exact format as the \"Bare NASA 2-line format elements\", available from AMSAT\'s webpage. If this file can not be found, a default set of elements shipped with the application will be used. The keps can be manually updated later on (see below). \n
-	- To manually enter a location: Select \"Menu > Set Home Location > Enter Coordinates\" and enter the coordinates (in decimal degrees) for your location. Use negative numbers for South latitude and West longitude. If an invalid latitude or longitude is entered the value will be automatically set to zero.\n
-	- To use your current position: Select \"Menu > Set Home Location > From GPS\" to use the GPS receiver, or \"Menu > Set Home Location > From Network\" for a faster (but typically less accurate) fix from the network.\n
-	- Select the satellite you want to calculate passes for from the drop-down menu. All the satellites imported from the keps file are available here.\n
-	- Select the time period for your pass calculation from the drop down menu.  Passes will be calculated starting from the current time and for the period of time selected in this drop-down menu.\n
-	- Hit the \"Calculate\" button to start the calculation. Depending on your device and other factors, this process can take between a few seconds and a minute or two.\n
-	- Click on a pass to display a graphical view of that pass. Use your device\'s \"Back\" button to go back to the pass screen.\n
-	- Select \"Menu > Map View\" to display the currently selected satellite and home location on a world map. Use your device\'s \"Back\" button to go back to the pass screen.\n
-	- If your device is connected to the Internet, select \"Menu > Update Keps > From Web (amsat.org)\". If no error is displayed it means the operation was successful.\n
-	- Keps can also be update from a file in the SD card, by selecting \"Menu > Update Keps > From SD Card (/nasabare.txt)\". Please see the first item in this page for the expected location and format of this file. If no error is displayed it means the operation was successful.\n
-	</string>
     
+
+    <!-- Compose UI -->
+    <string name="nav_sky">Sky view</string>
+    <string name="nav_map">Map view</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Common -->
+    <string name="action_back">Back</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_open_settings">Open settings</string>
+
+    <!-- Settings screen -->
+    <string name="settings_section_location">Home location</string>
+    <string name="settings_location_help">Enter your IARU (Maidenhead) locator, or your latitude and longitude in degrees. The other values are filled in for you.</string>
+    <string name="settings_locator_label">IARU locator</string>
+    <string name="settings_latitude_label">Latitude (-90 to 90)</string>
+    <string name="settings_longitude_label">Longitude (-180 to 180)</string>
+    <string name="settings_use_gps">Use GPS</string>
+    <string name="settings_use_network">Use network location</string>
+    <string name="settings_no_gps">This device has no GPS. Enter your locator, or try the network location.</string>
+    <string name="settings_getting_location">Retrieving location…</string>
+    <string name="error_invalid_latitude">Invalid latitude, set to 0</string>
+    <string name="error_invalid_longitude">Invalid longitude, set to 0</string>
+    <string name="error_invalid_locator">Invalid locator, set to %1$s</string>
+    <string name="location_set">Location set to %1$s, %2$s (%3$s).</string>
+    <string name="location_accuracy">Accuracy: %1$d meters.</string>
+    <string name="location_accuracy_unknown">Accuracy unknown.</string>
+    <string name="location_provider_disabled">Please turn on %1$s location in the system settings.</string>
+    <string name="location_provider_gps">GPS</string>
+    <string name="location_provider_network">network</string>
+    <string name="location_not_found">Could not get a location. Enter your locator instead.</string>
+    <string name="location_permission_needed">Location permission is needed to set your position automatically. You can enter your locator instead.</string>
+    <string name="settings_section_keps">Orbital elements (keps)</string>
+    <string name="settings_auto_refresh">Update keps automatically every 24 hours</string>
+    <string name="settings_keps_source">Keps source</string>
+    <string name="settings_section_display">Display</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_auto_red_night">Switch to red night mode automatically in the dark</string>
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_red_night">Red night</string>
+    <string name="settings_keep_screen_on">Keep the screen on while tracking</string>
+    <string name="settings_section_background">Background activity</string>
+    <string name="settings_background_text">Some devices, including Samsung tablets and phones, restrict background apps. That can delay automatic keps updates and pass alerts. If that happens, set this app\'s battery use to Unrestricted in the app settings.</string>
+    <string name="settings_open_app_settings">Open app settings</string>
+
+    <!-- Passes screen -->
+    <string name="passes_satellite_label">Satellite</string>
+    <string name="passes_range_label">Calculate passes for the next</string>
+    <string name="passes_starting_now">Starting: now</string>
+    <string name="passes_starting_at">Starting: %1$s</string>
+    <string name="passes_change_start_time">Change start time</string>
+    <string name="passes_use_current_time">Use current time</string>
+    <string name="passes_calculate">Calculate pass</string>
+    <string name="passes_loading">Loading satellites…</string>
+    <string name="passes_none_yet">Choose a satellite and press Calculate pass.</string>
+    <plurals name="passes_elements_stale">
+        <item quantity="one">The elements for %1$s are %2$d day old, so predictions may be wrong. Update the keps from the menu.</item>
+        <item quantity="other">The elements for %1$s are %2$d days old, so predictions may be wrong. Update the keps from the menu.</item>
+    </plurals>
+    <string name="menu_more">More options</string>
+    <string name="menu_set_home_location">Set home location</string>
+    <string name="menu_update_keps">Update keps</string>
+    <string name="menu_map_view">Map view</string>
+    <string name="menu_overview">All satellites</string>
+    <string name="overview_title">All satellites</string>
+    <string name="overview_refresh">Calculate again</string>
+    <string name="overview_window">Passes in the next</string>
+    <string name="overview_hours_option">%1$d h</string>
+    <string name="overview_min_elevation">Minimum elevation</string>
+    <string name="overview_degrees_option">%1$d°</string>
+    <string name="overview_no_location">Set a valid home location to see the overview.</string>
+    <plurals name="overview_progress">
+        <item quantity="one">Calculating: %1$d of %2$d satellite</item>
+        <item quantity="other">Calculating: %1$d of %2$d satellites</item>
+    </plurals>
+    <plurals name="overview_done">
+        <item quantity="one">%1$d satellite calculated in %2$s s</item>
+        <item quantity="other">%1$d satellites calculated in %2$s s</item>
+    </plurals>
+    <string name="overview_up_now">Up now</string>
+    <string name="overview_none_up">No satellite is above the horizon.</string>
+    <string name="overview_upcoming">Passes in the next %1$d h</string>
+    <string name="overview_none_upcoming">No passes in this window.</string>
+    <string name="overview_az_el">Az %1$s° El %2$s°</string>
+    <string name="overview_los_in">LOS in %1$s</string>
+    <string name="overview_always_up">Always up</string>
+    <string name="overview_aos_in">AOS in %1$s</string>
+    <string name="overview_aos_ago">AOS %1$s ago</string>
+    <string name="overview_pass_line">AOS %1$s · %2$s min · max %3$s°</string>
+
+    <!-- Pass alerts -->
+    <string name="alert_channel_name">Pass alerts</string>
+    <string name="alert_channel_description">Reminders before a satellite pass.</string>
+    <string name="alert_lead_title">%1$s rises soon</string>
+    <string name="alert_aos_title">%1$s is up</string>
+    <string name="alert_body">AOS azimuth %1$d°, max elevation %2$s°</string>
+    <string name="alert_set">Alert set for %1$s</string>
+    <string name="alert_cleared">Alert cleared for %1$s</string>
+    <string name="alert_pass_over">That pass has already ended.</string>
+    <string name="alert_needs_notifications">Allow notifications to use pass alerts.</string>
+    <string name="alert_exact_title">Allow exact timing?</string>
+    <string name="alert_exact_message">For alerts to arrive at the exact time, allow this app to schedule exact alarms. Without it, alerts may be a few minutes late.</string>
+    <string name="alert_exact_open">Open settings</string>
+    <string name="alert_exact_later">Not now</string>
+    <string name="alert_bell">Alert set</string>
+    <string name="settings_section_alerts">Pass alerts</string>
+    <string name="settings_alert_lead">Alert lead time</string>
+    <string name="settings_alert_lead_option">%1$d min before</string>
+    <string name="settings_spoken_alerts">Speak pass alerts</string>
+    <!-- Spoken announcements, written for text-to-speech -->
+    <plurals name="spoken_pass_soon">
+        <item quantity="one">%1$s rises in %2$d minute, azimuth %3$d degrees, maximum elevation %4$d degrees.</item>
+        <item quantity="other">%1$s rises in %2$d minutes, azimuth %3$d degrees, maximum elevation %4$d degrees.</item>
+    </plurals>
+    <plurals name="spoken_pass_start">
+        <item quantity="one">%1$s is now rising, azimuth %2$d degree.</item>
+        <item quantity="other">%1$s is now rising, azimuth %2$d degrees.</item>
+    </plurals>
+    <string name="spoken_pass_end">%1$s pass complete.</string>
+    <string name="menu_help">Help</string>
+    <string name="menu_about">About</string>
+
+    <!-- Pass header (text above the list) -->
+    <string name="header_predictions_next_pass">Pass predictions for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next passes only, starting %5$s:</string>
+    <string name="header_predictions_hours">Pass predictions for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next %6$d hours, starting %5$s:</string>
+    <string name="header_no_passes">No passes found for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next %5$d hours.</string>
+    <string name="header_bad_elements">The orbital elements for this satellite could not be used.</string>
+    <string name="header_unknown_satellite">This satellite never rises above the horizon at your location.</string>
+    <string name="header_invalid_location">Your home latitude or longitude is not a valid number. Please check the settings.</string>
+    <string name="header_restored">Passes for %1$s, calculated %2$s:</string>
+    <string name="header_error">Could not calculate passes: %1$s</string>
+
+    <!-- A pass in the list -->
+    <string name="pass_date">Date: %1$s</string>
+    <string name="pass_start_time">Start time: %1$s</string>
+    <string name="pass_duration">Duration: %1$s min</string>
+    <string name="pass_aos_azimuth">AOS azimuth: %1$d°</string>
+    <string name="pass_max_elevation">Max elevation: %1$s°</string>
+    <string name="pass_los_azimuth">LOS azimuth: %1$d°</string>
+
+    <!-- Keps messages -->
+    <string name="keps_updated">Keps updated (%1$d satellites)</string>
+    <string name="keps_too_soon">Keps are already up to date. Fetched %1$s. They can be downloaded again after %2$s.</string>
+    <string name="keps_too_soon_no_time">Keps cannot be downloaded again yet. Try again after %1$s.</string>
+    <string name="keps_failed">Could not download keps (%1$s). Kept existing element data.</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_keps_bundled">Keps: bundled with the app (may be out of date)</string>
+    <string name="about_keps_downloaded">Keps: %1$s, fetched %2$s (%3$d satellites)</string>
+    <string name="about_keps_failure">Last download problem (%1$s): %2$s</string>
+    <string name="about_dismiss">Dismiss</string>
+
+    <!-- Date and time pickers -->
+    <string name="picker_next">Next</string>
+    <string name="picker_set">Set</string>
+
+    <!-- Sky view -->
+    <string name="sky_home_position">Home lat/lon: %1$s°/%2$s°</string>
+    <string name="sky_home_gridsquare">Home gridsquare: %1$s</string>
+    <string name="sky_pass_information">Pass information</string>
+    <string name="sky_satellite_position">Satellite position</string>
+    <string name="sky_elevation">Elevation: %1$s°</string>
+    <string name="sky_azimuth">Azimuth: %1$s°</string>
+    <string name="sky_latitude">Latitude: %1$s°</string>
+    <string name="sky_longitude">Longitude: %1$s°</string>
+    <string name="sky_range">Range: %1$s km</string>
+    <string name="sky_no_pass">No pass selected. Choose a pass on the Passes screen to see its track.</string>
+    <string name="sky_no_satellite">No satellite selected.</string>
+    <string name="sky_chart_description">Sky chart showing the track of the satellite pass</string>
+    <string name="sky_label_aos">AOS</string>
+    <string name="sky_label_los">LOS</string>
+    <string name="compass_north">N</string>
+    <string name="compass_east">E</string>
+    <string name="compass_south">S</string>
+    <string name="compass_west">W</string>
+
+    <!-- Map view -->
+    <string name="map_home_latitude">Home latitude</string>
+    <string name="map_home_longitude">Home longitude</string>
+    <string name="map_satellite_latitude">Satellite latitude</string>
+    <string name="map_satellite_longitude">Satellite longitude</string>
+    <string name="map_geo_value">%1$s: %2$s° %3$s</string>
+    <string name="map_description">World map showing the satellite\'s ground track, its footprint and your home location</string>
+    <string name="map_no_satellite">No satellite selected.</string>
 </resources>

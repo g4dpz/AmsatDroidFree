@@ -10,3 +10,4 @@ app/build
 /captures
 .externalNativeBuild
 /build
+.kotlin

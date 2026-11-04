@@ -1,0 +1,207 @@
+# Implementation Plan: Satellite Companion Features
+
+Run `./gradlew :app:assembleDebug :app:testDebugUnitTest` after each task. The golden regression test must stay green (Requirement 7.1) and every task must leave the app building and runnable (Requirement 7.5).
+
+Order: data layer, then Compose migration (parity first), then features on the new UI, then widget and localisation clean-up. Nothing is built twice. Primary device: Galaxy Tab A11 SM-X130.
+
+- [x] 1. Foundations
+  - [x] 1.1 Add pinned dependencies (WorkManager, coroutines, test-scoped `org.json` and coroutines-test) and manifest permissions
+    - _Requirements: 3.5, 5.1, 7.3_
+  - [x] 1.2 Create a test environment matching the target: an emulator profile at 1340 x 800 px, about 179 ppi, plus note which system images are installed; record the real dp width and Android version when the Tab A11 is available
+    - Done: AVD `TabA11_API35` (Android 15, google_apis arm64-v8a, 800 x 1340, 213 dpi = 601 dp portrait / 1007 dp landscape, 4 GB RAM, light and magnetic sensors, no proximity). Start it with `emulator -avd TabA11_API35` and try other densities with `adb shell wm density 160|213|240` (reset with `adb shell wm density reset`).
+    - Limitation: the emulator still reports a gyroscope, which the real tablet lacks. The no-gyroscope compass path is covered by unit tests of the source selection and by a debug override in the app (task 10.2), and is confirmed on the real tablet.
+    - Installed system images relevant to testing: android-35 google_apis arm64-v8a (used), android-30/34 images in the SDK are x86 and do not run on this Apple Silicon Mac.
+    - Open: the real tablet's Android version, density and dp widths, and GPS presence, are recorded in the manual checklist when the device is to hand.
+    - _Requirements: 7.6_
+  - [x] 1.3 Add `KepsSource` (six sources, https URLs, key lookup) and `FileStore` (atomic write, read-or-null) with tests
+    - Done: `KepsSource` (default Celestrak amateur JSON, with `KepsFormat`, Celestrak sources on JSON, AMSAT on TLE text, the 2-hour minimum interval constant), `FileStore`, `KepsSourceTest` (10) and `FileStoreTest` (10).
+    - Found while doing this: the old Celestrak `.txt` URLs return 404 (removed by Celestrak), so five of the six original download sources were broken; Celestrak no longer issues TLEs for 6-digit catalogue numbers. The current activity now uses `KepsSource.legacyTleUrl` so its downloads work again until task 2.6.
+    - _Requirements: 5.3, 9.3, 9.5, 7.4_
+
+- [x] 2. Data layer
+  - [x] 2.1 Orbital elements: add `OrbitalElements`, `OmmJsonParser`, `TleTextParser` and `TLE.fromElements`; write `OmmJsonParserTest` (using a recorded sample of the Celestrak amateur JSON including 6-digit numbers), `TleTextParserTest` and `OrbitalElementsEquivalenceTest` (bundled keps round trip; same predicted positions)
+    - Done: `OrbitalElements` (in the library package, epoch held as year plus fractional day so a TLE round trip is exact), `OmmJsonParser`, `TleTextParser`, `TLE.fromElements`. 16 parser tests and 4 equivalence tests: all 66 bundled satellites (60 LEO, 6 deep space) rebuild with identical fields and identical predicted positions; breaking any conversion field makes the tests fail. A recorded sample of the real Celestrak JSON (including AO-129 and AO-130) is in `src/test/resources`, and AO-7's JSON matches its TLE.
+    - _Requirements: 5.13, 5.14, 9.1, 7.4_
+  - [x] 2.2 `KepsDownloadPolicy` (2-hour window, response classification, bounded retries) with `KepsDownloadPolicyTest`
+    - Done: 14 tests. One refinement from the plan: the 2-hour window starts only when the server actually answered (data or a permanent refusal); a network failure or 5xx does not start it, otherwise a retry after a temporary problem would be blocked.
+    - _Requirements: 5.5, 5.6, 5.7_
+  - [x] 2.3 `KepsRepository` (stored `keps.json`, bundled, download with User-Agent, timeouts, size cap and no redirects, parse by format, atomic store, record success and failure, refresh with `UpToDate`) and `KepsRepositoryTest` using a fake downloader
+    - Done: `KepsRepository`, `KepsJson`, `HttpsKepsDownloader` (https only, no redirects, timeouts, 1 MB cap, User-Agent naming the app), 25 tests with a scripted fake downloader. The download status (per-source last answer, last success, last failure) is kept in `keps_status.json` by the repository itself, so it is not part of `SettingsRepository`.
+    - _Requirements: 5.3, 5.4, 5.8, 5.10, 9.1, 9.5_
+  - [x] 2.4 Create `PassStore` (JSON) and `PassStoreTest`
+    - Done: 8 tests.
+    - _Requirements: 9.2, 9.3, 9.5_
+  - [x] 2.5 Create `SettingsRepository` over the existing preferences file with typed `StateFlow`s and defaults (lead 5, auto refresh on, compass on, keep screen on, theme System, auto red off, spoken alerts off, overview 12 h / min el 0, pointing axis top edge)
+    - Done: `SettingsRepository`, `SharedPreferencesStore` (the same `<package>_preferences` file as before, tolerant of wrongly-typed values), `LocationText` (comma or dot decimals, never locale-dependent), and `ThemeMode` / `PointingAxis` enums. 8 tests, including reading home location values exactly as the original app stored them. Added `selectedCatnum` for restoring and for the widget. Not yet wired into the screens (that is task 5).
+    - _Requirements: 7.2, 10.4, 10.5, 1.7, 5.2, 4.9, 14.1, 14.3, 18.2, 19.1_
+  - [x] 2.6 Switch the current `HamSatDroid` activity to the new repositories; remove `KepsSource.legacyTleUrl`; delete legacy `elems.bin` / `prefs.bin` on first run; remove the SD-card lookup, its dialogs and `MENU_LOAD_ELEM`; show "already up to date" when a manual download is inside the 2-hour window; make the menu and the first refresh use `KepsSource.DEFAULT` (Celestrak amateur JSON) unless the user chose another source
+    - Done and checked on the Tab A11 emulator (Android 15): a fresh install shows no dialog, makes one automatic download from Celestrak amateur JSON, stores 98 satellites including the three with 6-digit numbers, and calculates a pass for AO-129. A second manual download 2 minutes later shows "already up to date", with fetch time and next allowed time, and makes no request. The old `legacyTleUrl` is removed. Also fixed the menu labels that still said celestrak.com. Passes are saved with `PassStore` and the satellite selection by catalogue number.
+    - Behaviour note: with only the bundled keps loaded, the app makes one automatic download at start-up from the selected source (default Celestrak amateur). Scheduled refresh (task 3) will replace this.
+    - _Requirements: 6.1, 6.2, 6.3, 9.4, 5.7, 5.12_
+  - [x] 2.7 Reload keps on resume when the file changed, restoring selection by catnum; show source, fetch time and last failure in the About dialog
+    - Done: reload on resume when `keps.json` changed (selection kept by catalogue number); About shows source, fetch time, satellite count and the last download problem, or "bundled with the app (may be out of date)". The source is shown as its key (for example AMATEUR_CELESTRAK) until the strings work in task 13.
+    - _Requirements: 5.9, 5.10, 6.3_
+
+- [x] 3. Scheduled keps refresh
+  - [x] 3.1 Implement `KepsRefreshWorker` (retry only transient failures, at most 3 attempts; permanent failures return failure with no retry) and `KepsScheduler` (24 h periodic, connected, cancel when disabled)
+    - Done: `KepsRefreshWorker`, `KepsScheduler` (24 h period, 6 h flex, network required, 15 minute exponential backoff, unique work with `UPDATE`, which Android documents as preserving the enqueue time), and `KepsRefreshDecision` (pure, 4 tests). Also added a process-wide lock to `KepsRepository.refresh`: the activity and the worker could otherwise both pass the 2-hour check and both download, and the second would be refused. A test fires two repositories at once and confirms one request; removing the lock makes it fail.
+    - _Requirements: 5.1, 5.2, 5.5, 5.6, 5.11_
+  - [x] 3.2 Apply the scheduler at startup and when the setting changes
+    - Done: new `HamSatDroidApp` owns the one shared `SettingsRepository` and applies the scheduler from the `autoKepsRefresh` flow (the current value at start-up, then every change). The activity uses that shared instance. There is no switch for it on screen yet; that arrives with the settings screen in task 5.1.
+    - _Requirements: 5.11_
+  - [x] 3.3 Checkpoint: build, tests green, manual checks "Keps refresh"
+    - Done on the Tab A11 emulator (Android 15), 102 tests green: job scheduled (network required, 15 minute backoff, earliest run about 18 hours out); WorkManager refuses a forced run before schedule; after moving the emulator clock forward the real worker ran under WorkManager and logged "Refresh of AMATEUR_CELESTRAK: updated 98 satellites -> SUCCESS (run 0)", updated the status file and rescheduled; turning automatic refresh off removes the job and turning it on restores exactly one.
+    - Not checked on a device: the refusal path (HTTP 403) and retry backoff under WorkManager, and survival across a reboot. The decision logic and repository behaviour for those are unit tested.
+  - [x] 3.4 Warn when the selected satellite's elements are more than 30 days old (added after testing on the SM-T225)
+    - Done: `ElementAge` + `ElementAgeTest` (6 tests, including the bundled 2010 ISS elements at 6,123 days, checked independently); `SatelliteItem.epochMillis`; warning in the passes pane (plurals string `passes_elements_stale`), measured from the prediction start time.
+    - Not yet seen on screen: the tablet's keps were fresh by the time it was installed. Covered by the manual check under "Keps refresh".
+    - _Requirements: 5.15_
+
+- [x] 4. Compose foundation
+  - [x] 4.1 Add Compose plugin, BOM and libraries; create `HamSatDroidTheme` (Material 3 light/dark/dynamic) taking a `ThemeMode`, and `MainActivity` with `enableEdgeToEdge`, a placeholder `NavHost`, and `enableOnBackInvokedCallback`
+    - Done: Kotlin Compose plugin, Compose BOM, Material 3, window size class, activity-compose, lifecycle, navigation-compose; `HamSatDroidTheme` (light, dark, dynamic colour on Android 12+; `RED_NIGHT` behaves as dark until task 7); `MainActivity` with `enableEdgeToEdge()`, a four-destination placeholder `NavHost`, `enableOnBackInvokedCallback`, and day/night window themes. It is registered but not yet the launcher. Checked on the Tab A11 emulator: renders edge to edge with dynamic colours, navigates forward and back.
+    - **Version decision:** the newest stable releases (Compose 1.12, lifecycle 2.11, navigation 2.10, activity 1.13) need compileSdk 37 and AGP 9.1+, and the newest AGP only supports up to API 36.1. The project therefore uses the newest set that works with compileSdk 36 and AGP 8.13: Compose BOM 2026.06.01 (UI 1.11.4, Material 3 1.4), activity 1.12.4, lifecycle 2.10.0, navigation 2.9.8. A comment in `app/build.gradle.kts` says to move them all together later.
+    - _Requirements: 8.3, 8.4, 8.5_
+  - [x] 4.2 Move strings to resources with placeholders for the screens as they are built; create `PassSummary`
+    - Done: `PassSummary` (plain data, with `PoleCrossing`, stable pass id, `toSatPassTime()`), the `PassHeader` model (the heading above the pass list as data, including the "restored from last session" case), `PassCalculator` (the old `recalcPass` logic, testable), and the first Compose strings. The existing screens' strings move to resources task by task as each screen is built in task 5, since the old layouts still own the English text. 9 tests.
+    - _Requirements: 13.1, 13.2_
+  - [x] 4.3 Create `AppViewModel` (satellites, selection by catnum, ground station, passes, header, start time, loading flags, coroutine pass calculation and keps download) and `AppViewModelTest`
+    - Done: `AppViewModel` and `AppUiState` (satellites, selection by catalogue number, keps info, range, start time, passes, header, selected pass, calculating and downloading flags) with one-off `UiEvent`s. It loads keps, does the automatic first download, restores the last pass list, calculates in a coroutine (a newer calculation replaces an older one), saves passes, downloads keps under the 2-hour rule, and reloads when a background update changed the file. 21 tests; mutation checks confirmed that losing the selection on reload or on resume fails them. The tests found two things: a failed download did not appear in the keps info until the next reload (fixed), and my first selection test could not tell "kept" from "fell back to the first" (fixed by using a satellite that is not first).
+    - Added a `calcHoursAhead` setting so the "calculate for" choice is remembered as in the old app.
+    - Not yet used by any screen: the screens that use it are built in task 5.
+    - _Requirements: 8.8, 8.9, 12.4, 7.4_
+
+- [x] 5. Compose screens (parity)
+  - [x] 5.1 `LocatorSync` (validation and lat/lon/locator sync) with `LocatorSyncTest`; `SettingsScreen` with locator first, GPS action gated on `FEATURE_LOCATION_GPS`, network and single-shot location with permission handling, and the battery/background note with settings shortcut; remove `PrefHandling`
+    - Done: `LocatorSync` (16 tests), `LocationFetcher` (single-shot `getCurrentLocation`, permission checks, GPS only when the device has it), `SettingsScreen` (locator first; latitude and longitude with a text keyboard because the numeric keypad has no minus sign; validation on Done or leaving the field; GPS and network buttons with a cancellable progress dialog; keps update switch and source; keep-screen-on switch; background-activity note with a button to the app settings), `PrefHandling` and `preference_root.xml` removed. Checked on the emulator: locator IO92we followed latitude 52.2; latitude 95 was rejected and reset to 0 with the rest untouched.
+    - Improvements over the old screen: a comma is accepted as decimal separator, numbers are always stored with a dot, and a locator must be a whole locator (the old check accepted one anywhere inside other text).
+    - Settings that belong to later features (alert lead time, compass, theme, spoken alerts) are added with those features.
+    - _Requirements: 10.1 to 10.10, 3.6_
+  - [x] 5.2 `PassesScreen` (spinners as dropdowns, start-time pickers, calculate, header, pass list, overflow menu, About dialog)
+    - Done: `PassesScreen`, `PassFormatting` (locale-aware dates, times and numbers; text built from string resources), start-time picker (date then time), overflow menu, `AboutDialog`. Checked on the emulator, including the picker and a calculation from a chosen start time. Found and fixed a bug on the way: restoring the last pass list let that list's range override the "calculate for" setting.
+    - _Requirements: 8.1, 8.2, 5.12_
+  - [x] 5.3 `SkyGeometry` and `SkyGeometryTest` (compared with legacy formulas); `SkyChart` canvas with remembered drawing state; `SkyScreen` with lifecycle-bound 5 s refresh
+    - Done: `SkyGeometry` (9 tests: identical to the original formulas for 500 random directions, and a computed track's peak agrees with `PassPredictor`'s maximum elevation), `SkyChart` (path, paints and labels built once per track or size; rotation is a lambda read only when drawing, ready for the compass), `SkyScreen` (track computed off the main thread once per pass; live position every 5 s only while visible via `rememberTicker`). Chart colours are theme-aware (the original was drawn for a dark background only).
+    - _Requirements: 8.1, 8.6, 8.7, 4.11_
+  - [x] 5.4 `MapProjection` and `MapProjectionTest`; `WorldMap` canvas; `MapScreen` with lifecycle-bound 1 s refresh
+    - Done: `MapProjection` (13 tests: draws the same moves and lines as the original code at widths 360, 640, 800 and 1280 for a real 5-hour ground track), `WorldMap`, `MapScreen` (marker and footprint every second, ground track recalculated every 15 s, three orbits as one continuous line). The map is 2:1 at any width. The jump rule for breaking a line at the date line is now "more than half the map width", the same thing at every size (the original used a fixed 180 pixels).
+    - _Requirements: 8.1, 8.6, 8.7, 12.6_
+  - [x] 5.5 Navigation wiring, make `MainActivity` the launcher, remove `ASDActivity`, `HamSatDroid`, `SkyView`, `GroundView`, `PrefHandling`, the layout XML files and manual inset code; update the manifest
+    - Done: `MainActivity` is the launcher; `HamSatDroid`, `ASDActivity`, `SkyView`, `GroundView`, `PassListItem`, `StringPairVO`, all layout XML, the menu XML and 25 unused strings are gone. No Java files and no `android.preference` use remain. Lint warnings fell from 51 to 10.
+    - _Requirements: 8.9, 8.10_
+  - [x] 5.6 Keep screen on: `KeepScreenOn` effect in the sky and map screens with the setting (default on)
+    - Done and checked on the emulator: the Sky and Map screens hold a screen wake lock while visible and release it on going back. The setting is in the settings screen (default on).
+    - _Requirements: 18.1, 18.2, 18.3_
+  - [x] 5.7 Checkpoint: parity check against the manual checklist "Compose parity"
+    - Seen working on the Tab A11 emulator (Android 15, 800 x 1340 at 213 dpi): satellite and range dropdowns, calculate and the pass list, start-time picker and "use current time", tapping a pass to open the sky view, the map, settings (locator sync and rejection), the overflow menu with all six keps sources, About, "already up to date" for a repeat download, restoring the last session, launcher start, edge to edge, dynamic colour.
+    - Not yet seen: the "no passes found" and error headers on screen (unit tested through the view model), the calculation progress indicator, GPS and network location (needs a device), dark theme, back-gesture animation, and rotation or resizing (task 6). These are for the manual checklist, which is yours to mark.
+
+- [x] 6. Adaptive layout and dashboard
+  - Notes: verified on the emulator (portrait 601 dp two-pane, landscape 1007 dp dashboard, selection kept on rotation, idle about 1 frame/s) and on the physical Galaxy Tab A7 Lite SM-T225 (Android 12, same 800 x 1340 at 213 dpi; portrait two-pane, landscape dashboard, rotating back to portrait returns to two-pane). Not checked at other densities.
+  - The layout uses `Configuration.screenWidthDp`. `LocalWindowInfo.containerSize` (lint's suggestion) kept the landscape width after rotating back to portrait on the SM-T225, so the dashboard showed in portrait; the emulator did not show this.
+  - [x] 6.1 Remove `screenOrientation`; add `LayoutThresholds` (600 dp, 960 dp) and the two-pane list plus detail layout driven by live window width
+    - _Requirements: 12.1, 12.2, 12.3, 12.5_
+  - [x] 6.2 `DashboardLayout.choose` with `DashboardLayoutTest`; implement the landscape dashboard (list, sky and map together)
+    - _Requirements: 20.1 to 20.6_
+  - [x] 6.3 Verify state survives rotation and resizing (ViewModel scope, id-based selection)
+    - _Requirements: 12.4_
+  - [x] 6.4 Verify 90 Hz behaviour: screens redraw only when inputs change; check with the Compose recomposition tools and on the device
+    - _Requirements: 8.11_
+
+- [ ] 7. Red night mode
+  - [x] 7.1 `NightPalette`, `ChartColors` red-night variant, theme mode setting and picker; make all screens, dialogs and charts use the theme
+    - Done: `NightPalette` sets every Material 3 role (including the "fixed" roles) to a shade of pure red (green and blue zero); `NightPaletteTest` finds every role by reflection and fails if one is missed (checked by removing one). `ChartColors.RedNight`: dim frame, mid labels, bright track drawn 1.75x thicker, dashed map footprint; map photograph filtered to red luminance at 0.55, icons boosted to 1.6 so they stand out. Theme picker (System default, Light, Dark, Red night) in Settings > Display. `LocalRedNight` switches the charts. Theme changes recompose in place (no activity restart).
+    - System bars: the system draws its bar icons only in white or grey, so in red night the status and navigation bars are hidden (swipe from the edge shows them briefly). Android shows a one-time white "Viewing full screen" hint the first time. In Light and Dark the bar icons now follow the app's theme, not the system's.
+    - Verified on the emulator: settings, passes, sky chart, selected card, overflow menu, map and date picker are red and black only.
+    - _Requirements: 14.1, 14.2, 14.6, 14.7_
+  - [x] 7.2 `NightModeController` with `NightModeControllerTest` (hysteresis, timing)
+    - Done: on below 5 lux for 5 s, off above 20 lux for 3 s, no change between; a reading on the other side restarts the wait. `resetTimers` on return to the foreground keeps the current answer (no bright flash in the dark). 9 tests.
+    - _Requirements: 14.4, 7.4_
+  - [x] 7.3 `AmbientLightProvider` and the "switch automatically" setting (hidden when no light sensor); lifecycle-bound registration
+    - Done: `AmbientLightProvider` (callback flow over `TYPE_LIGHT`), `rememberAmbientNight` collects only while STARTED and only when the setting is on; the last reading is re-fed every 0.5 s because light sensors report only changes. Verified on the emulator with `adb emu sensor set light`: light at 3 s in the dark, red at 7 s, stays red at 10 lux, red 1 s after bright, light at 5 s. `dumpsys sensorservice` shows the listener while visible and none in the background.
+    - _Requirements: 14.3, 14.4, 14.5_
+  - [ ] 7.4 Checkpoint: manual checks "Red night mode" (tune thresholds and contrast on the device)
+    - Installed on the SM-T225 (light sensor tsl2540). David: covering the light sensor switches to red night and back, and the red display looks good (checked indoors in daylight).
+    - Still to do: readability with dark-adapted eyes in a dark room, and whether the 5 / 20 lux thresholds suit real night conditions.
+    - _Requirements: 14.8_
+
+- [ ] 8. All-satellite overview
+  - Satellite list order (Requirement 16, added after David saw the list by catalogue number): `SatelliteOrder` (pure, `SatelliteOrderTest`, 8 tests) sorts OSCAR satellites first by number then prefix letters (read from the name as an `xO-nn` tag), then the rest alphabetically. Used by the passes-screen chooser; the overview keeps its own order. Checked against the tablet's 98-satellite list; false positives (KKS-1, UWE-3, OTP-2, RS-44) are excluded by requiring the trailing O.
+  - [x] 8.1 `OverviewCalculator` (per-satellite predictor and ground-station copy, parallel, streaming, cancellable) and `OverviewCalculatorTest` (parallel equals sequential, skips never-visible, cancellation)
+    - Done: `OverviewCalculator.calculate` returns a `Flow<OverviewItem>`, one coroutine per satellite on `Dispatchers.Default.limitedParallelism(cores)`, each with its own predictor and ground station; the flow completes when every satellite has reported. `OverviewItem.Result` carries "up now" (az/el), the LOS of a pass in progress, and the passes in the window; `Skipped` for never-rises / bad elements / a stationary satellite out of view. 10 tests (parallel equals sequential, inside-window and sorted, agree with the passes screen, never-rises skipped, up-now with LOS, cancellation returns early, QO-100 geostationary up/skip).
+    - Geostationary note: a satellite below `MIN_MEAN_MOTION` (1.5 rev/day) is never searched for passes, because the pass search never returns for one that is up and never sets. It is listed as "up now" when visible and skipped otherwise. The thread-safety test does not reliably catch a shared ground station (the write/read race window is too narrow); one station per satellite is enforced in the code.
+    - _Requirements: 16.4, 16.5, 16.6, 16.9, 7.4_
+  - [x] 8.2 `OverviewViewModel` (window, filter, caching, progress) and `OverviewScreen` ("Now" and "Upcoming", tap to open sky, navigation entry)
+    - Done: `OverviewViewModel` recalculates when the elements, the home location or the window change (same inputs are not repeated); the elevation filter only filters. "Up now" positions are recomputed every 2 s while that list is on screen. `OverviewRows` (pure) builds the two lists; `OverviewRowsTest` + `OverviewViewModelTest` (18 tests). `OverviewScreen` has the two sections with live countdowns, a progress bar, window and min-elevation pickers, and a refresh action; reached from the menu's "All satellites". Tapping a row calls `AppViewModel.showPass` (selects the satellite, calculates from now, selects or adds that pass) and opens the sky view (beside the list on a wide screen).
+    - Long-press to set an alert (16.8) is deferred to task 9, which adds the alert store; noted there.
+    - Fixed a pre-existing bug this exposed: at start-up `onStart` could reload the keps before the first load set the selection, resetting it to the first satellite. It now falls back to the saved `selectedCatnum`. Checked over 8 restarts.
+    - _Requirements: 16.1, 16.2, 16.3, 16.7, 16.8_
+  - [x] 8.3 Measure and record calculation time on the Tab A11 (and the emulator); adjust defaults if too slow
+    - Emulator (Tab A11 AVD, Android 15, swiftshader): 98 satellites, first run 12 h about 4.0 s (cold, JIT warming up), then 24 h about 0.4 s. Fast enough; defaults left at 12 h / 0 degrees. Not yet measured on the physical SM-T225 (checklist item left open).
+    - _Requirements: 16.10_
+
+- [ ] 9. Pass alerts
+  - [x] 9.1 `PassAlert`, `PassAlertStore`, `AlertTiming` with `PassAlertStoreTest` and `AlertTimingTest`
+    - Done: `PassAlert` (id = catnum + AOS-to-the-second), `PassAlertStore` (`alerts.json` via `FileStore`; add/remove/contains/pruneEnded; corrupt file reads empty), `AlertTiming` (lead/AOS/LOS triggers, past ones dropped, `stageNow` for late delivery). 11 tests.
+    - _Requirements: 1.3, 1.5, 2.1, 2.2, 2.3, 7.4_
+  - [x] 9.2 `PassAlertScheduler` (exact when permitted, inexact otherwise, cancel, rescheduleAll)
+    - Done: three alarms per alert (one per stage), `setExactAndAllowWhileIdle` when `canScheduleExactAlarms()` else `setAndAllowWhileIdle`; intents carry only the id and stage. `rescheduleAll` prunes ended alerts then re-registers. Verified on the emulator: setting one alert created exactly the LEAD/AOS/LOS alarms at the right times.
+    - _Requirements: 1.4, 1.6, 2.7, 3.3, 3.4_
+  - [x] 9.3 `AlertNotifier` and `PassAlertReceiver` (lead, AOS, LOS, chronometer countdown, late-delivery handling) with string resources
+    - Done: channel `pass_alerts` (importance DEFAULT); LEAD "rises soon" counting down to AOS, AOS "is up" counting down to LOS, LOS cancels; `setUsesChronometer`/`setChronometerCountDown` so the system draws the countdown. The receiver loads the alert by id (a cleared alert does nothing), uses `stageNow()` so a late alarm shows the right stage, and prunes + cancels once the pass has ended. Verified on the emulator: LEAD showed "MOZHAETS 4 (RS22) rises soon / AOS azimuth 2°, max elevation 17.0°" with a live 1:01:11 countdown; AOS (pass in progress) showed "TEST-SAT is up" counting to LOS; LOS pruned the stored alert.
+    - _Requirements: 2.1, 2.2, 2.3, 2.5, 2.6, 2.8_
+  - [x] 9.4 Live Update promotion behind an API 36 check with fallback
+    - Done: on API ≥ 36, if `canPostPromotedNotifications()` (reflected, as the SDK constant is not in this compileSdk) the ongoing notification sets the promoted-ongoing extra; otherwise, and on API 30–35, it posts as a normal ongoing notification. Not exercised: the emulator and the SM-T225 are below API 36, so the promotion path is untested on a device.
+    - _Requirements: 2.4, 2.5_
+  - [x] 9.5 `AlertRescheduleReceiver` for boot, package replaced, time and timezone change, exact-alarm permission change; register in manifest
+    - Done: exported receiver for BOOT_COMPLETED, MY_PACKAGE_REPLACED, TIME_SET, TIMEZONE_CHANGED (and the exact-alarm permission action, handled in code); it recreates the channel and calls `rescheduleAll`. Not yet exercised on a device (reboot/time-change checks left for 9.8).
+    - _Requirements: 2.7, 3.4_
+  - [x] 9.6 UI: long-press to toggle (pass list and overview), bell icon on alerted passes, notification permission flow, exact-alarm opt-in dialog, lead time setting that reschedules
+    - Done: `AlertController` + `rememberAlertController` drive toggling, the notification-permission launcher, and the one-time exact-alarm dialog; `combinedClickable` long-press on the pass cards (home and overview) with a bell icon when set; "set/cleared/already ended" snackbars. Lead time and "Speak pass alerts" added to Settings; changing the lead time reschedules. Verified on the emulator: long-press on an ended pass said "already ended"; on a future pass it asked for the notification permission, then set the alert, showed the bell and the snackbar, and offered the exact-alarm dialog (exact alarms are not granted on the AVD, so the offer is correct).
+    - _Requirements: 1.1, 1.2, 1.5, 1.6, 3.1, 3.2, 3.3, 3.5_
+  - [x] 9.7 `SpokenAnnouncer` (TTS, ducking, timeout, `goAsync`), spoken string resources, settings switch (default off); call from the receiver at lead, AOS and LOS
+    - Done: `SpokenAnnouncer` takes transient ducking audio focus, speaks with QUEUE_FLUSH, shuts down on completion or an 8 s timeout, and fails silently; the receiver uses `goAsync` and speaks only when "Speak pass alerts" is on. Spoken strings are separate resources (minutes as a plural). Not yet heard on a device (left for 9.8).
+    - _Requirements: 19.1 to 19.7_
+  - [ ] 9.8 Checkpoint: manual checks "Pass alerts" and "Spoken alerts"
+    - On the SM-T225 for checking. Left to verify on the device: a real alert arriving at the set time, the countdown, tapping it opens the sky view, survival across a reboot and a clock change, spoken announcements (and ducking), and behaviour when notifications are denied. Note Samsung's background limits may delay a late-running announcement.
+
+- [ ] 10. Compass and aiming aid
+  - [ ] 10.1 `HeadingMath` and `HeadingMathTest` (wrap-around, declination, flat/upright selection with hysteresis)
+    - _Requirements: 4.2, 4.4, 4.10, 7.4_
+  - [ ] 10.2 `CompassProvider` as a `Flow` emitting `Orientation`: source fallback chain (rotation vector, geomagnetic rotation vector, accelerometer + magnetometer), display rotation, declination, smoothing per source, accuracy
+    - _Requirements: 4.1, 4.2, 4.3, 4.5, 4.6, 4.7, 4.8_
+  - [ ] 10.3 Wire into `SkyScreen`/`SkyChart`: rotation, lifecycle-bound collection, toggle (default on), persisted setting, calibration hint, hidden when no usable source
+    - _Requirements: 4.1, 4.5, 4.7, 4.8, 4.9, 4.11, 8.11_
+  - [ ] 10.4 `PointingMath` and `AimState` with `PointingMathTest` and `AimStateTest`
+    - _Requirements: 17.3, 17.4, 17.5, 17.9, 7.4_
+  - [ ] 10.5 Aim mode on the sky screen: bearings, deltas as text and arrows, on-target state, below-horizon message, accuracy and magnet warning, pointing-axis setting
+    - _Requirements: 17.1 to 17.8_
+  - [ ] 10.6 Checkpoint: manual checks "Compass" and "Aiming aid"
+
+- [ ] 11. Doppler
+  - [ ] 11.1 `DopplerMath` with `DopplerMathTest` (agrees with `PassPredictor`, signs, extremes)
+    - _Requirements: 15.2, 15.3, 7.4_
+  - [ ] 11.2 `FrequencyEntry`, `FrequencyStore` with `FrequencyStoreTest`
+    - _Requirements: 15.1, 15.8_
+  - [ ] 11.3 Sky screen Doppler card: entry picker, add/edit/delete dialog with fixed-locale parsing, nominal versus corrected downlink and uplink, shift, below-horizon note, 1 s refresh while shown
+    - _Requirements: 15.1, 15.2, 15.4, 15.5, 15.6, 15.7_
+  - [ ] 11.4 Checkpoint: manual checks "Doppler"
+
+- [ ] 12. Widget
+  - [ ] 12.1 Persist the selected satellite; implement `WidgetUpdater.compute` and `WidgetState`, with tests for the state logic
+    - _Requirements: 11.1, 11.2, 11.6, 7.4_
+  - [ ] 12.2 `NextPassWidget` (Glance, responsive compact and large layouts) and receiver, resizable provider XML, tap to open app
+    - _Requirements: 11.1, 11.5, 11.7, 11.8_
+  - [ ] 12.3 `WidgetRefreshWorker` and update triggers (keps refresh, satellite/location change, enable/disable)
+    - _Requirements: 11.3, 11.4_
+  - [ ] 12.4 Checkpoint: manual checks "Widget"
+
+- [ ] 13. Localisation and wrap-up
+  - [ ] 13.1 String audit: remove remaining literals and concatenations from UI, notification, spoken and widget code; plurals where needed
+    - _Requirements: 13.1, 13.2, 13.3, 13.5_
+  - [ ] 13.2 Add `locales_config.xml`, `android:localeConfig`, and the Settings language row (API 33+)
+    - _Requirements: 13.4_
+  - [ ] 13.3 Zero Kotlin compiler warnings; run lint and fix or consciously suppress new findings
+    - _Requirements: 7.3_
+  - [ ] 13.4 Run the full manual checklist on a Galaxy Tab A11 (and an emulator for the rest) and record results, including the Samsung-specific section
+    - _Requirements: all_

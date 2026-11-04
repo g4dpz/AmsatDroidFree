@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <lint>
     <issue id="MissingTranslation" severity="warning" />
+    <!-- The landscape map layout intentionally omits the lat/lon text views; GroundView null-checks them. -->
+    <issue id="InconsistentLayout" severity="ignore" />
+    <!-- Only style hints in the original activity, which is deleted when the Compose screens replace it (task 5.5). -->
+    <issue id="UseKtx" severity="ignore" />
+    <!-- Libraries are deliberately one step behind the newest because those need compileSdk 37 and AGP 9.1+; see
+         the comment in app/build.gradle.kts. -->
+    <issue id="GradleDependency" severity="ignore" />
 </lint>

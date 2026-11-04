@@ -1,0 +1,313 @@
+package uk.me.g4dpz.HamSatDroid.ui
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import uk.me.g4dpz.HamSatDroid.data.DownloadOutcome
+import uk.me.g4dpz.HamSatDroid.data.KepsRepository
+import uk.me.g4dpz.HamSatDroid.data.KepsSource
+import uk.me.g4dpz.HamSatDroid.data.LoadedKeps
+import uk.me.g4dpz.HamSatDroid.data.LocationText
+import uk.me.g4dpz.HamSatDroid.data.PassStore
+import uk.me.g4dpz.HamSatDroid.data.RefreshResult
+import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
+import uk.me.g4dpz.HamSatDroid.data.StoredPasses
+import uk.me.g4dpz.HamSatDroid.domain.CalcResult
+import uk.me.g4dpz.HamSatDroid.domain.ElementAge
+import uk.me.g4dpz.HamSatDroid.domain.PassCalculator
+import uk.me.g4dpz.HamSatDroid.domain.PassHeader
+import uk.me.g4dpz.HamSatDroid.domain.PassSummary
+import uk.me.g4dpz.HamSatDroid.domain.SatelliteOrder
+import uk.me.g4dpz.HamSatDroid.utils.IaruLocator
+import uk.me.g4dpz.satellite.GroundStationPosition
+import uk.me.g4dpz.satellite.SatPassTime
+import uk.me.g4dpz.satellite.TLE
+import java.io.IOException
+import java.time.Instant
+import java.util.Date
+
+/**
+ * Holds the app's state and does its slow work (loading keps, downloading, calculating passes) off the main thread.
+ * It replaces the static fields and thread helpers of the old activity, and survives rotation and window resizing.
+ *
+ * All the heavy dependencies are passed in, so it can be tested without Android.
+ *
+ * @param workDispatcher where loading, downloading and calculating run
+ */
+class AppViewModel(
+    private val keps: KepsRepository,
+    private val passStore: PassStore,
+    private val settings: SettingsRepository,
+    private val calculator: PassCalculator = PassCalculator(),
+    private val clock: () -> Long = System::currentTimeMillis,
+    private val workDispatcher: CoroutineDispatcher = Dispatchers.Default,
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(AppUiState(hoursAhead = settings.calcHoursAhead.value))
+    val state: StateFlow<AppUiState> = _state.asStateFlow()
+
+    private val _events = Channel<UiEvent>(Channel.BUFFERED)
+
+    /** One-off messages for the user; collect them once and show them. */
+    val events: Flow<UiEvent> = _events.receiveAsFlow()
+
+    private val _tles = MutableStateFlow<List<TLE>>(emptyList())
+
+    /** The current elements of every satellite (for the overview); changes when new keps are loaded. */
+    val tles: StateFlow<List<TLE>> = _tles.asStateFlow()
+    private var kepsModified: Long? = null
+    private var calcJob: Job? = null
+    private var rawPasses: List<SatPassTime> = emptyList()
+
+    init {
+        viewModelScope.launch(workDispatcher) { initialLoad() }
+    }
+
+    // ---- selections -------------------------------------------------------------------------------------------------
+
+    fun selectSatellite(catnum: Int) {
+        if (_tles.value.none { it.catnum == catnum }) return
+        settings.selectedCatnum.value = catnum
+        _state.update { it.copy(selectedCatnum = catnum) }
+    }
+
+    /** @param hours 0 for "next pass only", otherwise 6, 12 or 24 */
+    fun setHoursAhead(hours: Int) {
+        settings.calcHoursAhead.value = hours // rejects values other than 0, 6, 12 or 24
+        _state.update { it.copy(hoursAhead = hours) }
+    }
+
+    /** Sets the time to start looking from, or null to start from "now". */
+    fun setStartTime(start: Instant?) {
+        _state.update { it.copy(startTime = start) }
+    }
+
+    fun selectPass(id: String?) {
+        _state.update { it.copy(selectedPassId = id) }
+    }
+
+    /**
+     * Shows [pass] (from the overview) as if it had been chosen on the passes screen: selects its satellite, calculates
+     * that satellite's passes from now, and selects [pass]. If the calculation does not include it (it starts beyond
+     * the chosen range) it is added to the list, so the sky view always has it.
+     */
+    fun showPass(pass: PassSummary) {
+        selectSatellite(pass.catnum)
+        if (_state.value.selectedCatnum != pass.catnum) return
+        _state.update { it.copy(startTime = null, passes = listOf(pass), selectedPassId = pass.id) }
+        calculate(keepSelected = pass)
+    }
+
+    // ---- pass calculation -------------------------------------------------------------------------------------------
+
+    /** Calculates passes for the selected satellite, home location, start time and range. A newer call replaces an older one. */
+    fun calculate() = calculate(keepSelected = null)
+
+    private fun calculate(keepSelected: PassSummary?) {
+        val current = _state.value
+        val tle = _tles.value.firstOrNull { it.catnum == current.selectedCatnum } ?: return
+        val lat = LocationText.toDegrees(settings.homeLat.value)
+        val lon = LocationText.toDegrees(settings.homeLon.value)
+        if (lat == null || lon == null) {
+            _state.update { it.copy(header = PassHeader.InvalidLocation) }
+            return
+        }
+        val start = current.startTime ?: Instant.ofEpochMilli(clock())
+        val hours = current.hoursAhead
+
+        calcJob?.cancel()
+        _state.update { it.copy(calculating = true) }
+        calcJob = viewModelScope.launch(workDispatcher) {
+            try {
+                val result = calculator.calculate(tle, lat, lon, Date.from(start), hours)
+                ensureActive() // a newer calculation has replaced this one
+                val locator = IaruLocator(lat, lon).toMaidenhead()
+                when (result) {
+                    is CalcResult.Passes -> {
+                        rawPasses = result.passes
+                        val calculated = result.passes.map { PassSummary.from(it, tle.catnum, tle.name) }
+                        val (summaries, selected) = withPass(calculated, keepSelected)
+                        _state.update {
+                            it.copy(
+                                passes = summaries, selectedPassId = selected,
+                                header = PassHeader.Predictions(tle.name, lat, lon, locator, hours, start),
+                            )
+                        }
+                    }
+                    CalcResult.NoPasses -> {
+                        rawPasses = emptyList()
+                        _state.update {
+                            it.copy(
+                                passes = listOfNotNull(keepSelected), selectedPassId = keepSelected?.id,
+                                header = PassHeader.NoPasses(tle.name, lat, lon, locator, NO_PASS_SEARCH_HOURS),
+                            )
+                        }
+                    }
+                    CalcResult.BadElements -> showFailure(PassHeader.BadElements)
+                    CalcResult.UnknownSatellite -> showFailure(PassHeader.UnknownSatellite)
+                    is CalcResult.Error -> showFailure(PassHeader.Error(result.message))
+                }
+                savePasses(tle)
+            } finally {
+                _state.update { it.copy(calculating = false) }
+            }
+        }
+    }
+
+    /**
+     * [passes] and the id to select for [extra]. The same pass calculated from a different start time can differ by a
+     * few seconds, so a calculated pass that overlaps [extra] is taken to be it; otherwise [extra] is added.
+     */
+    private fun withPass(passes: List<PassSummary>, extra: PassSummary?): Pair<List<PassSummary>, String?> {
+        if (extra == null) return passes to null
+        val same = passes.firstOrNull {
+            it.catnum == extra.catnum && it.start.isBefore(extra.end) && extra.start.isBefore(it.end)
+        }
+        return if (same != null) passes to same.id else (passes + extra).sortedBy { it.start } to extra.id
+    }
+
+    private fun showFailure(header: PassHeader) {
+        rawPasses = emptyList()
+        _state.update { it.copy(passes = emptyList(), selectedPassId = null, header = header) }
+    }
+
+    private fun savePasses(tle: TLE) {
+        try {
+            passStore.save(StoredPasses(tle.catnum, tle.name, clock(), _state.value.hoursAhead, rawPasses))
+        } catch (e: IOException) {
+            // The saved list is a convenience; failing to save it loses nothing important.
+        }
+    }
+
+    // ---- keps -------------------------------------------------------------------------------------------------------
+
+    /**
+     * Downloads [source] if the download rules allow, and reloads the satellite list when new elements arrive. The
+     * repository keeps the existing elements on any failure.
+     *
+     * @param userRequested true for a menu choice, which also remembers the source and reports "already up to date"
+     *   and failures; false for the automatic download, which only reports success
+     */
+    fun refreshKeps(source: KepsSource = settings.kepsSource.value, userRequested: Boolean = true) {
+        viewModelScope.launch(workDispatcher) { refreshKepsNow(source, userRequested) }
+    }
+
+    /** Call when the screen becomes visible: picks up elements a background update has stored meanwhile. */
+    fun onStart() {
+        viewModelScope.launch(workDispatcher) {
+            val modified = keps.lastModifiedMillis()
+            // At start-up this can run before the first load has set the selection, so fall back to the saved one
+            // (otherwise the first satellite in the list would replace it)
+            val preferred = _state.value.selectedCatnum ?: settings.selectedCatnum.value.takeIf { it > 0 }
+            if (modified != null && modified != kepsModified) reload(preferred)
+        }
+    }
+
+    private fun refreshKepsNow(source: KepsSource, userRequested: Boolean) {
+        if (userRequested) settings.kepsSource.value = source
+        _state.update { it.copy(downloadingKeps = true) }
+        try {
+            when (val result = keps.refresh(source)) {
+                is RefreshResult.Updated -> {
+                    reload(_state.value.selectedCatnum)
+                    _events.trySend(UiEvent.KepsUpdated(result.count))
+                }
+                is RefreshResult.TooSoon -> if (userRequested) {
+                    _events.trySend(UiEvent.KepsTooSoon(result.lastSuccessMillis, result.nextAllowedAtMillis))
+                }
+                is RefreshResult.Failed -> if (userRequested) {
+                    val reason = when (val o = result.outcome) {
+                        is DownloadOutcome.Transient -> o.reason
+                        is DownloadOutcome.Permanent -> o.reason
+                        DownloadOutcome.Success -> ""
+                    }
+                    _events.trySend(UiEvent.KepsFailed(reason))
+                }
+            }
+        } finally {
+            // The outcome (including a failure) is recorded by the repository; show it in the keps info.
+            val lastFailure = keps.status().lastFailure
+            _state.update { it.copy(downloadingKeps = false, keps = it.keps?.copy(lastFailure = lastFailure)) }
+        }
+    }
+
+    private fun initialLoad() {
+        val loaded = keps.load()
+        kepsModified = keps.lastModifiedMillis()
+        apply(loaded, settings.selectedCatnum.value.takeIf { it > 0 })
+
+        // Show the passes from the previous session, if any
+        passStore.load()?.let { stored ->
+            rawPasses = stored.passes
+            _state.update {
+                it.copy(
+                    passes = stored.passes.map { p -> PassSummary.from(p, stored.catnum, stored.satName) },
+                    header = if (stored.passes.isEmpty()) null
+                    else PassHeader.Restored(stored.satName, Instant.ofEpochMilli(stored.computedAtMillis)),
+                )
+            }
+        }
+
+        // Until the first successful download only the elements shipped with the app are available.
+        if (loaded.isBundled) refreshKepsNow(settings.kepsSource.value, userRequested = false)
+    }
+
+    private fun reload(preferred: Int?) {
+        val loaded = keps.load()
+        kepsModified = keps.lastModifiedMillis()
+        apply(loaded, preferred)
+    }
+
+    private fun apply(loaded: LoadedKeps, preferred: Int?) {
+        _tles.value = loaded.tles
+        val items = loaded.tles
+            .map { SatelliteItem(it.catnum, it.name, ElementAge.epochMillis(it)) }
+            .sortedWith(SatelliteOrder.byName { it.name })
+        val selected = items.firstOrNull { it.catnum == preferred }?.catnum ?: items.firstOrNull()?.catnum
+        _state.update {
+            it.copy(
+                loading = false,
+                satellites = items,
+                selectedCatnum = selected,
+                keps = KepsInfo(
+                    source = loaded.source,
+                    fetchedAtMillis = loaded.fetchedAtMillis,
+                    isBundled = loaded.isBundled,
+                    satelliteCount = loaded.tles.size,
+                    lastFailure = keps.status().lastFailure,
+                ),
+            )
+        }
+    }
+
+    // ---- for the sky and map screens --------------------------------------------------------------------------------
+
+    /** The elements for [catnum], or null if it is not in the current list. */
+    fun tleFor(catnum: Int): TLE? = _tles.value.firstOrNull { it.catnum == catnum }
+
+    /**
+     * A new ground station at the home location, or null if the location in settings is not valid. Each caller gets
+     * its own instance because the prediction code writes into it.
+     */
+    fun newGroundStation(): GroundStationPosition? {
+        val lat = LocationText.toDegrees(settings.homeLat.value) ?: return null
+        val lon = LocationText.toDegrees(settings.homeLon.value) ?: return null
+        return GroundStationPosition(lat, lon, 0.0)
+    }
+
+    private companion object {
+        /** How far ahead the "no passes found" message says it looked (as in the original app). */
+        const val NO_PASS_SEARCH_HOURS = 24
+    }
+}

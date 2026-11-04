@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Window theme for the Compose activity: no action bar (Compose draws its own) and a light window background. -->
+    <style name="Theme.HamSatDroid" parent="android:Theme.DeviceDefault.Light.NoActionBar" />
+</resources>
