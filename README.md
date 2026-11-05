@@ -51,6 +51,15 @@ filters.*
 theme picker, automatic red night mode, keep-screen-on and the aiming axis.
 (The exact coordinates are redacted in this screenshot.)*
 
+<p align="center">
+  <img src="docs/screenshots/aim-compass.png" alt="AmsatDroid Free sky screen with the compass-rotated chart and Aim mode: plain instructions like 'Turn right 139 degrees, raise 5 degrees', the pointing and satellite bearings, compass accuracy and a magnet warning. Coordinates redacted." width="360">
+</p>
+
+*Compass and Aim mode on the sky screen: the chart rotates to the device
+heading, and Aim gives plain instructions ("turn right, raise") from the live
+pointing and satellite bearings, with the compass accuracy and a magnet
+warning. (The exact coordinates are redacted.)*
+
 ## Features
 
 - **Pass prediction** for your location, with a selectable time window and start time.
