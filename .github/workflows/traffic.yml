@@ -25,9 +25,27 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v7
 
-      - name: Fetch traffic and merge into the CSVs
+      # The built-in GITHUB_TOKEN cannot read the traffic API (it needs the
+      # Administration permission, which that token is never granted). A
+      # fine-grained PAT with Administration: Read and Contents: Read & Write,
+      # stored as the TRAFFIC_TOKEN secret, is required. If it is absent the job
+      # skips cleanly rather than failing every day.
+      - name: Check for the traffic token
+        id: token
         env:
-          GH_TOKEN: ${{ github.token }}
+          TRAFFIC_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+        run: |
+          if [ -z "${TRAFFIC_TOKEN:-}" ]; then
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::TRAFFIC_TOKEN secret is not set; skipping the traffic snapshot. See .github/workflows/traffic.yml."
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch traffic and merge into the CSVs
+        if: steps.token.outputs.present == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
@@ -71,6 +89,7 @@ jobs:
           merge clones clones.csv
 
       - name: Commit any changes
+        if: steps.token.outputs.present == 'true'
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
