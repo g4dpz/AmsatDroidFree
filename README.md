@@ -43,6 +43,14 @@ azimuth, elevation and time-to-LOS) and the upcoming passes, calculated in
 parallel across the whole catalogue, with window and minimum-elevation
 filters.*
 
+<p align="center">
+  <img src="docs/screenshots/settings.png" alt="AmsatDroid Free settings: locator-first home location, automatic keps updates and source, theme picker, red night auto-switch, keep-screen-on and aiming-axis options. The exact coordinates are redacted." width="360">
+</p>
+
+*Settings: locator-first home location, automatic keps updates and source, the
+theme picker, automatic red night mode, keep-screen-on and the aiming axis.
+(The exact coordinates are redacted in this screenshot.)*
+
 ## Features
 
 - **Pass prediction** for your location, with a selectable time window and start time.
