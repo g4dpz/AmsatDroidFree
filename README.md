@@ -68,17 +68,37 @@ Requires JDK 17 and the Android SDK (set `sdk.dir` in `local.properties`, or
 The same gate — assemble, unit tests and lint — runs in CI on every push and
 pull request (`.github/workflows/ci.yml`).
 
-## Satellite frequencies
+## Satellite frequencies — the OscarWatch transponder database
 
-Transponder characteristics (downlink/uplink frequencies, modulation modes,
-Doppler direction and CTCSS) come from the **OscarWatch transponder database**
-(`satellite_database.json`). A copy is bundled with the app as a fallback, and
-the app syncs the published copy from
-[`tle.oscarwatch.org`](https://tle.oscarwatch.org/satellite_database.json) on the
-same schedule as the orbital elements. The database is read-only in the app;
-there is no in-app frequency editor.
+> **AmsatDroid Free uses the OscarWatch transponder database maintained by
+> Peter Goodhall (MM9SQL).** The app would not have live, maintained transponder
+> frequencies without it — our thanks to Peter and the OscarWatch project.
 
-Orbital elements (keps) are downloaded separately from Celestrak or AMSAT.
+Transponder characteristics — downlink and uplink frequencies, modulation modes
+(USB/LSB/CW/FM…), Doppler direction (normal or REV for inverting transponders)
+and FM uplink CTCSS tones — all come from the OscarWatch transponder database
+(`satellite_database.json`), rather than from anything the user types in.
+
+How the app uses it:
+
+- **Bundled fallback.** A copy ships inside the app so frequencies are available
+  offline and on first run.
+- **Live sync from Peter's API.** The app fetches the published database from
+  **<https://tle.oscarwatch.org/satellite_database.json>** on the same
+  background schedule as the orbital elements, with the same safeguards
+  (https only, no redirects, a response size cap, timeouts, a User-Agent that
+  names the app, and a shared minimum interval between fetches). A valid sync
+  replaces the local copy wholesale; any failure keeps the copy already in use.
+- **Read-only.** Matched to satellites by NORAD id. There is no in-app frequency
+  editor — the database is the single source of truth, kept current from Peter's
+  server. This mirrors OscarWatch's own `user → bundled → remote` model.
+
+The same database powers Peter's cross-platform
+[OscarWatch-Tracker](https://github.com/magicbug/OscarWatch-Tracker) desktop app,
+so the two stay in step.
+
+Orbital elements (keps) are a separate data source, downloaded from Celestrak or
+AMSAT.
 
 ## Project layout
 
@@ -107,7 +127,15 @@ fitness for purpose.
 
 ## Licence
 
-No licence is currently declared for this repository. Until one is added, all
-rights are reserved by the author; contact the maintainer before reusing the
-code. The bundled OscarWatch transponder database is the property of its
-author (see [Credits](#credits)).
+AmsatDroid Free is licensed under the **GNU General Public License v3.0 or
+later** (`GPL-3.0-or-later`). See [LICENSE](LICENSE) for the full text; source
+files carry an `SPDX-License-Identifier: GPL-3.0-or-later` header.
+
+The orbit-prediction core (`uk.me.g4dpz.satellite`, the **predict4java** library,
+Copyright © 2004–2010 David A. B. Johnson, G4DPZ) is **GPL-2.0-or-later**; the
+"or later" clause is what allows the combined work to be distributed under
+GPL-3.0. Those files keep their original predict4java licence header.
+
+The bundled OscarWatch transponder database is a separate work under its own
+MIT licence (see [Satellite frequencies](#satellite-frequencies) and
+[Credits](#credits)); its copyright notice is retained.
