@@ -19,6 +19,14 @@ library, kept under a golden regression test so predictions do not drift.
 satellite chooser beside the sky chart, live satellite position, and the
 Doppler-corrected transponder frequencies drawn from the OscarWatch database.*
 
+<p align="center">
+  <img src="docs/screenshots/night-landscape.png" alt="AmsatDroid Free in red night mode, landscape dashboard: the pass list beside a red-and-black ground-track map with the three-orbit track, home marker and satellite footprint." width="640">
+</p>
+
+*Red night mode in the landscape dashboard: every screen, dialog and chart uses
+only red and black shades to preserve night vision, with the ground-track map
+and footprint rendered in red.*
+
 ## Features
 
 - **Pass prediction** for your location, with a selectable time window and start time.
