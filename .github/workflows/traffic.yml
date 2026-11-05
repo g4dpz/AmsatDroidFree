@@ -1,0 +1,84 @@
+name: Traffic stats
+
+# GitHub only keeps repository traffic (views and clones) for a rolling 14 days.
+# This job snapshots it daily and appends to docs/traffic/ so a long-term record
+# survives beyond that window.
+
+on:
+  schedule:
+    # 06:10 UTC daily. Cron on GitHub is best-effort and may run late; the merge
+    # is by date, so a missed or repeated run does not corrupt the history.
+    - cron: "10 6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: traffic-stats
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Fetch traffic and merge into the CSVs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p docs/traffic
+
+          # $1 = api sub-path (views|clones), $2 = output csv
+          merge() {
+            local kind="$1" out="docs/traffic/$2"
+            gh api "repos/$REPO/traffic/$kind" > "resp.json"
+            [ -f "$out" ] || echo "date,count,uniques" > "$out"
+            python3 - "$out" <<'PY'
+          import csv, json, sys
+          out = sys.argv[1]
+          data = json.load(open("resp.json"))
+          # Bucket key differs: views -> "views", clones -> "clones".
+          buckets = data.get("views") or data.get("clones") or []
+          rows = {}
+          try:
+              with open(out, newline="") as f:
+                  r = csv.reader(f)
+                  next(r, None)  # header
+                  for row in r:
+                      if len(row) >= 3:
+                          rows[row[0]] = (row[1], row[2])
+          except FileNotFoundError:
+              pass
+          for b in buckets:
+              # timestamp is an ISO day like 2026-11-05T00:00:00Z -> keep the date
+              day = b["timestamp"][:10]
+              rows[day] = (str(b["count"]), str(b["uniques"]))
+          with open(out, "w", newline="") as f:
+              w = csv.writer(f)
+              w.writerow(["date", "count", "uniques"])
+              for day in sorted(rows):
+                  w.writerow([day, rows[day][0], rows[day][1]])
+          PY
+            rm -f resp.json
+          }
+
+          merge views views.csv
+          merge clones clones.csv
+
+      - name: Commit any changes
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/traffic/views.csv docs/traffic/clones.csv
+          if git diff --cached --quiet; then
+            echo "No traffic changes to record."
+          else
+            git commit -m "Update traffic stats [skip ci]"
+            git push
+          fi
