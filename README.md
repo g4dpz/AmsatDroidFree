@@ -11,6 +11,14 @@ The app has been rebuilt as a modern Kotlin / Jetpack Compose application. The
 orbit-prediction core is the long-standing `uk.me.g4dpz.satellite` SGP4/SDP4
 library, kept under a golden regression test so predictions do not drift.
 
+<p align="center">
+  <img src="docs/screenshots/main-screen.png" alt="AmsatDroid Free main screen on a Galaxy Tab A7 Lite: the pass list and satellite chooser beside the sky chart, satellite position, and Doppler-corrected transponder frequencies for AO-73." width="360">
+</p>
+
+*Main screen on a Galaxy Tab A7 Lite (two-pane layout): pass prediction and the
+satellite chooser beside the sky chart, live satellite position, and the
+Doppler-corrected transponder frequencies drawn from the OscarWatch database.*
+
 ## Features
 
 - **Pass prediction** for your location, with a selectable time window and start time.
