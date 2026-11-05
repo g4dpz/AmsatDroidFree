@@ -38,6 +38,16 @@ jobs:
       - name: Assemble, unit test and lint
         run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 
+      # Make the built debug APK downloadable from the run. This is debug-signed, for testing and
+      # sideloading only — not a Play Store release (that needs a signed AAB; see the signing config).
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
       # Keep the reports even when a step fails, so failures can be diagnosed from the run.
       - name: Upload test reports
         if: always()

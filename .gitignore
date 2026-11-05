@@ -11,3 +11,8 @@ app/build
 .externalNativeBuild
 /build
 .kotlin
+
+# Release signing: never commit the keystore or its passwords
+keystore.properties
+*.jks
+*.keystore
