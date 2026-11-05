@@ -30,6 +30,10 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
+        with:
+          # Use GitHub's standard Actions cache, not v6's default proprietary enhanced caching
+          # (which carries separate Gradle Terms of Use).
+          cache-provider: basic
 
       - name: Assemble, unit test and lint
         run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
