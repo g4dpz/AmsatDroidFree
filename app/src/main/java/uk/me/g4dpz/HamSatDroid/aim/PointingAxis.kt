@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package uk.me.g4dpz.HamSatDroid.aim
 
 /** Which direction of the device counts as "where it is pointing" for the aiming aid. */

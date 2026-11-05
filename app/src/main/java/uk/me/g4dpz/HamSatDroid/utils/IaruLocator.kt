@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package uk.me.g4dpz.HamSatDroid.utils
 
 import kotlin.math.acos
