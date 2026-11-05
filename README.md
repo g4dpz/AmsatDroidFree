@@ -27,6 +27,13 @@ Doppler-corrected transponder frequencies drawn from the OscarWatch database.*
 only red and black shades to preserve night vision, with the ground-track map
 and footprint rendered in red.*
 
+<p align="center">
+  <img src="docs/screenshots/day-screen.png" alt="AmsatDroid Free in the day (light) theme, landscape: the pass list beside the full-colour world map with the ground track, home marker and satellite footprint." width="640">
+</p>
+
+*The same landscape dashboard in the day (light) theme: the full-colour world
+map with the satellite ground track, home marker and coverage footprint.*
+
 ## Features
 
 - **Pass prediction** for your location, with a selectable time window and start time.
