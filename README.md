@@ -34,6 +34,15 @@ and footprint rendered in red.*
 *The same landscape dashboard in the day (light) theme: the full-colour world
 map with the satellite ground track, home marker and coverage footprint.*
 
+<p align="center">
+  <img src="docs/screenshots/overview.png" alt="AmsatDroid Free All satellites overview: the satellites up now with live azimuth, elevation and LOS countdowns, and the upcoming passes, with window and minimum-elevation filters." width="360">
+</p>
+
+*The All satellites overview: everything above the horizon now (with live
+azimuth, elevation and time-to-LOS) and the upcoming passes, calculated in
+parallel across the whole catalogue, with window and minimum-elevation
+filters.*
+
 ## Features
 
 - **Pass prediction** for your location, with a selectable time window and start time.
