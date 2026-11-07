@@ -40,7 +40,8 @@ class HamSatDroidApp : Application() {
      */
     val transponderDatabase: StateFlow<TransponderDatabase> = _transponderDatabase.asStateFlow()
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    // IO: the work here is file reads and, for the sync, a network download.
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()

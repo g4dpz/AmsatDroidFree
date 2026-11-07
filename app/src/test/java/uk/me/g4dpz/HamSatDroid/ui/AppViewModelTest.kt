@@ -61,7 +61,7 @@ class AppViewModelTest {
     private fun passStore() = PassStore(files())
 
     private fun viewModel(calculator: PassCalculator = PassCalculator()) =
-        AppViewModel(keps(), passStore(), settings, calculator, { now }, dispatcher)
+        AppViewModel(keps(), passStore(), settings, calculator, { now }, dispatcher, ioDispatcher = dispatcher)
 
     @Before
     fun setUp() {
