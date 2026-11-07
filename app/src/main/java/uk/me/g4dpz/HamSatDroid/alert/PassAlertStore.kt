@@ -11,6 +11,10 @@ import java.io.IOException
  * The pass alerts the user has set, kept as JSON in `alerts.json` through [FileStore]. Reading never throws: a
  * missing, corrupt or wrong-schema file gives an empty list. Writes are atomic. It only stores; scheduling the
  * alarms is `PassAlertScheduler`'s job.
+ *
+ * Writes ([add], [remove], [pruneEnded]) throw [IOException] when the file cannot be written (storage full, for
+ * example). Kotlin does not make callers handle it, so every caller at a boundary (a click handler, a broadcast
+ * receiver) must catch it: an uncaught IOException there ends the process.
  */
 class PassAlertStore(private val files: FileStore) {
 

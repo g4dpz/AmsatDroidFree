@@ -126,6 +126,7 @@
     <string name="alert_cleared">Alert cleared for %1$s</string>
     <string name="alert_pass_over">That pass has already ended.</string>
     <string name="alert_needs_notifications">Allow notifications to use pass alerts.</string>
+    <string name="alert_save_failed">Could not save the alert: %1$s</string>
     <string name="alert_exact_title">Allow exact timing?</string>
     <string name="alert_exact_message">For alerts to arrive at the exact time, allow this app to schedule exact alarms. Without it, alerts may be a few minutes late.</string>
     <string name="alert_exact_open">Open settings</string>

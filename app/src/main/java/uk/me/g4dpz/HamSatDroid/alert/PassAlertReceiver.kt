@@ -4,8 +4,10 @@ package uk.me.g4dpz.HamSatDroid.alert
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import uk.me.g4dpz.HamSatDroid.HamSatDroidApp
 import uk.me.g4dpz.HamSatDroid.R
+import java.io.IOException
 import kotlin.math.roundToInt
 
 /**
@@ -32,7 +34,12 @@ class PassAlertReceiver : BroadcastReceiver() {
 
         if (decision.removeAlert) {
             // the pass has ended: drop it and stop its remaining alarms
-            app.passAlertStore.remove(id)
+            try {
+                app.passAlertStore.remove(id)
+            } catch (e: IOException) {
+                // The alert stays in the file until the next prune; its alarms are cancelled below regardless.
+                Log.w(TAG, "Could not remove the ended alert $id: ${e.message}")
+            }
             PassAlertScheduler(context, app.passAlertStore, app.settings).cancel(alert)
         }
 
@@ -55,5 +62,6 @@ class PassAlertReceiver : BroadcastReceiver() {
     companion object {
         const val EXTRA_ID = "id"
         const val EXTRA_STAGE = "stage"
+        private const val TAG = "PassAlertReceiver"
     }
 }

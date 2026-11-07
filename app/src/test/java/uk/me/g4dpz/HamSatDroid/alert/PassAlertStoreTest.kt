@@ -68,6 +68,21 @@ class PassAlertStoreTest {
     }
 
     @Test
+    fun `a write that fails throws IOException and leaves nothing behind`() {
+        // The "directory" is a plain file, so the store can neither create it nor write into it.
+        val blocker = File(tmp.root, "data")
+        blocker.writeText("in the way")
+        val s = PassAlertStore(FileStore(blocker))
+        try {
+            s.add(alert())
+            org.junit.Assert.fail("expected IOException")
+        } catch (expected: java.io.IOException) {
+            // callers at a boundary (click handler, receiver) must catch this
+        }
+        assertTrue(s.all().isEmpty())
+    }
+
+    @Test
     fun `a corrupt file reads as empty`() {
         val files = FileStore(File(tmp.root, "data"))
         files.writeTextAtomic("alerts.json", "{ not valid")

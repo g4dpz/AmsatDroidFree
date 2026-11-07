@@ -29,6 +29,7 @@ import uk.me.g4dpz.HamSatDroid.alert.AlertNotifier
 import uk.me.g4dpz.HamSatDroid.alert.PassAlert
 import uk.me.g4dpz.HamSatDroid.alert.PassAlertScheduler
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
+import java.io.IOException
 
 /**
  * Setting and clearing pass alerts from the UI. It owns the permission flow (notifications, and the one-time offer to
@@ -101,7 +102,13 @@ class AlertController internal constructor(
     }
 
     private fun set(alert: PassAlert) {
-        store.add(alert)
+        try {
+            store.add(alert)
+        } catch (e: IOException) {
+            // Not stored, so not scheduled either: the receiver would find nothing when the alarm fired.
+            message(R.string.alert_save_failed, e.message ?: e.javaClass.simpleName)
+            return
+        }
         scheduler.schedule(alert)
         refresh()
         message(R.string.alert_set, alert.satName)
@@ -109,11 +116,19 @@ class AlertController internal constructor(
     }
 
     private fun clear(alert: PassAlert) {
-        store.remove(alert.id)
+        val removed = try {
+            store.remove(alert.id)
+            true
+        } catch (e: IOException) {
+            // Still in the file, so the bell stays; its alarms and notification go regardless, and the next
+            // successful write (a later clear, or the receiver's prune) drops it.
+            message(R.string.alert_save_failed, e.message ?: e.javaClass.simpleName)
+            false
+        }
         scheduler.cancel(alert)
         AlertNotifier(context).show(alert, stage = null)
         refresh()
-        message(R.string.alert_cleared, alert.satName)
+        if (removed) message(R.string.alert_cleared, alert.satName)
     }
 
     /** Reschedule everything after the lead time changes. */
