@@ -18,6 +18,7 @@ import uk.me.g4dpz.HamSatDroid.aim.Orientation
  * Collects compass readings while the sky screen is visible and [enabled], for the observer at [latitude]/[longitude].
  * The sensor registers only while this is in the composition and the lifecycle is at least STARTED, so it stops when
  * the screen is left or the app goes to the background. Null while disabled, unavailable, or before the first reading.
+ * Readings follow the display rotation as it changes (the activity handles rotation without being recreated).
  */
 @Composable
 fun rememberCompassOrientation(
@@ -31,7 +32,9 @@ fun rememberCompassOrientation(
     return produceState<Orientation?>(null, provider, enabled, latitude, longitude) {
         value = null
         if (!enabled || !provider.isAvailable || latitude == null || longitude == null) return@produceState
-        val displayRotation = view.display?.rotation ?: android.view.Surface.ROTATION_0
+        // Read per reading, not once: the activity is not recreated on rotation (configChanges), so a rotation made
+        // while this flow runs would otherwise leave the sensor axes mapped for the old display rotation.
+        val displayRotation = { view.display?.rotation ?: android.view.Surface.ROTATION_0 }
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             provider.orientations(latitude, longitude, displayRotation).collect { value = it }
         }
