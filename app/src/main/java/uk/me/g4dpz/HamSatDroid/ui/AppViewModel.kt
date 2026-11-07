@@ -264,8 +264,12 @@ class AppViewModel(
             }
         }
 
-        // Until the first successful download only the elements shipped with the app are available.
-        if (loaded.isBundled) refreshKepsNow(settings.kepsSource.value, userRequested = false)
+        // Until the first successful download only the elements shipped with the app are available, so fetch once
+        // without being asked. Only when the user allows automatic downloads: with the setting off every launch
+        // would otherwise try the network (a failed connection does not start the two-hour wait).
+        if (loaded.isBundled && settings.autoKepsRefresh.value) {
+            refreshKepsNow(settings.kepsSource.value, userRequested = false)
+        }
     }
 
     private fun reload(preferred: Int?) {

@@ -108,6 +108,20 @@ class AppViewModelTest {
     }
 
     @Test
+    fun theFirstRunDownloadRespectsTheAutomaticRefreshSetting() {
+        settings.autoKepsRefresh.value = false
+        downloader.next = { DownloadResponse(200, celestrakJson) }
+        val vm = viewModel()
+        assertTrue(vm.state.value.keps!!.isBundled)
+        assertTrue("no download may be attempted with automatic refresh off", downloader.requested.isEmpty())
+
+        settings.autoKepsRefresh.value = true
+        val vm2 = viewModel()
+        assertFalse(vm2.state.value.keps!!.isBundled)
+        assertEquals(1, downloader.requested.size)
+    }
+
+    @Test
     fun aSelectionThatIsNoLongerInTheListFallsBackToTheFirstSatellite() {
         settings.selectedCatnum.value = 999999
         val vm = viewModel()
