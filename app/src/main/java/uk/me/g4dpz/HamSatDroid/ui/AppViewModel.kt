@@ -77,6 +77,9 @@ class AppViewModel(
     val tles: StateFlow<List<TLE>> = _tles.asStateFlow()
     private var kepsModified: Long? = null
     private var calcJob: Job? = null
+
+    /** Counts calculations started; see [calculate]. Only touched from the callers' thread (the main thread). */
+    private var calcGeneration = 0
     private var rawPasses: List<SatPassTime> = emptyList()
 
     init {
@@ -137,6 +140,10 @@ class AppViewModel(
         val hours = current.hoursAhead
 
         calcJob?.cancel()
+        // The library call cannot be interrupted, so a cancelled job only notices after it returns. Its finally block
+        // must then leave `calculating` alone: by then a newer job owns the flag. Each job remembers the generation
+        // it belongs to and only the newest clears the flag.
+        val generation = ++calcGeneration
         _state.update { it.copy(calculating = true) }
         calcJob = viewModelScope.launch(workDispatcher) {
             try {
@@ -171,7 +178,7 @@ class AppViewModel(
                 }
                 savePasses(tle)
             } finally {
-                _state.update { it.copy(calculating = false) }
+                if (generation == calcGeneration) _state.update { it.copy(calculating = false) }
             }
         }
     }
