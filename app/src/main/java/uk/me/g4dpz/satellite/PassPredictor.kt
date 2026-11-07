@@ -129,11 +129,17 @@ class PassPredictor @Throws(IllegalArgumentException::class, InvalidTleException
         var satPos = getSatPos(cal.time)
         var prevPos = satPos
 
+        // The search is bounded: a satellite that never crosses the horizon from this station (geostationary and
+        // similar) would otherwise keep these loops stepping forward for ever. willBeSeen() cannot catch that case,
+        // because such a satellite may well be "seen" (it is simply always up, or always down).
+        val giveUpAtMillis = cal.timeInMillis + MAX_SEARCH_MILLIS
+
         // test for the elevation being above the horizon
         if (satPos.elevation > 0.0) {
             // move time forward in 60 second intervals until the sat goes below the horizon
             do {
                 satPos = getPosition(cal, 60)
+                checkSearchBound(cal, giveUpAtMillis)
             } while (satPos.elevation > 0.0)
 
             // move time forward 3/4 orbit
@@ -143,6 +149,7 @@ class PassPredictor @Throws(IllegalArgumentException::class, InvalidTleException
         // now find the next time it comes above the horizon
         do {
             satPos = getPosition(cal, 60)
+            checkSearchBound(cal, giveUpAtMillis)
             val now = cal.time
             elevation = satPos.elevation
             if (elevation > maxElevation) {
@@ -170,6 +177,7 @@ class PassPredictor @Throws(IllegalArgumentException::class, InvalidTleException
         // now find when it goes below
         do {
             satPos = getPosition(cal, 30)
+            checkSearchBound(cal, giveUpAtMillis)
             val now = cal.time
 
             val currPolePassed = getPolePassed(prevPos, satPos)
@@ -213,6 +221,16 @@ class PassPredictor @Throws(IllegalArgumentException::class, InvalidTleException
     private fun getPosition(cal: Calendar, offSet: Int): SatPos {
         cal.add(Calendar.SECOND, offSet)
         return getSatPos(cal.time)
+    }
+
+    /** Stops a horizon search that has gone on for [MAX_SEARCH_MILLIS] of satellite time without a crossing. */
+    @Throws(SatNotFoundException::class)
+    private fun checkSearchBound(cal: Calendar, giveUpAtMillis: Long) {
+        if (cal.timeInMillis > giveUpAtMillis) {
+            throw SatNotFoundException(
+                "No horizon crossing within $MAX_SEARCH_DAYS days: the satellite does not rise or set here"
+            )
+        }
     }
 
     /**
@@ -305,15 +323,23 @@ class PassPredictor @Throws(IllegalArgumentException::class, InvalidTleException
         return positions
     }
 
-    private companion object {
-        const val UTC = "UTC"
-        const val SOUTH = "south"
-        const val NORTH = "north"
-        const val SPEED_OF_LIGHT = 2.99792458E8
-        const val TWOPI = Math.PI * 2.0
-        const val DEADSPOT_NONE = "none"
+    companion object {
+        /**
+         * How far ahead [nextSatPass] searches for a horizon crossing before giving up with [SatNotFoundException].
+         * Every satellite that crosses the horizon at all does so well inside this (a day or so at most, even for
+         * highly elliptical orbits); the bound only matters for satellites that stay put in the sky.
+         */
+        const val MAX_SEARCH_DAYS = 10L
+        const val MAX_SEARCH_MILLIS: Long = MAX_SEARCH_DAYS * 24 * 60 * 60 * 1000
+
+        private const val UTC = "UTC"
+        private const val SOUTH = "south"
+        private const val NORTH = "north"
+        private const val SPEED_OF_LIGHT = 2.99792458E8
+        private const val TWOPI = Math.PI * 2.0
+        private const val DEADSPOT_NONE = "none"
 
         /** The time zone in which we do all the calculations. */
-        val TZ: TimeZone = TimeZone.getTimeZone(UTC)
+        private val TZ: TimeZone = TimeZone.getTimeZone(UTC)
     }
 }

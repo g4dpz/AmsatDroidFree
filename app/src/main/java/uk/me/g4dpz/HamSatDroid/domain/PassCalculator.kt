@@ -16,6 +16,12 @@ sealed interface CalcResult {
     /** The satellite is visible from here but no pass starts in the following hours. */
     data object NoPasses : CalcResult
 
+    /**
+     * The satellite does not move across the sky (geostationary or similar), so there are no passes: it is either
+     * always up at [position] or never visible from here.
+     */
+    data class Stationary(val position: SatelliteMotion.FixedPosition) : CalcResult
+
     data object BadElements : CalcResult
     data object UnknownSatellite : CalcResult
     data class Error(val message: String) : CalcResult
@@ -32,10 +38,15 @@ open class PassCalculator {
      * @param start when to start looking
      */
     open fun calculate(tle: TLE, latitude: Double, longitude: Double, start: Date, hoursAhead: Int): CalcResult = try {
-        val predictor = PassPredictor(tle, GroundStationPosition(latitude, longitude, 0.0))
-        val passes = predictor.getPasses(start, hoursAhead, true)
-        // The library reports "nothing found" as a single pass with zero maximum elevation.
-        if (passes.isEmpty() || passes.first().maxEl == 0.0) CalcResult.NoPasses else CalcResult.Passes(passes)
+        if (SatelliteMotion.isStationary(tle)) {
+            // A pass search would never find a horizon crossing; report where it sits instead.
+            CalcResult.Stationary(SatelliteMotion.fixedPosition(tle, latitude, longitude, start))
+        } else {
+            val predictor = PassPredictor(tle, GroundStationPosition(latitude, longitude, 0.0))
+            val passes = predictor.getPasses(start, hoursAhead, true)
+            // The library reports "nothing found" as a single pass with zero maximum elevation.
+            if (passes.isEmpty() || passes.first().maxEl == 0.0) CalcResult.NoPasses else CalcResult.Passes(passes)
+        }
     } catch (e: InvalidTleException) {
         CalcResult.BadElements
     } catch (e: SatNotFoundException) {

@@ -158,6 +158,7 @@ class AppViewModel(
                             )
                         }
                     }
+                    is CalcResult.Stationary -> showFailure(PassHeader.Stationary(tle.name, result.position))
                     CalcResult.BadElements -> showFailure(PassHeader.BadElements)
                     CalcResult.UnknownSatellite -> showFailure(PassHeader.UnknownSatellite)
                     is CalcResult.Error -> showFailure(PassHeader.Error(result.message))

@@ -237,6 +237,8 @@ class AppViewModelTest {
             CalcResult.NoPasses to PassHeader.NoPasses("AO-07", 51.5, -0.1, "IO91wm", 24),
             CalcResult.BadElements to PassHeader.BadElements,
             CalcResult.UnknownSatellite to PassHeader.UnknownSatellite,
+            CalcResult.Stationary(uk.me.g4dpz.HamSatDroid.domain.SatelliteMotion.FixedPosition(145.0, 22.0)) to
+                PassHeader.Stationary("AO-07", uk.me.g4dpz.HamSatDroid.domain.SatelliteMotion.FixedPosition(145.0, 22.0)),
             CalcResult.Error("boom") to PassHeader.Error("boom"),
         )
         for ((result, expected) in cases) {

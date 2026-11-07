@@ -6,6 +6,7 @@ import uk.me.g4dpz.HamSatDroid.HamSatDroidApp
 import uk.me.g4dpz.HamSatDroid.data.LocationText
 import uk.me.g4dpz.HamSatDroid.data.createKepsRepository
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
+import uk.me.g4dpz.HamSatDroid.domain.SatelliteMotion
 import uk.me.g4dpz.satellite.GroundStationPosition
 import uk.me.g4dpz.satellite.InvalidTleException
 import uk.me.g4dpz.satellite.PassPredictor
@@ -51,6 +52,10 @@ object WidgetUpdater {
         if (tle == null) return WidgetState.NoSatellite
 
         return try {
+            if (SatelliteMotion.isStationary(tle)) {
+                // No pass search for a satellite that never crosses the horizon; show where it sits instead.
+                return WidgetState.Stationary(tle.name, SatelliteMotion.fixedPosition(tle, latitude, longitude, Date(nowMillis)))
+            }
             val predictor = PassPredictor(tle, GroundStationPosition(latitude, longitude, 0.0))
             val pass = predictor.nextSatPass(Date(nowMillis))
             // The library reports "nothing" as a pass with zero max elevation.

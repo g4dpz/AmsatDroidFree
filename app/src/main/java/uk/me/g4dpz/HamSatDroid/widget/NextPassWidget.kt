@@ -74,6 +74,7 @@ class NextPassWidget : GlanceAppWidget() {
                 WidgetState.NoLocation -> Message(context.getString(R.string.widget_set_location))
                 WidgetState.NoSatellite -> Message(context.getString(R.string.widget_no_satellite))
                 WidgetState.Error -> Message(context.getString(R.string.widget_error))
+                is WidgetState.Stationary -> StationaryContent(context, state)
                 is WidgetState.Ready -> ReadyContent(context, state, showDetail)
             }
         }
@@ -104,6 +105,23 @@ class NextPassWidget : GlanceAppWidget() {
                 style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp),
             )
         }
+    }
+
+    @Composable
+    private fun StationaryContent(context: Context, state: WidgetState.Stationary) {
+        Text(
+            state.satName,
+            style = TextStyle(color = GlanceTheme.colors.onSurface, fontWeight = FontWeight.Bold, fontSize = 16.sp),
+        )
+        Spacer(GlanceModifier.height(2.dp))
+        val p = state.position
+        Message(
+            if (p.isUp) {
+                context.getString(R.string.widget_stationary_up, p.azimuthDeg.toInt(), p.elevationDeg.toInt())
+            } else {
+                context.getString(R.string.widget_stationary_down)
+            }
+        )
     }
 
     @Composable
