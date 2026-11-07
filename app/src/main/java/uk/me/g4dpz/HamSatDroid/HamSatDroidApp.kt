@@ -23,7 +23,7 @@ import uk.me.g4dpz.HamSatDroid.keps.KepsScheduler
  * Application object: owns the one shared [SettingsRepository] (so every screen sees the same live values) and keeps
  * the background keps refresh in step with the "automatic refresh" setting.
  */
-class HamSatDroidApp : Application() {
+open class HamSatDroidApp : Application() {
 
     /** The app's settings. Use this instance everywhere so changes reach all observers. */
     val settings: SettingsRepository by lazy { SettingsRepository(SharedPreferencesStore(this)) }

@@ -72,6 +72,14 @@ android {
         // Lint errors fail the build; a check that cannot fail is not a check. Warnings are still only reported.
         abortOnError = true
     }
+
+    testOptions {
+        unitTests {
+            // Robolectric needs the resources and the merged manifest. The plain JVM tests are unaffected: only
+            // classes that name the Robolectric runner use it.
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -102,4 +110,9 @@ dependencies {
     // Android's org.json is only a stub on the JVM, so unit tests need the real implementation.
     testImplementation("org.json:json:20260814")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
+    // Robolectric: Android framework on the JVM, for the receivers, scheduler and notifier.
+    testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation("androidx.test:core:1.6.1")
+    // WorkManager test initialiser: the application onCreate schedules work, so tests need an instance first.
+    testImplementation("androidx.work:work-testing:2.12.0")
 }
