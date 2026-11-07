@@ -22,10 +22,22 @@ class PassAlertStore(private val files: FileStore) {
 
     fun contains(id: Int): Boolean = all().any { it.id == id }
 
+    /** The stored alert for the pass of [catnum] running from [aosMillis] to [losMillis], if there is one. */
+    fun find(catnum: Int, aosMillis: Long, losMillis: Long): PassAlert? =
+        all().firstOrNull { it.isSamePass(catnum, aosMillis, losMillis) }
+
+    /**
+     * Stores [alert]. Any alert already stored for the same pass (see [PassAlert.isSamePass]) is replaced, so a pass
+     * predicted again a few seconds different does not get a second alert.
+     *
+     * @return the alerts that were replaced; their alarms and notifications are registered under their own ids, so
+     *   the caller should cancel them
+     */
     @Throws(IOException::class)
-    fun add(alert: PassAlert) {
-        val without = all().filterNot { it.id == alert.id }
-        write(without + alert)
+    fun add(alert: PassAlert): List<PassAlert> {
+        val (replaced, kept) = all().partition { it.id == alert.id || it.isSamePass(alert) }
+        write(kept + alert)
+        return replaced.filterNot { it == alert }
     }
 
     @Throws(IOException::class)
