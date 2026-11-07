@@ -32,6 +32,19 @@ class AlertTiming(private val alert: PassAlert, leadMinutes: Int, private val no
         else -> AlertStage.LEAD // before the lead time nothing is shown, but if asked, LEAD is the first stage
     }
 
+    /**
+     * The stage whose trigger time has already passed while the pass has not yet ended, or null: nothing before the
+     * lead time, LEAD from the lead time up to AOS, AOS from AOS up to LOS, nothing from LOS. Unlike [stageNow] it is
+     * null before the lead time, so it says what should already be showing when an alert is set (or restored after
+     * a reboot) part-way through its stages.
+     */
+    fun stageDue(): AlertStage? = when {
+        nowMillis >= alert.losMillis -> null
+        nowMillis >= alert.aosMillis -> AlertStage.AOS
+        nowMillis >= leadMillis -> AlertStage.LEAD
+        else -> null
+    }
+
     /** Whether any stage is still to come, so scheduling is worthwhile. */
     fun hasFuture(): Boolean = alert.losMillis > nowMillis
 }

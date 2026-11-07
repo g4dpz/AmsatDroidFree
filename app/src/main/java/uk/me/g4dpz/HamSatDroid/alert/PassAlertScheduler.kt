@@ -23,10 +23,18 @@ class PassAlertScheduler(
 ) {
 
     private val alarmManager = context.getSystemService(AlarmManager::class.java)
+    private val notifier = AlertNotifier(context)
 
+    /**
+     * Sets the alarms for the stages still to come. A stage already reached ([AlertTiming.stageDue], for example an
+     * alert set three minutes before AOS with a five-minute lead, or one restored after a reboot that happened in the
+     * lead window) has no alarm ahead of it, so its notification is posted right away rather than waiting for the
+     * next stage.
+     */
     fun schedule(alert: PassAlert, nowMillis: Long = System.currentTimeMillis()) {
         val timing = AlertTiming(alert, settings.alertLeadMinutes.value, nowMillis)
         for ((stage, at) in timing.futureTriggers()) setAlarm(alert.id, stage, at)
+        timing.stageDue()?.let { notifier.show(alert, it) }
     }
 
     fun cancel(alert: PassAlert) {

@@ -49,6 +49,29 @@ class AlertTimingTest {
     }
 
     @Test
+    fun `stageDue is the stage already reached, and nothing before the lead time or after LOS`() {
+        val leadAt = aos - 5 * 60_000L
+        assertNull("well before the lead time", timing(aos - 60 * 60_000L).stageDue())
+        assertNull("one ms before the lead time", timing(leadAt - 1).stageDue())
+        assertEquals("at the lead time", AlertStage.LEAD, timing(leadAt).stageDue())
+        assertEquals("inside the lead window", AlertStage.LEAD, timing(aos - 2 * 60_000L).stageDue())
+        assertEquals("one ms before AOS", AlertStage.LEAD, timing(aos - 1).stageDue())
+        assertEquals("at AOS", AlertStage.AOS, timing(aos).stageDue())
+        assertEquals("during the pass", AlertStage.AOS, timing(aos + 60_000L).stageDue())
+        assertEquals("one ms before LOS", AlertStage.AOS, timing(los - 1).stageDue())
+        assertNull("at LOS", timing(los).stageDue())
+        assertNull("after LOS", timing(los + 10_000L).stageDue())
+    }
+
+    @Test
+    fun `stageDue respects the configured lead time`() {
+        // 15 minute lead: 10 minutes before AOS is inside the window, so LEAD is due
+        assertEquals(AlertStage.LEAD, timing(aos - 10 * 60_000L, lead = 15).stageDue())
+        // 5 minute lead: the same moment is before the window
+        assertNull(timing(aos - 10 * 60_000L, lead = 5).stageDue())
+    }
+
+    @Test
     fun `hasFuture is true until the pass ends`() {
         assertTrue(timing(aos - 60_000L).hasFuture())
         assertTrue(timing(aos + 60_000L).hasFuture())
