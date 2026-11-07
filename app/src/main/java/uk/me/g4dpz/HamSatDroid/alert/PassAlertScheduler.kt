@@ -6,7 +6,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
+import java.io.IOException
 
 /**
  * Schedules the alarms that drive the alert notifications. One alarm per stage (lead, AOS, LOS), each a broadcast to
@@ -23,20 +25,39 @@ class PassAlertScheduler(
 ) {
 
     private val alarmManager = context.getSystemService(AlarmManager::class.java)
+    private val notifier = AlertNotifier(context)
 
+    /**
+     * Sets the alarms for the stages still to come. A stage already reached ([AlertTiming.stageDue], for example an
+     * alert set three minutes before AOS with a five-minute lead, or one restored after a reboot that happened in the
+     * lead window) has no alarm ahead of it, so its notification is posted right away rather than waiting for the
+     * next stage.
+     */
     fun schedule(alert: PassAlert, nowMillis: Long = System.currentTimeMillis()) {
         val timing = AlertTiming(alert, settings.alertLeadMinutes.value, nowMillis)
         for ((stage, at) in timing.futureTriggers()) setAlarm(alert.id, stage, at)
+        timing.stageDue()?.let { notifier.show(alert, it) }
     }
 
     fun cancel(alert: PassAlert) {
         for (stage in AlertStage.entries) alarmManager?.cancel(pendingIntent(alert.id, stage, mutableUpdate = false))
     }
 
-    /** Prunes ended alerts (cancelling their alarms) and reschedules the rest. Called after a reboot or a time change. */
+    /**
+     * Prunes ended alerts (cancelling their alarms) and reschedules the rest. Called after a reboot or a time change.
+     * If the pruned list cannot be written, the ended alerts stay in the file until a later prune succeeds, but their
+     * alarms are still cancelled and they are not rescheduled.
+     */
     fun rescheduleAll(nowMillis: Long = System.currentTimeMillis()) {
-        for (ended in store.pruneEnded(nowMillis)) cancel(ended)
+        val ended = try {
+            store.pruneEnded(nowMillis)
+        } catch (e: IOException) {
+            Log.w(TAG, "Could not prune ended alerts: ${e.message}")
+            store.all().filter { it.hasEnded(nowMillis) }
+        }
+        for (alert in ended) cancel(alert)
         for (alert in store.all()) {
+            if (alert.hasEnded(nowMillis)) continue // left behind by a failed prune
             cancel(alert) // clear any stale alarms before setting fresh ones (lead time may have changed)
             schedule(alert, nowMillis)
         }
@@ -66,6 +87,10 @@ class PassAlertScheduler(
     }
 
     private fun requestCode(id: Int, stage: AlertStage): Int = id * 3 + stage.ordinal
+
+    private companion object {
+        const val TAG = "PassAlertScheduler"
+    }
 }
 
 /** The broadcast action for each stage. */

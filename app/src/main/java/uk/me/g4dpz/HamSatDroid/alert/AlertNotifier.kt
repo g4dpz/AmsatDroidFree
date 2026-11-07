@@ -31,24 +31,23 @@ class AlertNotifier(private val context: Context) {
         manager.createNotificationChannel(channel)
     }
 
-    /** Shows the notification for [alert] in [stage], or clears it when [stage] is null (the pass has ended). */
+    /**
+     * Shows the countdown notification for [alert] in [stage], or clears it when [stage] is null (the pass has
+     * ended). [AlertStage.LOS] also clears: there is nothing to count down to once the satellite has set.
+     */
     @SuppressLint("MissingPermission") // the caller sets alerts only after POST_NOTIFICATIONS is granted
     fun show(alert: PassAlert, stage: AlertStage?) {
-        if (stage == null) {
+        if (stage == null || stage == AlertStage.LOS) {
             manager.cancel(alert.id)
             return
         }
         ensureChannel()
         if (!manager.areNotificationsEnabled()) return
 
-        if (stage == AlertStage.LOS) {
-            manager.cancel(alert.id)
-            return
-        }
-        val title = when (stage) {
-            AlertStage.LEAD -> context.getString(R.string.alert_lead_title, alert.satName)
-            AlertStage.AOS -> context.getString(R.string.alert_aos_title, alert.satName)
-            AlertStage.LOS -> return // handled above
+        val title = if (stage == AlertStage.LEAD) {
+            context.getString(R.string.alert_lead_title, alert.satName)
+        } else {
+            context.getString(R.string.alert_aos_title, alert.satName)
         }
         val text = context.getString(
             R.string.alert_body, alert.aosAz, oneDecimal(alert.maxElDeg),
