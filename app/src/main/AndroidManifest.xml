@@ -50,7 +50,8 @@
             android:name=".alert.PassAlertReceiver"
             android:exported="false" />
 
-        <!-- Re-registers alarms after a reboot, an app update, or a clock or time-zone change. -->
+        <!-- Re-registers alarms after a reboot, an app update, a clock or time-zone change, or a change to the
+             exact-alarm permission (so inexact alarms are replaced by exact ones once the user allows them). -->
         <receiver
             android:name=".alert.AlertRescheduleReceiver"
             android:exported="true">
@@ -59,6 +60,7 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
 
