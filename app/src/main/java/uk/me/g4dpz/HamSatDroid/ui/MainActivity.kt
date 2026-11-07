@@ -22,6 +22,7 @@ import uk.me.g4dpz.HamSatDroid.night.rememberAmbientNight
 import uk.me.g4dpz.HamSatDroid.ui.theme.isDark
 import uk.me.g4dpz.HamSatDroid.widget.WidgetRefresh
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableSharedFlow
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import uk.me.g4dpz.HamSatDroid.HamSatDroidApp
@@ -65,9 +66,22 @@ class MainActivity : ComponentActivity() {
             val redNight = mode == ThemeMode.RED_NIGHT
             LaunchedEffect(dark, redNight) { applySystemBars(dark, redNight) }
             HamSatDroidTheme(mode) {
-                AppNavHost(viewModel, settings, locationFetcher, lightProvider.available, startRoute)
+                AppNavHost(viewModel, settings, locationFetcher, lightProvider.available, startRoute, routeRequests)
             }
         }
+    }
+
+    /**
+     * Routes asked for after the activity exists (a notification or widget tap while the app is running). With
+     * `launchMode="singleTask"` such a tap arrives here rather than creating a second instance; the navigation host
+     * collects these and navigates. Buffered so a request made before the host is composed is not lost.
+     */
+    private val routeRequests = MutableSharedFlow<String>(replay = 0, extraBufferCapacity = 1)
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        intent.getStringExtra(EXTRA_ROUTE)?.let { routeRequests.tryEmit(it) }
     }
 
     /**

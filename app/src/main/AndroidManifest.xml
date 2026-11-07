@@ -29,10 +29,13 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:localeConfig="@xml/locales_config" >
-        <!-- The Compose UI: one activity hosting every screen. It follows the device orientation and window size. -->
+        <!-- The Compose UI: one activity hosting every screen. It follows the device orientation and window size.
+             singleTask: a tap on a notification or the widget while the app is running re-enters the existing
+             instance through onNewIntent instead of stacking a second copy of the activity. -->
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden|uiMode|density"
             android:theme="@style/Theme.HamSatDroid">
             <intent-filter>
