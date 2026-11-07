@@ -5,6 +5,9 @@ import android.app.Application
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import uk.me.g4dpz.HamSatDroid.alert.AlertNotifier
 import uk.me.g4dpz.HamSatDroid.alert.PassAlertStore
@@ -12,6 +15,7 @@ import uk.me.g4dpz.HamSatDroid.data.FileStore
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.data.SharedPreferencesStore
 import uk.me.g4dpz.HamSatDroid.data.TransponderDatabase
+import uk.me.g4dpz.HamSatDroid.data.TransponderSyncResult
 import uk.me.g4dpz.HamSatDroid.data.createTransponderDatabaseRepository
 import uk.me.g4dpz.HamSatDroid.keps.KepsScheduler
 
@@ -27,14 +31,14 @@ class HamSatDroidApp : Application() {
     /** The pass alerts the user has set. Shared so the UI and the broadcast receivers see the same list. */
     val passAlertStore: PassAlertStore by lazy { PassAlertStore(FileStore(filesDir)) }
 
+    private val _transponderDatabase = MutableStateFlow(TransponderDatabase.EMPTY)
+
     /**
-     * The satellite transponder database (OscarWatch's `satellite_database.json`), read-only, for Doppler. Loaded
-     * once (synced copy if present, otherwise bundled). It is replaced after a successful background sync; read it
-     * through [transponderDatabase] so the latest load is seen.
+     * The satellite transponder database (OscarWatch's `satellite_database.json`), read-only, for Doppler. It is
+     * [TransponderDatabase.EMPTY] until the first load finishes and is replaced after every successful sync
+     * (start-up and the background worker), so observe it rather than reading it once.
      */
-    @Volatile
-    var transponderDatabase: TransponderDatabase = TransponderDatabase.EMPTY
-        private set
+    val transponderDatabase: StateFlow<TransponderDatabase> = _transponderDatabase.asStateFlow()
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -46,21 +50,23 @@ class HamSatDroidApp : Application() {
         scope.launch {
             settings.autoKepsRefresh.state.collect { enabled -> scheduler.apply(enabled) }
         }
-        loadTransponderDatabase()
+        scope.launch {
+            reloadTransponderDatabase()
+            // When automatic refresh is on, also sync the published copy (the minimum-interval rule makes this cheap
+            // when it ran recently) and pick up the result.
+            if (settings.autoKepsRefresh.value &&
+                createTransponderDatabaseRepository(this@HamSatDroidApp).sync() is TransponderSyncResult.Updated
+            ) {
+                reloadTransponderDatabase()
+            }
+        }
     }
 
     /**
-     * Loads the transponder database off the main thread, and, when automatic refresh is on, syncs the published copy
-     * (respecting the minimum-interval rule) and reloads if it changed. Safe to call again after a background sync.
+     * Reads the stored (or bundled) transponder database into [transponderDatabase]. Blocking file I/O: call off the
+     * main thread. The background worker calls this after a successful sync so the app sees the new file at once.
      */
-    fun loadTransponderDatabase() {
-        scope.launch {
-            val repository = createTransponderDatabaseRepository(this@HamSatDroidApp)
-            transponderDatabase = repository.load().database
-            if (settings.autoKepsRefresh.value) {
-                repository.sync()
-                transponderDatabase = repository.load().database
-            }
-        }
+    fun reloadTransponderDatabase() {
+        _transponderDatabase.value = createTransponderDatabaseRepository(this).load().database
     }
 }
