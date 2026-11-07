@@ -286,7 +286,8 @@ private fun FrequencyLines(mode: TransponderMode, rangeRateKmS: Double?, formats
             )
             Text(stringResource(R.string.doppler_nominal, formats.groupedInteger(up)), style = MaterialTheme.typography.bodyMedium)
             if (rangeRateKmS != null) {
-                val tx = DopplerMath.uplinkHz(up, rangeRateKmS, inverting = mode.doppler == DopplerDirection.REV)
+                // The uplink correction is the same for normal and inverting transponders (see DopplerMath).
+                val tx = DopplerMath.uplinkHz(up, rangeRateKmS)
                 Text(stringResource(R.string.doppler_corrected_tx, formats.groupedInteger(tx)), style = MaterialTheme.typography.bodyMedium)
                 Text(
                     stringResource(R.string.doppler_shift, formats.groupedInteger(tx - up)),
