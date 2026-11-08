@@ -47,8 +47,30 @@ jobs:
           done
           echo "::error::Could not download the Gradle distribution after 4 attempts"
           exit 1
-      - name: Assemble, unit test and lint
-        run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+      # Dependencies such as the Kotlin compiler jar are also fetched from GitHub-hosted downloads, which time out
+      # during GitHub incidents and fail the build before any code is compiled. Retry the build, but only when the log
+      # shows a network failure; a compile error, test failure or lint finding fails at once, without a retry.
+      - name: Assemble, unit test and lint (retries only on network errors)
+        run: |
+          set +e  # a failed build must not end the script before the status is checked
+          log="$RUNNER_TEMP/gradle-build.log"
+          network_error='Could not (download|GET)|Read timed out|Connect timed out|Connection reset|HTTP response code: 5|status code 5'
+          attempts=3
+          for attempt in $(seq 1 "$attempts"); do
+            ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug 2>&1 | tee "$log"
+            status="${PIPESTATUS[0]}"
+            if [ "$status" -eq 0 ]; then exit 0; fi
+            if ! grep -qE "$network_error" "$log"; then
+              echo "Build failed (exit $status) with no network error in the log; not retrying."
+              exit "$status"
+            fi
+            if [ "$attempt" -lt "$attempts" ]; then
+              echo "::warning::Build failed on a network error (attempt $attempt of $attempts); retrying in $((attempt * 30))s"
+              sleep $((attempt * 30))
+            fi
+          done
+          echo "::error::Build still failing on network errors after $attempts attempts"
+          exit "$status"
 
       # Make the built debug APK downloadable from the run. This is debug-signed, for testing and
       # sideloading only — not a Play Store release (that needs a signed AAB; see the signing config).
