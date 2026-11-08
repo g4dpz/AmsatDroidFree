@@ -112,7 +112,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
     // Robolectric: Android framework on the JVM, for the receivers, scheduler and notifier.
     testImplementation("org.robolectric:robolectric:4.14.1")
-    testImplementation("androidx.test:core:1.6.1")
+    testImplementation("androidx.test:core:1.7.0")
     // WorkManager test initialiser: the application onCreate schedules work, so tests need an instance first.
     testImplementation("androidx.work:work-testing:2.12.0")
 }
