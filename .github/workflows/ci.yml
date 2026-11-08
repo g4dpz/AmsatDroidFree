@@ -35,6 +35,18 @@ jobs:
           # (which carries separate Gradle Terms of Use).
           cache-provider: basic
 
+      # The wrapper downloads the Gradle distribution from GitHub, which occasionally answers 504 and fails the
+      # whole run before any code is built. Fetch it on its own with a few retries; only this download is retried,
+      # so a genuine build, test or lint failure still fails straight away.
+      - name: Fetch the Gradle distribution (retries on a flaky download)
+        run: |
+          for attempt in 1 2 3 4; do
+            ./gradlew --no-daemon --version && exit 0
+            echo "Gradle download failed (attempt $attempt of 4); retrying in $((attempt * 15))s"
+            sleep $((attempt * 15))
+          done
+          echo "::error::Could not download the Gradle distribution after 4 attempts"
+          exit 1
       - name: Assemble, unit test and lint
         run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 
