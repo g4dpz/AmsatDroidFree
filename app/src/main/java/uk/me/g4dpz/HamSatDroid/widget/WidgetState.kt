@@ -2,6 +2,7 @@
 package uk.me.g4dpz.HamSatDroid.widget
 
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
+import uk.me.g4dpz.HamSatDroid.domain.SatelliteMotion
 
 /** What the next-pass widget shows. The content is worked out off the widget and passed in. */
 sealed interface WidgetState {
@@ -13,6 +14,12 @@ sealed interface WidgetState {
 
     /** A next pass was found. [satName] may differ from the pass if the keps name is preferred. */
     data class Ready(val satName: String, val pass: PassSummary) : WidgetState
+
+    /**
+     * The satellite is stationary in the sky (geostationary), so there is no next pass: it is always up at
+     * [position] or never visible from the home location.
+     */
+    data class Stationary(val satName: String, val position: SatelliteMotion.FixedPosition) : WidgetState
 
     /** The elements could not be used, or the prediction failed. */
     data object Error : WidgetState

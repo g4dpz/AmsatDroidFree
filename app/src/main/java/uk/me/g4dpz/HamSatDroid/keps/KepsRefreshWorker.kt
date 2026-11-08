@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import uk.me.g4dpz.HamSatDroid.HamSatDroidApp
 import uk.me.g4dpz.HamSatDroid.data.RefreshResult
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.data.SharedPreferencesStore
@@ -33,6 +34,11 @@ class KepsRefreshWorker(context: Context, params: WorkerParameters) : Worker(con
         // cheap when it ran recently. A sync failure never affects the keps result; the old database is kept.
         val syncResult = createTransponderDatabaseRepository(applicationContext).sync()
         Log.i(TAG, "Transponder database sync: ${describe(syncResult)}")
+        // The worker runs in the app's process, so hand the new file to the running app at once; otherwise the
+        // Doppler card would keep the old database until the next process start.
+        if (syncResult is TransponderSyncResult.Updated) {
+            (applicationContext as? HamSatDroidApp)?.reloadTransponderDatabase()
+        }
 
         return when (decision) {
             WorkerDecision.SUCCESS -> Result.success()

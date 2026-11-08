@@ -90,6 +90,12 @@ sealed interface PassHeader {
         val searchedHours: Int,
     ) : PassHeader
 
+    /**
+     * The satellite is stationary in the sky (geostationary or similar): no passes, it is always up at
+     * [position] or never visible from here.
+     */
+    data class Stationary(val satName: String, val position: SatelliteMotion.FixedPosition) : PassHeader
+
     /** The elements for the satellite could not be used. */
     data object BadElements : PassHeader
 

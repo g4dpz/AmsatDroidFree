@@ -31,8 +31,10 @@ object AimState {
         if (target.elevationDeg < 0.0) return AimStatus.BelowHorizon
 
         val deltaEl = target.elevationDeg - pointing.elevationDeg
-        // When the device is near vertical the azimuth is meaningless, so judge on elevation alone until it tilts down.
-        val deltaAz = if (pointing.azimuthValid) HeadingMath.signedDelta(pointing.azimuthDeg, target.azimuthDeg) else 180.0
+        // When the device points within about a degree of straight up its azimuth is meaningless, so judge on
+        // elevation alone: a satellite near the zenith is on target whichever way the device "faces", and one lower
+        // down needs lowering, with no turn worth naming (so the azimuth delta is 0, not an arbitrary direction).
+        val deltaAz = if (pointing.azimuthValid) HeadingMath.signedDelta(pointing.azimuthDeg, target.azimuthDeg) else 0.0
 
         return if (abs(deltaAz) <= TOLERANCE_DEG && abs(deltaEl) <= TOLERANCE_DEG) {
             AimStatus.OnTarget

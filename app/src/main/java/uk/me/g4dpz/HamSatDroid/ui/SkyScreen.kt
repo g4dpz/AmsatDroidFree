@@ -211,7 +211,9 @@ fun SkyContent(viewModel: AppViewModel, state: AppUiState, keepScreenOn: Boolean
 
         val catnum = tle?.catnum
         if (catnum != null) {
-            val database = (LocalContext.current.applicationContext as HamSatDroidApp).transponderDatabase
+            // Observed, not read once: the database arrives after start-up and changes after a background sync.
+            val database by (LocalContext.current.applicationContext as HamSatDroidApp).transponderDatabase
+                .collectAsStateWithLifecycle()
             DopplerCard(
                 modes = remember(database, catnum) { database.modesForNoradId(catnum) },
                 reading = reading,

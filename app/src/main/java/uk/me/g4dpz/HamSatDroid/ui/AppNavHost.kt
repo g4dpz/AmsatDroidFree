@@ -11,11 +11,19 @@ import uk.me.g4dpz.HamSatDroid.alert.PassAlertScheduler
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel as screenViewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.location.LocationFetcher
+
+/** Leaves [route]: pops it when something is behind it, otherwise replaces it with the passes screen. */
+private fun NavController.popOrGoHome(route: String) {
+    if (!popBackStack()) navigate(Routes.PASSES) { popUpTo(route) { inclusive = true } }
+}
 
 /** Navigation destinations. */
 object Routes {
@@ -41,9 +49,21 @@ fun AppNavHost(
     locationFetcher: LocationFetcher,
     hasLightSensor: Boolean,
     startRoute: String = Routes.PASSES,
+    /** Routes requested while the host is showing (a notification or widget tap into the running app). */
+    routeRequests: Flow<String> = emptyFlow(),
 ) {
     val navController = rememberNavController()
     val layout = WindowLayout.forWidth(LocalConfiguration.current.screenWidthDp)
+    LaunchedEffect(navController, routeRequests) {
+        routeRequests.collect { route ->
+            // Return to the passes screen first so the requested screen sits directly above it, as it would when
+            // opened from the app itself; launchSingleTop stops a repeat request stacking the same screen twice.
+            navController.navigate(route) {
+                launchSingleTop = true
+                popUpTo(Routes.PASSES) { inclusive = false }
+            }
+        }
+    }
     NavHost(navController = navController, startDestination = startRoute) {
         composable(Routes.PASSES) {
             val keepScreenOn by settings.keepScreenOn.state.collectAsStateWithLifecycle()
@@ -59,13 +79,14 @@ fun AppNavHost(
         }
         composable(Routes.SKY) {
             val keepScreenOn by settings.keepScreenOn.state.collectAsStateWithLifecycle()
-            // After rotating to a wide window the sky view is already shown beside the list
-            if (layout != WindowLayout.SINGLE_PANE) LaunchedEffect(Unit) { navController.popBackStack() }
+            // After rotating to a wide window the sky view is already shown beside the list. When this screen was the
+            // start route (opened from a notification) there is nothing to pop, so go to the passes screen instead.
+            if (layout != WindowLayout.SINGLE_PANE) LaunchedEffect(Unit) { navController.popOrGoHome(Routes.SKY) }
             SkyScreen(viewModel, keepScreenOn, onBack = { navController.popBackStack() })
         }
         composable(Routes.MAP) {
             val keepScreenOn by settings.keepScreenOn.state.collectAsStateWithLifecycle()
-            if (layout == WindowLayout.DASHBOARD) LaunchedEffect(Unit) { navController.popBackStack() }
+            if (layout == WindowLayout.DASHBOARD) LaunchedEffect(Unit) { navController.popOrGoHome(Routes.MAP) }
             MapScreen(viewModel, keepScreenOn, onBack = { navController.popBackStack() })
         }
         composable(Routes.OVERVIEW) {

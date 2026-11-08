@@ -69,7 +69,8 @@ android {
     }
 
     lint {
-        abortOnError = false
+        // Lint errors fail the build; a check that cannot fail is not a check. Warnings are still only reported.
+        abortOnError = true
     }
 }
 
