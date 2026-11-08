@@ -65,18 +65,69 @@ class DopplerMathTest {
         assertTrue("shift was $shift", Math.abs(shift) in 3_000..6_000)
     }
 
+    // ---- the physics the corrections must satisfy, modelled directly ----
+
+    /** What a signal sent at [hz] arrives at after crossing the link once, at range rate [rangeRateKmS]. */
+    private fun afterOneHop(hz: Double, rangeRateKmS: Double): Double =
+        hz * (1.0 - rangeRateKmS * 1000.0 / DopplerMath.SPEED_OF_LIGHT)
+
+    /**
+     * The corrections are first order and truncate to a whole hertz, so a round trip is off by the second-order term
+     * (f v^2/c^2, about 0.2 Hz at 435 MHz and 6 km/s) plus up to a hertz per truncation. A few hertz of tolerance
+     * separates that from the error being hunted, which is thousands of hertz.
+     */
+    private val roundTripToleranceHz = 3.0
+
     @Test
-    fun `an inverting transponder follows the downlink direction on the uplink`() {
-        val nominal = 145_900_000L
-        val receding = 6.0
-        // Normal: uplink raised while receding. Inverting: uplink lowered instead, matching the downlink direction.
-        assertEquals(DopplerMath.uplinkHz(nominal, receding), DopplerMath.uplinkHz(nominal, receding, inverting = false))
-        assertEquals(DopplerMath.downlinkHz(nominal, receding), DopplerMath.uplinkHz(nominal, receding, inverting = true))
-        assertTrue(DopplerMath.uplinkHz(nominal, receding, inverting = true) < nominal)
-        // The magnitude of the shift is the same either way; only the direction differs (within 1 Hz, as the normal
-        // and inverting corrections truncate to a whole hertz independently).
-        val normalShift = DopplerMath.uplinkHz(nominal, receding, inverting = false) - nominal
-        val invertedShift = DopplerMath.uplinkHz(nominal, receding, inverting = true) - nominal
-        assertTrue("normal $normalShift vs inverted $invertedShift", Math.abs(normalShift + invertedShift) <= 1)
+    fun `transmitting on the corrected uplink is heard at the nominal uplink, whatever the transponder does`() {
+        // The satellite's receiver sees the uplink shift before the transponder touches the signal, so the frequency
+        // to transmit on depends only on the range rate, not on whether the transponder inverts.
+        val nominalUplink = 435_000_000L
+        for (rangeRate in listOf(6.0, -6.0, 2.5, -0.7)) {
+            val transmitted = DopplerMath.uplinkHz(nominalUplink, rangeRate)
+            val heardAtSatellite = afterOneHop(transmitted.toDouble(), rangeRate)
+            assertEquals("range rate $rangeRate km/s", nominalUplink.toDouble(), heardAtSatellite, roundTripToleranceHz)
+        }
+    }
+
+    @Test
+    fun `the station's own signal comes back at the displayed receive frequency for normal and inverting transponders`() {
+        // A U/V transponder: uplink around 435 MHz, downlink around 145 MHz. Normal: out = in + k. Inverting:
+        // out = k - in. Either way the downlink nominal is what the transponder makes of the nominal uplink, and the
+        // signal arrives on the ground shifted by one more hop.
+        val nominalUplink = 435_050_000L
+        for (rangeRate in listOf(6.0, -6.0)) {
+            val transmitted = DopplerMath.uplinkHz(nominalUplink, rangeRate).toDouble()
+            val received = afterOneHop(transmitted, rangeRate)
+
+            val kNormal = 145_900_000L - nominalUplink // out = in + k
+            val normalNominalDownlink = nominalUplink + kNormal
+            val normalArrival = afterOneHop(received + kNormal, rangeRate)
+            assertEquals(
+                "normal transponder, range rate $rangeRate",
+                DopplerMath.downlinkHz(normalNominalDownlink, rangeRate).toDouble(), normalArrival, roundTripToleranceHz,
+            )
+
+            val kInverting = 435_050_000L + 145_950_000L // out = k - in
+            val invertingNominalDownlink = kInverting - nominalUplink
+            val invertingArrival = afterOneHop(kInverting - received, rangeRate)
+            assertEquals(
+                "inverting transponder, range rate $rangeRate",
+                DopplerMath.downlinkHz(invertingNominalDownlink, rangeRate).toDouble(), invertingArrival, roundTripToleranceHz,
+            )
+        }
+    }
+
+    @Test
+    fun `flipping the uplink correction for an inverting transponder would miss by twice the shift`() {
+        // Documents why the earlier flip was wrong: transmitting on the downlink-style correction is heard at the
+        // satellite about two shifts below nominal, not at nominal.
+        val nominalUplink = 435_000_000L
+        val rangeRate = 6.0
+        val flipped = DopplerMath.downlinkHz(nominalUplink, rangeRate)
+        val heardAtSatellite = afterOneHop(flipped.toDouble(), rangeRate)
+        val shift = DopplerMath.uplinkShiftHz(nominalUplink, rangeRate)
+        assertEquals(nominalUplink - 2.0 * shift, heardAtSatellite, roundTripToleranceHz)
+        assertTrue("shift of $shift Hz should be thousands of Hz at 435 MHz", shift > 5_000)
     }
 }
