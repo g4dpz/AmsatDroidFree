@@ -33,8 +33,11 @@ import java.io.IOException
 
 /**
  * Setting and clearing pass alerts from the UI. It owns the permission flow (notifications, and the one-time offer to
- * allow exact alarms), updates the store and the alarms, and keeps the set of alert ids as state so rows can show a
+ * allow exact alarms), updates the store and the alarms, and keeps the stored alerts as state so rows can show a
  * bell. Remember one with [rememberAlertController] and share it between the screens that show passes.
+ *
+ * A pass is recognised by satellite and overlapping time ([PassAlert.isSamePass]), not by an exact AOS: the overview
+ * and the passes screen predict the same pass from different start times and get times a few seconds apart.
  */
 class AlertController internal constructor(
     private val context: Context,
@@ -45,7 +48,7 @@ class AlertController internal constructor(
     private val store = app.passAlertStore
     private val scheduler = PassAlertScheduler(context, store, app.settings)
 
-    var alertIds by mutableStateOf(store.all().map { it.id }.toSet())
+    var alerts by mutableStateOf(store.all())
         private set
 
     /** A pass waiting for the notification permission answer; set an alert for it once granted. */
@@ -58,10 +61,10 @@ class AlertController internal constructor(
     var showExactAlarmDialog by mutableStateOf(false)
         internal set
 
-    fun hasAlert(pass: PassSummary): Boolean = alertIds.contains(PassAlert.from(pass).id)
+    fun hasAlert(pass: PassSummary): Boolean = alerts.any { it.isSamePass(pass) }
 
     private fun refresh() {
-        alertIds = store.all().map { it.id }.toSet()
+        alerts = store.all()
     }
 
     private fun message(resId: Int, arg: String) {
@@ -82,8 +85,12 @@ class AlertController internal constructor(
     /** Toggles the alert for [pass], asking for the notification permission first if it is needed. */
     fun toggle(pass: PassSummary) {
         val alert = PassAlert.from(pass)
-        if (store.contains(alert.id)) {
-            clear(alert)
+        // Clear the alerts as stored: their notifications and alarms are registered under the stored ids, which may
+        // differ from this prediction's id by a few seconds of AOS. There can be more than one for the pass on a
+        // device that set it from both screens before passes were matched by overlap.
+        val existing = store.findAll(alert.catnum, alert.aosMillis, alert.losMillis)
+        if (existing.isNotEmpty()) {
+            clear(existing)
             return
         }
         if (alert.hasEnded(System.currentTimeMillis())) {
@@ -102,12 +109,18 @@ class AlertController internal constructor(
     }
 
     private fun set(alert: PassAlert) {
-        try {
+        val replaced = try {
             store.add(alert)
         } catch (e: IOException) {
             // Not stored, so not scheduled either: the receiver would find nothing when the alarm fired.
             message(R.string.alert_save_failed, e.message ?: e.javaClass.simpleName)
             return
+        }
+        // An alert for the same pass under another id (set while the permission dialog was up, say) is replaced;
+        // its alarms and notification would otherwise fire alongside the new ones.
+        for (old in replaced) {
+            scheduler.cancel(old)
+            AlertNotifier(context).show(old, stage = null)
         }
         scheduler.schedule(alert)
         refresh()
@@ -115,20 +128,23 @@ class AlertController internal constructor(
         maybeOfferExactAlarms()
     }
 
-    private fun clear(alert: PassAlert) {
+    private fun clear(existing: List<PassAlert>) {
         val removed = try {
-            store.remove(alert.id)
+            store.removeAll(existing.map { it.id }.toSet())
             true
         } catch (e: IOException) {
-            // Still in the file, so the bell stays; its alarms and notification go regardless, and the next
-            // successful write (a later clear, or the receiver's prune) drops it.
+            // Still in the file, so the bell stays; their alarms and notifications go regardless, and the next
+            // successful write (a later clear, or the receiver's prune) drops them.
             message(R.string.alert_save_failed, e.message ?: e.javaClass.simpleName)
             false
         }
-        scheduler.cancel(alert)
-        AlertNotifier(context).show(alert, stage = null)
+        val notifier = AlertNotifier(context)
+        for (alert in existing) {
+            scheduler.cancel(alert)
+            notifier.show(alert, stage = null)
+        }
         refresh()
-        if (removed) message(R.string.alert_cleared, alert.satName)
+        if (removed) message(R.string.alert_cleared, existing.first().satName)
     }
 
     /** Reschedule everything after the lead time changes. */

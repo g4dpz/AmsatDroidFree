@@ -3,6 +3,11 @@ name: Traffic stats
 # GitHub only keeps repository traffic (views and clones) for a rolling 14 days.
 # This job snapshots it daily and appends to docs/traffic/ so a long-term record
 # survives beyond that window.
+#
+# views.csv and clones.csv are per-day. referrers.csv and popular_paths.csv are different: GitHub gives
+# those only as a trailing-14-day total, so each row is that total as of the snapshot date (see
+# .github/scripts/traffic_ranked.py). The difference between snapshots is the net change in a rolling total
+# (new visits minus visits leaving the window), so use it for trends and new sources, not exact daily counts.
 
 on:
   schedule:
@@ -88,13 +93,21 @@ jobs:
           merge views views.csv
           merge clones clones.csv
 
+          # Referrers and popular paths: 14-day totals, recorded once per snapshot date.
+          snapshot="$(date -u +%F)"
+          gh api "repos/$REPO/traffic/popular/referrers" > resp.json
+          python3 .github/scripts/traffic_ranked.py resp.json docs/traffic/referrers.csv referrer "$snapshot"
+          gh api "repos/$REPO/traffic/popular/paths" > resp.json
+          python3 .github/scripts/traffic_ranked.py resp.json docs/traffic/popular_paths.csv path "$snapshot"
+          rm -f resp.json
+
       - name: Commit any changes
         if: steps.token.outputs.present == 'true'
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/traffic/views.csv docs/traffic/clones.csv
+          git add docs/traffic/views.csv docs/traffic/clones.csv docs/traffic/referrers.csv docs/traffic/popular_paths.csv
           if git diff --cached --quiet; then
             echo "No traffic changes to record."
           else
