@@ -4,7 +4,6 @@ package uk.me.g4dpz.HamSatDroid.alert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -60,14 +59,35 @@ class PassAlertStoreTest {
     }
 
     @Test
-    fun `find matches by satellite and overlapping time, not by exact AOS`() {
+    fun `findAll matches by satellite and overlapping time, not by exact AOS`() {
         val s = store()
         val stored = alert(catnum = 25544, aos = 2_000_000L, los = 2_600_000L)
         s.add(stored)
-        assertEquals(stored, s.find(25544, 2_004_000L, 2_597_000L))
-        assertNull(s.find(7530, 2_004_000L, 2_597_000L)) // another satellite
-        assertNull(s.find(25544, 2_600_000L, 3_200_000L)) // the next pass, touching but not overlapping
-        assertNull(s.find(25544, 8_000_000L, 8_600_000L))
+        assertEquals(listOf(stored), s.findAll(25544, 2_004_000L, 2_597_000L))
+        assertTrue(s.findAll(7530, 2_004_000L, 2_597_000L).isEmpty()) // another satellite
+        assertTrue(s.findAll(25544, 2_600_000L, 3_200_000L).isEmpty()) // the next pass, touching but not overlapping
+        assertTrue(s.findAll(25544, 8_000_000L, 8_600_000L).isEmpty())
+    }
+
+    @Test
+    fun `a pass stored twice under different ids is found and cleared in full`() {
+        // What a device that hit the old bug holds: the same pass set from both screens, AOS a few seconds apart.
+        val files = FileStore(File(tmp.root, "data"))
+        val s = PassAlertStore(files)
+        val fromOverview = alert(catnum = 25544, aos = 2_000_000L, los = 2_600_000L)
+        val fromPasses = alert(catnum = 25544, aos = 2_004_000L, los = 2_597_000L)
+        val other = alert(catnum = 7530)
+        assertNotEquals(fromOverview.id, fromPasses.id)
+        files.writeTextAtomic("alerts.json", s.encode(listOf(fromOverview, fromPasses, other)))
+
+        // The long-press, as AlertController.toggle does it: find every stored alert for the pass, remove them all.
+        val found = s.findAll(25544, 2_002_000L, 2_598_000L)
+        assertEquals(listOf(fromOverview, fromPasses), found)
+        s.removeAll(found.map { it.id }.toSet())
+
+        // hasAlert is the same overlap test over what is stored, so the bell goes.
+        assertTrue(s.all().none { it.isSamePass(25544, 2_002_000L, 2_598_000L) })
+        assertEquals(listOf(other), s.all())
     }
 
     @Test

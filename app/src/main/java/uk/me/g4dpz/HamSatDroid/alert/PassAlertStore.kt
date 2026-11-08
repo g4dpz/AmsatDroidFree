@@ -22,9 +22,12 @@ class PassAlertStore(private val files: FileStore) {
 
     fun contains(id: Int): Boolean = all().any { it.id == id }
 
-    /** The stored alert for the pass of [catnum] running from [aosMillis] to [losMillis], if there is one. */
-    fun find(catnum: Int, aosMillis: Long, losMillis: Long): PassAlert? =
-        all().firstOrNull { it.isSamePass(catnum, aosMillis, losMillis) }
+    /**
+     * The stored alerts for the pass of [catnum] running from [aosMillis] to [losMillis]. Usually none or one, but a
+     * device that set an alert from both screens before passes were matched by overlap can hold two for one pass.
+     */
+    fun findAll(catnum: Int, aosMillis: Long, losMillis: Long): List<PassAlert> =
+        all().filter { it.isSamePass(catnum, aosMillis, losMillis) }
 
     /**
      * Stores [alert]. Any alert already stored for the same pass (see [PassAlert.isSamePass]) is replaced, so a pass
@@ -41,9 +44,14 @@ class PassAlertStore(private val files: FileStore) {
     }
 
     @Throws(IOException::class)
-    fun remove(id: Int) {
-        val remaining = all().filterNot { it.id == id }
-        if (remaining.size != all().size) write(remaining)
+    fun remove(id: Int) = removeAll(setOf(id))
+
+    /** Removes every alert whose id is in [ids], in one write. */
+    @Throws(IOException::class)
+    fun removeAll(ids: Set<Int>) {
+        val all = all()
+        val remaining = all.filterNot { it.id in ids }
+        if (remaining.size != all.size) write(remaining)
     }
 
     /** Drops alerts whose pass has ended, and returns what was removed (so the caller can cancel their alarms). */

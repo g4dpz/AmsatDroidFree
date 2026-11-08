@@ -85,9 +85,11 @@ class AlertController internal constructor(
     /** Toggles the alert for [pass], asking for the notification permission first if it is needed. */
     fun toggle(pass: PassSummary) {
         val alert = PassAlert.from(pass)
-        // Clear the alert as stored: its notification and alarms are registered under the stored id, which may differ
-        // from this prediction's id by a few seconds of AOS.
-        store.find(alert.catnum, alert.aosMillis, alert.losMillis)?.let { existing ->
+        // Clear the alerts as stored: their notifications and alarms are registered under the stored ids, which may
+        // differ from this prediction's id by a few seconds of AOS. There can be more than one for the pass on a
+        // device that set it from both screens before passes were matched by overlap.
+        val existing = store.findAll(alert.catnum, alert.aosMillis, alert.losMillis)
+        if (existing.isNotEmpty()) {
             clear(existing)
             return
         }
@@ -126,20 +128,23 @@ class AlertController internal constructor(
         maybeOfferExactAlarms()
     }
 
-    private fun clear(alert: PassAlert) {
+    private fun clear(existing: List<PassAlert>) {
         val removed = try {
-            store.remove(alert.id)
+            store.removeAll(existing.map { it.id }.toSet())
             true
         } catch (e: IOException) {
-            // Still in the file, so the bell stays; its alarms and notification go regardless, and the next
-            // successful write (a later clear, or the receiver's prune) drops it.
+            // Still in the file, so the bell stays; their alarms and notifications go regardless, and the next
+            // successful write (a later clear, or the receiver's prune) drops them.
             message(R.string.alert_save_failed, e.message ?: e.javaClass.simpleName)
             false
         }
-        scheduler.cancel(alert)
-        AlertNotifier(context).show(alert, stage = null)
+        val notifier = AlertNotifier(context)
+        for (alert in existing) {
+            scheduler.cancel(alert)
+            notifier.show(alert, stage = null)
+        }
         refresh()
-        if (removed) message(R.string.alert_cleared, alert.satName)
+        if (removed) message(R.string.alert_cleared, existing.first().satName)
     }
 
     /** Reschedule everything after the lead time changes. */
