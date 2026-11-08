@@ -9,8 +9,12 @@ breakdown. So each row records the 14-day total *as of* the snapshot date:
     snapshot,<key-field>,count,uniques
 
 Running twice on the same date replaces that date's rows (idempotent); earlier dates are kept, so
-the history survives beyond GitHub's window. To estimate what a source contributed on a given day,
-compare consecutive snapshots.
+the history survives beyond GitHub's window.
+
+Reading the history: the difference between two consecutive snapshots is the net change in a rolling
+total, i.e. new visits minus visits that dropped out of the 14-day window. It shows trends and when a
+source first appears, but it is not a per-day count: 100 new visits replacing 100 expiring ones look
+like no change. For exact per-day numbers use views.csv and clones.csv.
 """
 import csv
 import json

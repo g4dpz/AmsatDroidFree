@@ -6,7 +6,8 @@ name: Traffic stats
 #
 # views.csv and clones.csv are per-day. referrers.csv and popular_paths.csv are different: GitHub gives
 # those only as a trailing-14-day total, so each row is that total as of the snapshot date (see
-# .github/scripts/traffic_ranked.py). Compare consecutive snapshots to see what changed.
+# .github/scripts/traffic_ranked.py). The difference between snapshots is the net change in a rolling total
+# (new visits minus visits leaving the window), so use it for trends and new sources, not exact daily counts.
 
 on:
   schedule:
