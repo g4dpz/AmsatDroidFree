@@ -37,6 +37,42 @@ class PassCalculatorTest {
         assertEquals(CalcResult.UnknownSatellite, PassCalculator().calculate(sat("SO-33"), 85.0, 0.0, start, 24))
     }
 
+    /** QO-100 (Es'hail 2), geostationary at 25.9 E, from the Celestrak amateur list of November 2026. */
+    private val qo100 = TLE.fromElements(
+        uk.me.g4dpz.satellite.OrbitalElements(
+            name = "ES'HAIL 2", catnum = 43700, epochYear = 2026, epochDay = 308.11433122,
+            meanMotion = 1.00272722, eccentricity = 0.00016, inclination = 0.0116, raan = 244.1212,
+            argPerigee = 23.3346, meanAnomaly = 202.8356, elementSetNo = 999, revAtEpoch = 2908,
+        )
+    )
+    private val nov2026 = Date(1793880000000L) // 2026-11-04T12:00:00Z
+
+    @Test
+    fun aGeostationarySatelliteThatIsUpIsReportedAsStationaryWithItsPosition() {
+        // Before this guard the call never returned: the predictor searched for a setting that never comes.
+        val result = PassCalculator().calculate(qo100, 51.5, -0.1, nov2026, 24)
+        assertTrue("got $result", result is CalcResult.Stationary)
+        val position = (result as CalcResult.Stationary).position
+        assertTrue(position.isUp)
+        // From London QO-100 sits low in the south-east.
+        assertTrue("azimuth ${position.azimuthDeg}", position.azimuthDeg in 130.0..160.0)
+        assertTrue("elevation ${position.elevationDeg}", position.elevationDeg in 15.0..30.0)
+    }
+
+    @Test
+    fun aGeostationarySatelliteBelowTheHorizonIsReportedAsStationaryAndDown() {
+        val result = PassCalculator().calculate(qo100, 21.3, -157.8, nov2026, 24) // Hawaii
+        assertTrue("got $result", result is CalcResult.Stationary)
+        assertTrue(!(result as CalcResult.Stationary).position.isUp)
+    }
+
+    @Test
+    fun theStationaryThresholdMatchesTheOverview() {
+        assertEquals(OverviewCalculator.MIN_MEAN_MOTION, SatelliteMotion.MIN_MEAN_MOTION, 0.0)
+        assertTrue(SatelliteMotion.isStationary(qo100))
+        assertTrue(!SatelliteMotion.isStationary(sat("AO-07")))
+    }
+
     @Test
     fun theSameResultComesFromSeparateCalls() {
         val a = PassCalculator().calculate(sat("FO-29"), 52.0, -1.0, start, 12) as CalcResult.Passes

@@ -79,7 +79,7 @@ class OverviewCalculator(
             null
         }
 
-        if (tle.meanmo < MIN_MEAN_MOTION) {
+        if (SatelliteMotion.isStationary(tle)) {
             if (now == null) OverviewItem.Skipped(tle.catnum)
             else OverviewItem.Result(tle.catnum, tle.name, now, losNow = null, passes = emptyList())
         } else {
@@ -102,7 +102,7 @@ class OverviewCalculator(
     }
 
     companion object {
-        /** Below this many revolutions a day a satellite is treated as stationary in the sky (geostationary is 1.0). */
-        const val MIN_MEAN_MOTION = 1.5
+        /** See [SatelliteMotion.MIN_MEAN_MOTION]; kept here for existing callers. */
+        const val MIN_MEAN_MOTION = SatelliteMotion.MIN_MEAN_MOTION
     }
 }

@@ -47,11 +47,17 @@ class AimStateTest {
     }
 
     @Test
-    fun `an invalid pointing azimuth never counts as on target`() {
-        // elevation matches but azimuth is unknown (device near vertical): keep aiming
-        val status = AimState.compute(Pointing(0.0, 45.0, azimuthValid = false), AimTarget(123.0, 45.0))
-        assertTrue(status is AimStatus.Aiming)
-        assertEquals(180.0, aiming(status).deltaAzDeg, 1e-9)
+    fun `pointing straight up is judged on elevation alone`() {
+        // The azimuth is only invalid within about a degree of vertical, so the pointing elevation is ~89 or more.
+        // A satellite near the zenith is then on target whatever azimuth the matrix happens to give.
+        val overhead = AimState.compute(Pointing(37.0, 89.5, azimuthValid = false), AimTarget(123.0, 87.0))
+        assertEquals(AimStatus.OnTarget, overhead)
+
+        // A lower satellite needs lowering; no turn is named (0, not an arbitrary 180) because none can be known.
+        val lower = aiming(AimState.compute(Pointing(37.0, 89.5, azimuthValid = false), AimTarget(123.0, 45.0)))
+        assertEquals(0.0, lower.deltaAzDeg, 1e-9)
+        assertEquals(-44.5, lower.deltaElDeg, 1e-9)
+        assertTrue(lower.deltaElDeg < 0)
     }
 
     @Test

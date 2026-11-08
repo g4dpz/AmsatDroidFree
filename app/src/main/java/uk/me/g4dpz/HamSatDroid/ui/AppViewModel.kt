@@ -55,6 +55,12 @@ class AppViewModel(
     private val workDispatcher: CoroutineDispatcher = Dispatchers.Default,
     /** Called when the keps or the selected satellite change, so the widget can be redrawn. Default no-op (tests). */
     private val onDataChanged: suspend () -> Unit = {},
+    /**
+     * Where loading and downloading run. Blocking network and file I/O must not sit on [Dispatchers.Default], whose
+     * thread count is the CPU count and which the overview's calculations share: one download waiting on a 30 s
+     * read timeout would hold a quarter of a four-core tablet's CPU workers.
+     */
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AppUiState(hoursAhead = settings.calcHoursAhead.value))
@@ -71,10 +77,13 @@ class AppViewModel(
     val tles: StateFlow<List<TLE>> = _tles.asStateFlow()
     private var kepsModified: Long? = null
     private var calcJob: Job? = null
+
+    /** Counts calculations started; see [calculate]. Only touched from the callers' thread (the main thread). */
+    private var calcGeneration = 0
     private var rawPasses: List<SatPassTime> = emptyList()
 
     init {
-        viewModelScope.launch(workDispatcher) { initialLoad() }
+        viewModelScope.launch(ioDispatcher) { initialLoad() }
     }
 
     // ---- selections -------------------------------------------------------------------------------------------------
@@ -131,6 +140,10 @@ class AppViewModel(
         val hours = current.hoursAhead
 
         calcJob?.cancel()
+        // The library call cannot be interrupted, so a cancelled job only notices after it returns. Its finally block
+        // must then leave `calculating` alone: by then a newer job owns the flag. Each job remembers the generation
+        // it belongs to and only the newest clears the flag.
+        val generation = ++calcGeneration
         _state.update { it.copy(calculating = true) }
         calcJob = viewModelScope.launch(workDispatcher) {
             try {
@@ -158,13 +171,14 @@ class AppViewModel(
                             )
                         }
                     }
+                    is CalcResult.Stationary -> showFailure(PassHeader.Stationary(tle.name, result.position))
                     CalcResult.BadElements -> showFailure(PassHeader.BadElements)
                     CalcResult.UnknownSatellite -> showFailure(PassHeader.UnknownSatellite)
                     is CalcResult.Error -> showFailure(PassHeader.Error(result.message))
                 }
                 savePasses(tle)
             } finally {
-                _state.update { it.copy(calculating = false) }
+                if (generation == calcGeneration) _state.update { it.copy(calculating = false) }
             }
         }
     }
@@ -204,12 +218,12 @@ class AppViewModel(
      *   and failures; false for the automatic download, which only reports success
      */
     fun refreshKeps(source: KepsSource = settings.kepsSource.value, userRequested: Boolean = true) {
-        viewModelScope.launch(workDispatcher) { refreshKepsNow(source, userRequested) }
+        viewModelScope.launch(ioDispatcher) { refreshKepsNow(source, userRequested) }
     }
 
     /** Call when the screen becomes visible: picks up elements a background update has stored meanwhile. */
     fun onStart() {
-        viewModelScope.launch(workDispatcher) {
+        viewModelScope.launch(ioDispatcher) {
             val modified = keps.lastModifiedMillis()
             // At start-up this can run before the first load has set the selection, so fall back to the saved one
             // (otherwise the first satellite in the list would replace it)
@@ -263,8 +277,12 @@ class AppViewModel(
             }
         }
 
-        // Until the first successful download only the elements shipped with the app are available.
-        if (loaded.isBundled) refreshKepsNow(settings.kepsSource.value, userRequested = false)
+        // Until the first successful download only the elements shipped with the app are available, so fetch once
+        // without being asked. Only when the user allows automatic downloads: with the setting off every launch
+        // would otherwise try the network (a failed connection does not start the two-hour wait).
+        if (loaded.isBundled && settings.autoKepsRefresh.value) {
+            refreshKepsNow(settings.kepsSource.value, userRequested = false)
+        }
     }
 
     private fun reload(preferred: Int?) {

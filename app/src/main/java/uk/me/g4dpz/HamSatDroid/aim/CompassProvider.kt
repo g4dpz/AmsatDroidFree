@@ -62,10 +62,13 @@ class CompassProvider(context: Context) {
     val isAvailable: Boolean get() = source != CompassSource.NONE
 
     /**
-     * Readings for the observer at [latitudeDeg]/[longitudeDeg] (for the declination). [displayRotation] is
-     * `display.rotation` (Surface.ROTATION_*). Emits nothing if no source is available.
+     * Readings for the observer at [latitudeDeg]/[longitudeDeg] (for the declination). [displayRotation] gives the
+     * current `display.rotation` (Surface.ROTATION_*); it is asked for every reading, not once, because the activity
+     * handles orientation changes itself (no recreation) and the flow must follow a rotation made while it runs,
+     * including a 180 degree flip between the two landscape rotations, which no configuration key would notice.
+     * Emits nothing if no source is available.
      */
-    fun orientations(latitudeDeg: Double, longitudeDeg: Double, displayRotation: Int): Flow<Orientation> = callbackFlow {
+    fun orientations(latitudeDeg: Double, longitudeDeg: Double, displayRotation: () -> Int): Flow<Orientation> = callbackFlow {
         val manager = sensorManager
         if (manager == null || source == CompassSource.NONE) {
             close()
@@ -89,7 +92,7 @@ class CompassProvider(context: Context) {
         var accuracy = SensorManager.SENSOR_STATUS_ACCURACY_HIGH
 
         fun emitFrom(matrix: FloatArray) {
-            val worldFromDevice = remapForDisplay(matrix, displayRotation, mapped)
+            val worldFromDevice = remapForDisplay(matrix, displayRotation(), mapped)
             SensorManager.getOrientation(worldFromDevice, orientationAngles)
             val magneticHeading = Math.toDegrees(orientationAngles[0].toDouble())
             val trueHeading = HeadingMath.trueHeading(magneticHeading, declination)

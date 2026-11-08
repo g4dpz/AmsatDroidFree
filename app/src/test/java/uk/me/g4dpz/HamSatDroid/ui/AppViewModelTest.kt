@@ -61,7 +61,7 @@ class AppViewModelTest {
     private fun passStore() = PassStore(files())
 
     private fun viewModel(calculator: PassCalculator = PassCalculator()) =
-        AppViewModel(keps(), passStore(), settings, calculator, { now }, dispatcher)
+        AppViewModel(keps(), passStore(), settings, calculator, { now }, dispatcher, ioDispatcher = dispatcher)
 
     @Before
     fun setUp() {
@@ -105,6 +105,20 @@ class AppViewModelTest {
         assertEquals(1, downloader.requested.size)
         assertEquals(KepsSource.DEFAULT.url, downloader.requested.single())
         assertEquals(UiEvent.KepsUpdated(8), withTimeout(1000) { vm.events.first() })
+    }
+
+    @Test
+    fun theFirstRunDownloadRespectsTheAutomaticRefreshSetting() {
+        settings.autoKepsRefresh.value = false
+        downloader.next = { DownloadResponse(200, celestrakJson) }
+        val vm = viewModel()
+        assertTrue(vm.state.value.keps!!.isBundled)
+        assertTrue("no download may be attempted with automatic refresh off", downloader.requested.isEmpty())
+
+        settings.autoKepsRefresh.value = true
+        val vm2 = viewModel()
+        assertFalse(vm2.state.value.keps!!.isBundled)
+        assertEquals(1, downloader.requested.size)
     }
 
     @Test
@@ -237,6 +251,8 @@ class AppViewModelTest {
             CalcResult.NoPasses to PassHeader.NoPasses("AO-07", 51.5, -0.1, "IO91wm", 24),
             CalcResult.BadElements to PassHeader.BadElements,
             CalcResult.UnknownSatellite to PassHeader.UnknownSatellite,
+            CalcResult.Stationary(uk.me.g4dpz.HamSatDroid.domain.SatelliteMotion.FixedPosition(145.0, 22.0)) to
+                PassHeader.Stationary("AO-07", uk.me.g4dpz.HamSatDroid.domain.SatelliteMotion.FixedPosition(145.0, 22.0)),
             CalcResult.Error("boom") to PassHeader.Error("boom"),
         )
         for ((result, expected) in cases) {

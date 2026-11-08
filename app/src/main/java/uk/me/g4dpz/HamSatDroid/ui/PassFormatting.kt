@@ -83,6 +83,15 @@ fun PassHeader.text(formats: DisplayFormats): String = when (this) {
         R.plurals.header_no_passes, searchedHours,
         satName, formats.coordinate(latitude), formats.coordinate(longitude), locator, searchedHours,
     )
+    is PassHeader.Stationary ->
+        if (position.isUp) {
+            stringResource(
+                R.string.header_stationary_up,
+                satName, formats.integer(position.azimuthDeg), formats.integer(position.elevationDeg),
+            )
+        } else {
+            stringResource(R.string.header_stationary_down, satName)
+        }
     PassHeader.BadElements -> stringResource(R.string.header_bad_elements)
     PassHeader.UnknownSatellite -> stringResource(R.string.header_unknown_satellite)
     PassHeader.InvalidLocation -> stringResource(R.string.header_invalid_location)
