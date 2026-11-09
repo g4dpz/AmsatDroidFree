@@ -60,3 +60,26 @@ object DashboardLayout {
             ChartArrangement.STACKED
         }
 }
+
+/**
+ * How the controls of the passes pane (the satellite and range pickers, start time, Calculate and the heading) are
+ * arranged, from the size of the pane they sit in. Phones are narrow and, in landscape, short; tablets have room.
+ */
+object PassesPaneLayout {
+    /**
+     * Below this pane width, in dp, the two pickers are stacked, each the full width. Side by side each gets half, and
+     * under about 220 dp each the label "Calculate passes for the next" wraps and is clipped and a satellite name such
+     * as "OSCAR 7 (AO-7)" is cut off. A phone in portrait has a pane about 380 dp wide.
+     */
+    const val STACK_PICKERS_BELOW_WIDTH_DP = 480f
+
+    /**
+     * Below this pane height, in dp, the controls scroll away with the pass list instead of staying pinned above it.
+     * Pinned, they take most of a phone's 411 dp landscape height and leave the list a single line.
+     */
+    const val SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP = 520f
+
+    fun stackPickers(paneWidthDp: Float): Boolean = paneWidthDp < STACK_PICKERS_BELOW_WIDTH_DP
+
+    fun scrollWholePane(paneHeightDp: Float): Boolean = paneHeightDp < SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP
+}
