@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -274,7 +275,13 @@ fun HomeScreen(
     if (showAbout) AboutDialog(state.keps, formats, onDismiss = { showAbout = false })
 }
 
-/** Satellite and range choices, the start time, the calculate button, and the list of passes. */
+/**
+ * Satellite and range choices, the start time, the calculate button, and the list of passes.
+ *
+ * On a tall pane the controls stay pinned above a scrolling list. On a short one (a phone in landscape) pinned controls
+ * would leave the list a single line, so the controls become the first item of one scrolling list; see
+ * [PassesPaneLayout]. The two pickers stack when the pane is narrow, so their labels and names are not clipped.
+ */
 @Composable
 private fun PassesPane(
     viewModel: AppViewModel,
@@ -287,95 +294,121 @@ private fun PassesPane(
     onPassLongClick: (PassSummary) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    run {
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            // In a narrow pane (the dashboard) the two choices are stacked so their text is not cut off
-            BoxWithConstraints(Modifier.fillMaxWidth()) {
-              val narrow = maxWidth < 340.dp
-              val choices: @Composable (Modifier) -> Unit = { choiceModifier ->
-                DropdownField(
-                    label = stringResource(R.string.passes_satellite_label),
-                    options = state.satellites,
-                    selected = state.selectedSatellite,
-                    optionLabel = { it.name },
-                    onSelected = { viewModel.selectSatellite(it.catnum) },
-                    modifier = choiceModifier,
-                    enabled = !state.loading,
+    BoxWithConstraints(modifier) {
+        val stackPickers = PassesPaneLayout.stackPickers(maxWidth.value)
+        val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value)
+        val controls: @Composable () -> Unit = {
+            PassesControls(viewModel, state, formats, stackPickers, onChangeStartTime)
+        }
+        val passes: LazyListScope.() -> Unit = {
+            items(state.passes, key = { it.id }) { pass ->
+                PassCard(
+                    pass, formats,
+                    selected = highlightSelection && pass.id == state.selectedPassId,
+                    hasAlert = alerts.hasAlert(pass),
+                    onClick = { onPassClick(pass) },
+                    onLongClick = { onPassLongClick(pass) },
                 )
-                val rangeLabels = stringArrayResource(R.array.Times)
-                DropdownField(
-                    label = stringResource(R.string.passes_range_label),
-                    options = RANGE_HOURS,
-                    selected = state.hoursAhead,
-                    optionLabel = { rangeLabels.getOrElse(RANGE_HOURS.indexOf(it)) { it.toString() } },
-                    onSelected = viewModel::setHoursAhead,
-                    modifier = choiceModifier,
-                )
-              }
-              if (narrow) {
-                  Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { choices(Modifier.fillMaxWidth()) }
-              } else {
-                  Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { choices(Modifier.weight(1f)) }
-              }
             }
+        }
 
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (scrollWholePane) {
+            LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                item(key = "controls") { controls() }
+                passes()
+            }
+        } else {
+            Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                controls()
+                LazyColumn(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) { passes() }
+            }
+        }
+    }
+}
+
+/** The part of the passes pane above the list: pickers, start time, Calculate, the stale warning and the heading. */
+@Composable
+private fun PassesControls(
+    viewModel: AppViewModel,
+    state: AppUiState,
+    formats: DisplayFormats,
+    stackPickers: Boolean,
+    onChangeStartTime: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        val rangeLabels = stringArrayResource(R.array.Times)
+        val satellitePicker: @Composable (Modifier) -> Unit = { pickerModifier ->
+            DropdownField(
+                label = stringResource(R.string.passes_satellite_label),
+                options = state.satellites,
+                selected = state.selectedSatellite,
+                optionLabel = { it.name },
+                onSelected = { viewModel.selectSatellite(it.catnum) },
+                modifier = pickerModifier,
+                enabled = !state.loading,
+            )
+        }
+        val rangePicker: @Composable (Modifier) -> Unit = { pickerModifier ->
+            DropdownField(
+                label = stringResource(R.string.passes_range_label),
+                options = RANGE_HOURS,
+                selected = state.hoursAhead,
+                optionLabel = { rangeLabels.getOrElse(RANGE_HOURS.indexOf(it)) { it.toString() } },
+                onSelected = viewModel::setHoursAhead,
+                modifier = pickerModifier,
+            )
+        }
+        if (stackPickers) {
+            satellitePicker(Modifier.fillMaxWidth())
+            rangePicker(Modifier.fillMaxWidth())
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                satellitePicker(Modifier.weight(1f))
+                rangePicker(Modifier.weight(1f))
+            }
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                text = state.startTime?.let { stringResource(R.string.passes_starting_at, formats.dateTime(it)) }
+                    ?: stringResource(R.string.passes_starting_now),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(onClick = onChangeStartTime) { Text(stringResource(R.string.passes_change_start_time)) }
+            if (state.startTime != null) {
+                TextButton(onClick = { viewModel.setStartTime(null) }) {
+                    Text(stringResource(R.string.passes_use_current_time))
+                }
+            }
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Button(onClick = viewModel::calculate, enabled = state.selectedCatnum != null && !state.calculating) {
+                Text(stringResource(R.string.passes_calculate))
+            }
+            if (state.calculating) CircularProgressIndicator(modifier = Modifier.padding(4.dp))
+        }
+
+        // Old elements give wrong predictions; measured from the prediction start, which may be in the future
+        state.selectedSatellite?.let { sat ->
+            val reference = state.startTime?.toEpochMilli() ?: System.currentTimeMillis()
+            ElementAge.staleDays(sat.epochMillis, reference)?.let { days ->
                 Text(
-                    text = state.startTime?.let { stringResource(R.string.passes_starting_at, formats.dateTime(it)) }
-                        ?: stringResource(R.string.passes_starting_now),
+                    pluralStringResource(R.plurals.passes_elements_stale, days, sat.name, days),
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.error,
                 )
-                TextButton(onClick = onChangeStartTime) { Text(stringResource(R.string.passes_change_start_time)) }
-                if (state.startTime != null) {
-                    TextButton(onClick = { viewModel.setStartTime(null) }) {
-                        Text(stringResource(R.string.passes_use_current_time))
-                    }
-                }
             }
+        }
 
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Button(onClick = viewModel::calculate, enabled = state.selectedCatnum != null && !state.calculating) {
-                    Text(stringResource(R.string.passes_calculate))
-                }
-                if (state.calculating) CircularProgressIndicator(modifier = Modifier.padding(4.dp))
-            }
-
-            // Old elements give wrong predictions; measured from the prediction start, which may be in the future
-            state.selectedSatellite?.let { sat ->
-                val reference = state.startTime?.toEpochMilli() ?: System.currentTimeMillis()
-                ElementAge.staleDays(sat.epochMillis, reference)?.let { days ->
-                    Text(
-                        pluralStringResource(R.plurals.passes_elements_stale, days, sat.name, days),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                }
-            }
-
-            when {
-                state.loading -> Text(stringResource(R.string.passes_loading))
-                state.header != null -> Text(state.header.text(formats), style = MaterialTheme.typography.bodyMedium)
-                else -> Text(stringResource(R.string.passes_none_yet), style = MaterialTheme.typography.bodyMedium)
-            }
-
-            LazyColumn(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(state.passes, key = { it.id }) { pass ->
-                    PassCard(
-                        pass, formats,
-                        selected = highlightSelection && pass.id == state.selectedPassId,
-                        hasAlert = alerts.hasAlert(pass),
-                        onClick = { onPassClick(pass) },
-                        onLongClick = { onPassLongClick(pass) },
-                    )
-                }
-            }
+        when {
+            state.loading -> Text(stringResource(R.string.passes_loading))
+            state.header != null -> Text(state.header.text(formats), style = MaterialTheme.typography.bodyMedium)
+            else -> Text(stringResource(R.string.passes_none_yet), style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
