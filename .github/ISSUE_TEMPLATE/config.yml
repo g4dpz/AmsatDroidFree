@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "Project wiki: features, privacy policy and help"
+    url: https://github.com/g4dpz/AmsatDroidFree/wiki
+    about: Overview of AmsatDroid, how to set your location, and the privacy policy.
