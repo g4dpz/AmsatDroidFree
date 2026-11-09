@@ -22,7 +22,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "uk.me.g4dpz.HamSatDroid"
+        applicationId = "uk.me.g4dpz.amsatdroid"
         minSdk = 30
         targetSdk = 36
         versionCode = 20

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AmsatDroid Free</string>
+    <string name="app_name">AmsatDroid</string>
     <string name="DownloadAmateurAmsatElem">Amateur (amsat.org)</string>
     <string name="DownloadAmateurCelestrakElem">Amateur (celestrak.org)</string>
     <string name="DownloadCubesatCelestrakElem">Cubesat (celestrak.org)</string>
