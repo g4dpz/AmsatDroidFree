@@ -42,7 +42,7 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [ ] Charts are smooth (no visible stutter), no leftover timers after leaving a screen
 
 ## Adaptive layout
-- [ ] Phone portrait and landscape: single pane, no lost state on rotation
+- [ ] Phone portrait (below 600 dp) shows a single pane; phone landscape (891 dp on the Galaxy A16) shows two panes; no lost state on rotation. Widths follow `WindowLayout.forWidth`: single pane below 600 dp, two panes at 600 to 959 dp, dashboard at 960 dp or wider
 - [ ] Tablet or resizable emulator: list and sky view side by side
 - [ ] Resize window / fold and unfold: selected satellite, passes and selected pass kept
 - [ ] World map keeps 2:1 aspect ratio at any size
