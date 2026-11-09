@@ -1,8 +1,8 @@
-# AmsatDroid Free
+# AmsatDroid
 
 Amateur radio satellite pass calculator and companion for Android.
 
-AmsatDroid Free (package `uk.me.g4dpz.HamSatDroid`) predicts amateur satellite
+AmsatDroid (package `uk.me.g4dpz.amsatdroid`) predicts amateur satellite
 passes for your location, shows a live sky view and ground track, and helps you
 work a pass: Doppler-corrected frequencies, pass alerts, a compass-oriented sky
 chart, an aiming aid, an all-satellite overview, and a home-screen widget.
@@ -12,7 +12,7 @@ orbit-prediction core is the long-standing `uk.me.g4dpz.satellite` SGP4/SDP4
 library, kept under a golden regression test so predictions do not drift.
 
 <p align="center">
-  <img src="docs/screenshots/main-screen.png" alt="AmsatDroid Free main screen on a Galaxy Tab A7 Lite: the pass list and satellite chooser beside the sky chart, satellite position, and Doppler-corrected transponder frequencies for AO-73." width="360">
+  <img src="docs/screenshots/main-screen.png" alt="AmsatDroid main screen on a Galaxy Tab A7 Lite: the pass list and satellite chooser beside the sky chart, satellite position, and Doppler-corrected transponder frequencies for AO-73." width="360">
 </p>
 
 *Main screen on a Galaxy Tab A7 Lite (two-pane layout): pass prediction and the
@@ -20,7 +20,7 @@ satellite chooser beside the sky chart, live satellite position, and the
 Doppler-corrected transponder frequencies drawn from the OscarWatch database.*
 
 <p align="center">
-  <img src="docs/screenshots/night-landscape.png" alt="AmsatDroid Free in red night mode, landscape dashboard: the pass list beside a red-and-black ground-track map with the three-orbit track, home marker and satellite footprint." width="640">
+  <img src="docs/screenshots/night-landscape.png" alt="AmsatDroid in red night mode, landscape dashboard: the pass list beside a red-and-black ground-track map with the three-orbit track, home marker and satellite footprint." width="640">
 </p>
 
 *Red night mode in the landscape dashboard: every screen, dialog and chart uses
@@ -28,14 +28,14 @@ only red and black shades to preserve night vision, with the ground-track map
 and footprint rendered in red.*
 
 <p align="center">
-  <img src="docs/screenshots/day-screen.png" alt="AmsatDroid Free in the day (light) theme, landscape: the pass list beside the full-colour world map with the ground track, home marker and satellite footprint." width="640">
+  <img src="docs/screenshots/day-screen.png" alt="AmsatDroid in the day (light) theme, landscape: the pass list beside the full-colour world map with the ground track, home marker and satellite footprint." width="640">
 </p>
 
 *The same landscape dashboard in the day (light) theme: the full-colour world
 map with the satellite ground track, home marker and coverage footprint.*
 
 <p align="center">
-  <img src="docs/screenshots/overview.png" alt="AmsatDroid Free All satellites overview: the satellites up now with live azimuth, elevation and LOS countdowns, and the upcoming passes, with window and minimum-elevation filters." width="360">
+  <img src="docs/screenshots/overview.png" alt="AmsatDroid All satellites overview: the satellites up now with live azimuth, elevation and LOS countdowns, and the upcoming passes, with window and minimum-elevation filters." width="360">
 </p>
 
 *The All satellites overview: everything above the horizon now (with live
@@ -44,7 +44,7 @@ parallel across the whole catalogue, with window and minimum-elevation
 filters.*
 
 <p align="center">
-  <img src="docs/screenshots/settings.png" alt="AmsatDroid Free settings: locator-first home location, automatic keps updates and source, theme picker, red night auto-switch, keep-screen-on and aiming-axis options. The exact coordinates are redacted." width="360">
+  <img src="docs/screenshots/settings.png" alt="AmsatDroid settings: locator-first home location, automatic keps updates and source, theme picker, red night auto-switch, keep-screen-on and aiming-axis options. The exact coordinates are redacted." width="360">
 </p>
 
 *Settings: locator-first home location, automatic keps updates and source, the
@@ -52,7 +52,7 @@ theme picker, automatic red night mode, keep-screen-on and the aiming axis.
 (The exact coordinates are redacted in this screenshot.)*
 
 <p align="center">
-  <img src="docs/screenshots/aim-compass.png" alt="AmsatDroid Free sky screen with the compass-rotated chart and Aim mode: plain instructions like 'Turn right 139 degrees, raise 5 degrees', the pointing and satellite bearings, compass accuracy and a magnet warning. Coordinates redacted." width="360">
+  <img src="docs/screenshots/aim-compass.png" alt="AmsatDroid sky screen with the compass-rotated chart and Aim mode: plain instructions like 'Turn right 139 degrees, raise 5 degrees', the pointing and satellite bearings, compass accuracy and a magnet warning. Coordinates redacted." width="360">
 </p>
 
 *Compass and Aim mode on the sky screen: the chart rotates to the device
@@ -119,7 +119,7 @@ pull request (`.github/workflows/ci.yml`).
 
 ## Satellite frequencies — the OscarWatch transponder database
 
-> **AmsatDroid Free uses the OscarWatch transponder database maintained by
+> **AmsatDroid uses the OscarWatch transponder database maintained by
 > Peter Goodhall (MM9SQL).** The app would not have live, maintained transponder
 > frequencies without it — our thanks to Peter and the OscarWatch project.
 
@@ -176,7 +176,7 @@ fitness for purpose.
 
 ## Licence
 
-AmsatDroid Free is licensed under the **GNU General Public License v3.0 or
+AmsatDroid is licensed under the **GNU General Public License v3.0 or
 later** (`GPL-3.0-or-later`). See [LICENSE](LICENSE) for the full text; source
 files carry an `SPDX-License-Identifier: GPL-3.0-or-later` header.
 

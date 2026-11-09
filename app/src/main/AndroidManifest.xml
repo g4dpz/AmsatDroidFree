@@ -25,7 +25,7 @@
         android:name=".HamSatDroidApp"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="33"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:localeConfig="@xml/locales_config" >

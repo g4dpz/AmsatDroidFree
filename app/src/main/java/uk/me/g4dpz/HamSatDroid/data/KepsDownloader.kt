@@ -73,8 +73,8 @@ class HttpsKepsDownloader(
         const val MAX_RESPONSE_BYTES = 1024 * 1024
         private const val ERROR_BODY_BYTES = 512
 
-        /** e.g. `AmsatDroidFree/1.0.14 (Android 15; amateur radio satellite tracker)` */
+        /** e.g. `AmsatDroid/1.0.14 (Android 15; amateur radio satellite tracker)` */
         fun userAgent(appVersion: String, androidRelease: String): String =
-            "AmsatDroidFree/$appVersion (Android $androidRelease; amateur radio satellite tracker)"
+            "AmsatDroid/$appVersion (Android $androidRelease; amateur radio satellite tracker)"
     }
 }

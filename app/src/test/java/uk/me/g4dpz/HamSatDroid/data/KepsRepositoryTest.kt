@@ -332,7 +332,7 @@ class KepsRepositoryTest {
     @Test
     fun theUserAgentNamesTheAppAndItsVersion() {
         val ua = HttpsKepsDownloader.userAgent("1.0.14", "15")
-        assertTrue(ua, ua.startsWith("AmsatDroidFree/1.0.14 "))
+        assertTrue(ua, ua.startsWith("AmsatDroid/1.0.14 "))
         assertTrue(ua.contains("Android 15"))
     }
 
