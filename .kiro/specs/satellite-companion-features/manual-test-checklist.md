@@ -161,6 +161,16 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [ ] Widget on the tablet home screen: resizes between compact and large layouts
 - [ ] 60 Hz display: compass-driven rotation is smooth, no dropped frames; with nothing moving the app is idle (low CPU in a profiler)
 
+## Phone sizes (Galaxy A16 emulator, 411 x 891 dp)
+- [ ] Portrait: pass screen pickers are stacked; the "Calculate passes for the next" label and long satellite names (for example "OSCAR 7 (AO-7)") are not clipped
+- [ ] Landscape (891 x 411 dp): the left pane scrolls so the pass cards can be reached; the right pane scrolls to the sky chart
+- [ ] Overflow menu, About dialog and date picker fit without clipping
+- [ ] Sky screen, Aim mode and map: no clipping in portrait; map and sky reachable by scrolling in landscape
+- [ ] All satellites overview: rows and the range and elevation pickers fit in portrait and landscape
+- [ ] Settings: every section reachable by scrolling in portrait and landscape, down to "Open app settings"
+
+Note: a screenshot pass on the emulator found no clipping in the items above, except Aim mode in landscape, which was not checked. Red night mode and the widget were not covered. Tick the boxes after your own check.
+
 ## Regression
 - [ ] `./gradlew :app:testDebugUnitTest` green (golden test unchanged)
 - [ ] Pass times match the pre-migration app for the same satellite, location and start time

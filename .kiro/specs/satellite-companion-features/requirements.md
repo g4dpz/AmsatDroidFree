@@ -33,6 +33,8 @@ Primary target: **Samsung Galaxy Tab A7 Lite 8.7", model SM-T225 (LTE)**, the ta
 
 The spec's original stated target was the Galaxy Tab A11 (SM-X130); it was changed to the SM-T225 actually used. The app must work well on this device, and still run on any Android 11+ phone or tablet.
 
+Secondary target (phone sizes): **Samsung Galaxy A16**, checked on an emulator only (AVD `GalaxyA16_API35`: 1080 x 2340 px at 420 dpi, which is 411 x 891 dp, 4 GB RAM, Android 15). Processor speed is deliberately not simulated; only screen size, density and memory are matched. Phone portrait (411 dp) and phone landscape (891 x 411 dp) must show every screen without clipped labels, truncated names or unreachable content. The phone-specific thresholds are `PassesPaneLayout` in `LayoutThresholds.kt`: pickers stack below 480 dp width, and controls scroll with the pass list in panes shorter than 520 dp.
+
 ### Decisions already made
 
 - D1. Alert lead time defaults to **5 minutes**, user-selectable (5, 10, 15, 30).
