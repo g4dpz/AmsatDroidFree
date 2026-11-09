@@ -55,8 +55,8 @@ In the Play Console choose Create app. Set the app name (AmsatDroid), default la
 
 These sit under Policy and programs, App content. Each must be finished before a production release.
 
-- **Privacy policy:** a public URL is required because the app requests location. State that location is used on the device only to compute pass predictions and is not sent anywhere. The app does use the network to download orbital elements (keps) and the transponder database; say so.
-- **Data safety form:** location (approximate and precise) is processed on the device only and is not collected or shared. Confirm each answer against the privacy policy.
+- **Privacy policy:** a public URL is required because the app requests location. State that location is used on the device only to compute pass predictions, and that the app does not send it to any server of its own. The app does use the network to download orbital elements (keps) and the transponder database; say so. Be precise about backups: the manifest has `allowBackup="true"` with no exclusions, so the saved home latitude and longitude (in shared preferences) can be included in Android Auto Backup to the user's Google account. Either say that in the policy and the data safety answers, or exclude those preferences from backup (`dataExtractionRules` and `fullBackupContent`) or set `allowBackup="false"` before making an absolute "not sent anywhere" claim.
+- **Data safety form:** location (approximate and precise) is processed on the device only and is not sent to the developer or any third party. Confirm each answer against the privacy policy, including the backup point above.
 - **Content rating:** answer the questionnaire (a utility app, no user content, no ads).
 - **Target audience:** choose adults or a general audience; not directed at children.
 - **Ads:** none.
@@ -90,7 +90,7 @@ Steps:
 5. Release notes, per language, for example: `Version 2.0: rebuilt in Kotlin and Compose; pass alerts, compass and aim mode, Doppler, home screen widget, red night mode, all-satellites overview, phone and tablet layouts.`
 6. Save, Review release, fix any errors, then Start rollout.
 
-For production you can use a staged rollout (for example 20 percent) and raise it later.
+For later production updates you can use a staged rollout (for example 20 percent) and raise it afterwards. Staged rollout may not be offered for the first production release of a new app, which then goes to all users in the selected countries; check what the console offers.
 
 ## 8. After you submit
 
