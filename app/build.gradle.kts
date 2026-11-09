@@ -25,7 +25,7 @@ android {
         applicationId = "uk.me.g4dpz.HamSatDroid"
         minSdk = 30
         targetSdk = 36
-        versionCode = 1
+        versionCode = 20
         versionName = "2.0.0"
     }
 
