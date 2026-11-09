@@ -16,3 +16,6 @@ app/build
 keystore.properties
 *.jks
 *.keystore
+
+# My Stuff
+/gp_testing
