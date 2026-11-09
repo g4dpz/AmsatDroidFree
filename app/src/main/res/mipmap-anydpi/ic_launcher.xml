@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive launcher icon: a globe with an orbit ring and satellite. minSdk is 30, so adaptive icons are
+     always available and no legacy bitmap launcher icons are needed. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+    <monochrome android:drawable="@mipmap/ic_launcher_monochrome" />
+</adaptive-icon>
