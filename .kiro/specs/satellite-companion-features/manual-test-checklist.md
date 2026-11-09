@@ -42,7 +42,7 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [ ] Charts are smooth (no visible stutter), no leftover timers after leaving a screen
 
 ## Adaptive layout
-- [ ] Phone portrait and landscape: single pane, no lost state on rotation
+- [ ] Phone portrait (below 600 dp) shows a single pane; phone landscape (891 dp on the Galaxy A16) shows two panes; no lost state on rotation. Widths follow `WindowLayout.forWidth`: single pane below 600 dp, two panes at 600 to 959 dp, dashboard at 960 dp or wider
 - [ ] Tablet or resizable emulator: list and sky view side by side
 - [ ] Resize window / fold and unfold: selected satellite, passes and selected pass kept
 - [ ] World map keeps 2:1 aspect ratio at any size
@@ -160,6 +160,16 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [ ] Android 12: standard ongoing notification (the Android 16 Live Update path cannot be exercised on this device)
 - [ ] Widget on the tablet home screen: resizes between compact and large layouts
 - [ ] 60 Hz display: compass-driven rotation is smooth, no dropped frames; with nothing moving the app is idle (low CPU in a profiler)
+
+## Phone sizes (Galaxy A16 emulator, 411 x 891 dp)
+- [ ] Portrait: pass screen pickers are stacked; the "Calculate passes for the next" label and long satellite names (for example "OSCAR 7 (AO-7)") are not clipped
+- [ ] Landscape (891 x 411 dp): the left pane scrolls so the pass cards can be reached; the right pane scrolls to the sky chart
+- [ ] Overflow menu, About dialog and date picker fit without clipping
+- [ ] Sky screen, Aim mode and map: no clipping in portrait; map and sky reachable by scrolling in landscape
+- [ ] All satellites overview: rows and the range and elevation pickers fit in portrait and landscape
+- [ ] Settings: every section reachable by scrolling in portrait and landscape, down to "Open app settings"
+
+Note: a screenshot pass on the emulator found no clipping in the items above, except Aim mode in landscape, which was not checked. Red night mode and the widget were not covered. Tick the boxes after your own check.
 
 ## Regression
 - [ ] `./gradlew :app:testDebugUnitTest` green (golden test unchanged)
