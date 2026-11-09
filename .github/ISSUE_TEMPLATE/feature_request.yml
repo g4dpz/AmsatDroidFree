@@ -1,0 +1,28 @@
+name: Feature request
+description: Suggest an improvement or a new feature
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the situation, such as how you work a pass, rather than only the feature you have in mind.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+      description: Your idea for how the app could do it. Sketches and screenshots of other apps are welcome.
+    validations:
+      required: false
+  - type: dropdown
+    id: device
+    attributes:
+      label: Where would you use it?
+      options:
+        - Phone
+        - Tablet
+        - Both
+    validations:
+      required: false

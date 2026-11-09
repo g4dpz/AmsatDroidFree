@@ -1,0 +1,92 @@
+name: Bug report
+description: Something is wrong, missing or confusing in AmsatDroid
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing AmsatDroid. A few details help me reproduce the problem.
+
+        Please do not post your exact home coordinates or any email addresses. A locator to four characters (for example IO91) is enough.
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      description: Menu, then About. It shows the version name, for example 2.0.0.
+      placeholder: "2.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: install-source
+    attributes:
+      label: How did you install it?
+      options:
+        - Google Play test (closed or internal)
+        - Google Play (public)
+        - Built from source or sideloaded APK
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: Make and model.
+      placeholder: "Samsung Galaxy A16, Pixel 8, Galaxy Tab A7 Lite"
+    validations:
+      required: true
+  - type: input
+    id: android-version
+    attributes:
+      label: Android version
+      description: Settings, About phone, Software information.
+      placeholder: "Android 15"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where did it happen?
+      options:
+        - Pass list or pass calculation
+        - Sky chart, Compass or Aim mode
+        - Map
+        - Doppler or transponder frequencies
+        - Pass alerts or notifications
+        - All satellites overview
+        - Widget
+        - Settings, location or keps update
+        - Red night mode or layout
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect to see?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the app
+        2. Choose satellite ...
+        3. Press ...
+    validations:
+      required: false
+  - type: textarea
+    id: comparison
+    attributes:
+      label: Comparison, if it is about pass times or frequencies
+      description: Another tracker's result for the same satellite, place and time, and which tracker it was.
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or anything else
+      description: You can paste or drag images here. Check they do not show your exact location.
+    validations:
+      required: false
