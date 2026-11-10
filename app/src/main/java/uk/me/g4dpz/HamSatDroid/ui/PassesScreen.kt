@@ -115,16 +115,21 @@ fun HomeScreen(
             when (event) {
                 is UiEvent.KepsUpdated ->
                     snackbar.showSnackbar(resources.getQuantityString(R.plurals.keps_updated, event.satelliteCount, event.satelliteCount))
-                is UiEvent.KepsTooSoon -> kepsDialog = KepsDialog(
-                    if (event.lastSuccessMillis != null) {
-                        resources.getString(
-                            R.string.keps_too_soon,
-                            formats.dateTime(event.lastSuccessMillis), formats.dateTime(event.nextAllowedAtMillis),
-                        )
-                    } else {
-                        resources.getString(R.string.keps_too_soon_no_time, formats.dateTime(event.nextAllowedAtMillis))
-                    }
-                )
+                is UiEvent.KepsTooSoon -> {
+                    val sourceName = resources.getString(event.source.labelRes)
+                    kepsDialog = KepsDialog(
+                        if (event.lastSuccessMillis != null) {
+                            resources.getString(
+                                R.string.keps_too_soon, sourceName,
+                                formats.dateTime(event.lastSuccessMillis), formats.dateTime(event.nextAllowedAtMillis),
+                            )
+                        } else {
+                            resources.getString(
+                                R.string.keps_too_soon_no_time, sourceName, formats.dateTime(event.nextAllowedAtMillis),
+                            )
+                        }
+                    )
+                }
                 is UiEvent.KepsFailed -> kepsDialog = KepsDialog(resources.getString(R.string.keps_failed, event.reason))
             }
         }

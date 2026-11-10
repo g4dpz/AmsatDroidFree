@@ -17,7 +17,11 @@ fun createKepsRepository(context: Context): KepsRepository {
     } catch (e: android.content.pm.PackageManager.NameNotFoundException) {
         "unknown"
     }
+    // Read from the preferences each time, so a source chosen in the menu or in Settings is seen at once, by the
+    // activity, the widget and the background worker alike.
+    val prefs = SharedPreferencesStore(app)
     return KepsRepository(
+        activeSource = { KepsSource.fromKey(prefs.getString(SettingsRepository.KEPS_SOURCE, KepsSource.DEFAULT.key)) },
         files = FileStore(app.filesDir),
         downloader = HttpsKepsDownloader(HttpsKepsDownloader.userAgent(version, Build.VERSION.RELEASE)),
         bundledText = { app.resources.openRawResource(R.raw.nasabare).bufferedReader().use { it.readText() } },

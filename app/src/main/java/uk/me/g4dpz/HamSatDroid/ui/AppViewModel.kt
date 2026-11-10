@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -82,9 +83,20 @@ class AppViewModel(
     private var calcGeneration = 0
     private var rawPasses: List<SatPassTime> = emptyList()
 
+    // Declared before init: the first load starts there.
+    private val reloadLock = Any()
+
     init {
         viewModelScope.launch(ioDispatcher) { initialLoad() }
+        // A change of source, from the menu or from the Settings screen, shows that source's stored copy at once and
+        // without a download (each source keeps its own copy). A download that follows reloads again when it arrives.
+        viewModelScope.launch(ioDispatcher) {
+            settings.kepsSource.state.drop(1).collect { reload(currentSelection()) }
+        }
     }
+
+    /** The satellite to keep selected across a reload: the current one, or before the first load the saved one. */
+    private fun currentSelection(): Int? = _state.value.selectedCatnum ?: settings.selectedCatnum.value.takeIf { it > 0 }
 
     // ---- selections -------------------------------------------------------------------------------------------------
 
@@ -233,7 +245,13 @@ class AppViewModel(
     }
 
     private fun refreshKepsNow(source: KepsSource, userRequested: Boolean) {
-        if (userRequested) settings.kepsSource.value = source
+        if (userRequested) {
+            settings.kepsSource.value = source
+            // Show the chosen source's stored copy now, before the (possibly slow, possibly failing) download. The
+            // observer in init does the same for a change made elsewhere, but it runs on its own schedule; doing it here
+            // as well makes the order certain.
+            reload(currentSelection())
+        }
         _state.update { it.copy(downloadingKeps = true) }
         try {
             when (val result = keps.refresh(source)) {
@@ -241,9 +259,13 @@ class AppViewModel(
                     reload(_state.value.selectedCatnum)
                     _events.trySend(UiEvent.KepsUpdated(result.count))
                 }
+                // Nothing to download. The chosen source's stored copy is already showing: setting the source switched
+                // to it (see init), so choosing a source never needs a download and is never locked out by the
+                // two-hour rule.
                 is RefreshResult.TooSoon -> if (userRequested) {
-                    _events.trySend(UiEvent.KepsTooSoon(result.lastSuccessMillis, result.nextAllowedAtMillis))
+                    _events.trySend(UiEvent.KepsTooSoon(source, result.lastSuccessMillis, result.nextAllowedAtMillis))
                 }
+                // Failed: the stored copy of the chosen source if it has one, otherwise the list stays as it was
                 is RefreshResult.Failed -> if (userRequested) {
                     val reason = when (val o = result.outcome) {
                         is DownloadOutcome.Transient -> o.reason
@@ -261,9 +283,7 @@ class AppViewModel(
     }
 
     private fun initialLoad() {
-        val loaded = keps.load()
-        kepsModified = keps.lastModifiedMillis()
-        apply(loaded, settings.selectedCatnum.value.takeIf { it > 0 })
+        val loaded = loadAndApply(settings.selectedCatnum.value.takeIf { it > 0 })
 
         // Show the passes from the previous session, if any
         passStore.load()?.let { stored ->
@@ -286,10 +306,20 @@ class AppViewModel(
     }
 
     private fun reload(preferred: Int?) {
+        loadAndApply(preferred)
+    }
+
+    /**
+     * Reads the stored elements and shows them. Serialised: a reload for a change of source and one after a download
+     * can be asked for at the same moment, and each reads the files afresh, so whichever runs last shows the latest.
+     */
+    private fun loadAndApply(preferred: Int?): LoadedKeps = synchronized(reloadLock) {
         val loaded = keps.load()
         kepsModified = keps.lastModifiedMillis()
         apply(loaded, preferred)
+        loaded
     }
+
 
     private fun apply(loaded: LoadedKeps, preferred: Int?) {
         viewModelScope.launch { onDataChanged() }

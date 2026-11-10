@@ -57,7 +57,8 @@ class AppViewModelTest {
         javaClass.classLoader!!.getResourceAsStream("celestrak_amateur_sample.json")!!.bufferedReader().use { it.readText() }
 
     private fun files() = FileStore(File(tmp.root, "data"))
-    private fun keps(clock: () -> Long = { now }) = KepsRepository(files(), downloader, { bundledTle }, clock)
+    private fun keps(clock: () -> Long = { now }) =
+        KepsRepository(files(), downloader, { bundledTle }, clock, { settings.kepsSource.value })
     private fun passStore() = PassStore(files())
 
     private fun viewModel(calculator: PassCalculator = PassCalculator()) =
@@ -344,6 +345,103 @@ class AppViewModelTest {
         assertEquals(now, event.lastSuccessMillis)
         assertEquals(now + 2 * 3600_000, event.nextAllowedAtMillis)
         assertEquals(1, downloader.requested.size)
+    }
+
+    @Test
+    fun choosingAnotherSourceAndGoingBackKeepsBothListsAndNeedsNoSecondDownload() = runTest {
+        // The tester's report: amateur downloaded, then another set, then back to amateur inside the two hours. The
+        // amateur list used to be gone and could not be downloaded again, so it was out of reach for two hours.
+        downloader.next = { DownloadResponse(200, celestrakJson) }
+        val vm = viewModel() // the first automatic download: Celestrak amateur
+        assertEquals(8, vm.state.value.satellites.size)
+        assertEquals(UiEvent.KepsUpdated(8), withTimeout(1000) { vm.events.first() })
+
+        downloader.next = { DownloadResponse(200, bundledTle) }
+        vm.refreshKeps(KepsSource.AMATEUR_AMSAT)
+        assertEquals(60, vm.state.value.satellites.size)
+        assertEquals("AMATEUR_AMSAT", vm.state.value.keps!!.source)
+        assertEquals(UiEvent.KepsUpdated(60), withTimeout(1000) { vm.events.first() })
+
+        vm.refreshKeps(KepsSource.AMATEUR_CELESTRAK) // inside its two hours
+        assertEquals(8, vm.state.value.satellites.size)
+        assertEquals("AMATEUR_CELESTRAK", vm.state.value.keps!!.source)
+        assertEquals(KepsSource.AMATEUR_CELESTRAK, settings.kepsSource.value)
+        val event = withTimeout(1000) { vm.events.first() } as UiEvent.KepsTooSoon
+        assertEquals(KepsSource.AMATEUR_CELESTRAK, event.source)
+        assertEquals(now, event.lastSuccessMillis)
+        assertEquals(2, downloader.requested.size) // no third request
+
+        vm.refreshKeps(KepsSource.AMATEUR_AMSAT) // and forward again, also with no request
+        assertEquals(60, vm.state.value.satellites.size)
+        assertEquals(2, downloader.requested.size)
+    }
+
+    @Test
+    fun changingTheSourceInSettingsShowsItsStoredCopyWithoutAnyDownload() = runTest {
+        downloader.next = { DownloadResponse(200, celestrakJson) }
+        val vm = viewModel()
+        downloader.next = { DownloadResponse(200, bundledTle) }
+        vm.refreshKeps(KepsSource.AMATEUR_AMSAT)
+        assertEquals(60, vm.state.value.satellites.size)
+        assertEquals(2, downloader.requested.size)
+
+        // What the Settings screen does: it only stores the choice
+        settings.kepsSource.value = KepsSource.AMATEUR_CELESTRAK
+        assertEquals(8, vm.state.value.satellites.size)
+        assertEquals("AMATEUR_CELESTRAK", vm.state.value.keps!!.source)
+
+        settings.kepsSource.value = KepsSource.AMATEUR_AMSAT
+        assertEquals(60, vm.state.value.satellites.size)
+        assertEquals(2, downloader.requested.size) // no request at all
+    }
+
+    @Test
+    fun theChosenSourcesStoredCopyIsShownBeforeTheDownloadFinishes() = runTest {
+        var now = 1264723200000L
+        val repo = KepsRepository(files(), downloader, { bundledTle }, { now }, { settings.kepsSource.value })
+        downloader.next = { DownloadResponse(200, celestrakJson) }
+        val vm = AppViewModel(repo, passStore(), settings, PassCalculator(), { now }, dispatcher, ioDispatcher = dispatcher)
+        downloader.next = { DownloadResponse(200, bundledTle) }
+        vm.refreshKeps(KepsSource.AMATEUR_AMSAT)
+        assertEquals("AMATEUR_AMSAT", vm.state.value.keps!!.source)
+
+        // Three hours on, the amateur set may be downloaded again; the download is slow, or never comes
+        now += 3 * 3600_000
+        var shownWhileDownloading: String? = null
+        downloader.next = {
+            shownWhileDownloading = vm.state.value.keps!!.source // the app is waiting for the network here
+            throw java.io.IOException("offline")
+        }
+        vm.refreshKeps(KepsSource.AMATEUR_CELESTRAK)
+
+        assertEquals("the stored copy was not shown while waiting", "AMATEUR_CELESTRAK", shownWhileDownloading)
+        assertEquals("AMATEUR_CELESTRAK", vm.state.value.keps!!.source) // and it stays after the failure
+        assertEquals(8, vm.state.value.satellites.size)
+    }
+
+    @Test
+    fun aFailedDownloadOfAnotherSourceLeavesTheCurrentListShowing() = runTest {
+        downloader.next = { DownloadResponse(200, celestrakJson) }
+        val vm = viewModel()
+        assertEquals(8, vm.state.value.satellites.size)
+
+        downloader.next = { DownloadResponse(403, "refused") }
+        vm.refreshKeps(KepsSource.WEATHER_CELESTRAK) // never downloaded, and this time it fails
+        assertEquals(8, vm.state.value.satellites.size) // still the amateur list, not the bundled one
+        assertEquals("AMATEUR_CELESTRAK", vm.state.value.keps!!.source)
+    }
+
+    @Test
+    fun theSelectedSatelliteSurvivesSwitchingToASourceThatHasIt() = runTest {
+        settings.selectedCatnum.value = 27607 // SO-50 is in the amateur download and in the AMSAT list
+        downloader.next = { DownloadResponse(200, celestrakJson) }
+        val vm = viewModel()
+        assertEquals(27607, vm.state.value.selectedCatnum)
+        downloader.next = { DownloadResponse(200, bundledTle) }
+        vm.refreshKeps(KepsSource.AMATEUR_AMSAT)
+        assertEquals(27607, vm.state.value.selectedCatnum)
+        vm.refreshKeps(KepsSource.AMATEUR_CELESTRAK)
+        assertEquals(27607, vm.state.value.selectedCatnum)
     }
 
     @Test

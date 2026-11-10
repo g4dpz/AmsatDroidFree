@@ -38,43 +38,224 @@ class KepsRepositoryTest {
     private var now = 1_800_000_000_000L
     private val downloader = FakeDownloader()
     private fun files() = FileStore(File(tmp.root, "data"))
-    private fun repo() = KepsRepository(files(), downloader, { bundledTle }, { now })
+    private fun repo(active: KepsSource = KepsSource.DEFAULT) =
+        KepsRepository(files(), downloader, { bundledTle }, { now }, { active })
+    private fun file(source: KepsSource) = KepsRepository.fileName(source)
 
     private fun ok(body: String) = { DownloadResponse(200, body) }
 
     // ---- loading ----
 
     @Test
-    fun firstRunUsesBundledKepsAndStoresThemSilently() {
+    fun firstRunUsesTheBundledKepsAndWritesNothing() {
         val loaded = repo().load()
         assertTrue(loaded.isBundled)
         assertNull(loaded.fetchedAtMillis)
         assertEquals(60, loaded.tles.size)
-        val stored = KepsJson.decode(files().readTextOrNull(KepsRepository.KEPS_FILE)!!)!!
-        assertEquals(StoredKeps.BUNDLED, stored.source)
-        assertEquals(60, stored.elements.size)
+        assertNull(repo().lastModifiedMillis())
         assertTrue(downloader.requested.isEmpty())
     }
 
     @Test
-    fun aCorruptFileFallsBackToBundledAndIsRewritten() {
-        files().writeTextAtomic(KepsRepository.KEPS_FILE, "{ this is not valid json")
+    fun aCorruptFileFallsBackToBundled() {
+        files().writeTextAtomic(file(KepsSource.DEFAULT), "{ this is not valid json")
         val loaded = repo().load()
         assertTrue(loaded.isBundled)
         assertEquals(60, loaded.tles.size)
-        assertNotNull(KepsJson.decode(files().readTextOrNull(KepsRepository.KEPS_FILE)!!))
     }
 
     @Test
     fun aFileWithNoSatellitesFallsBackToBundled() {
-        files().writeTextAtomic(KepsRepository.KEPS_FILE, KepsJson.encode(StoredKeps("AMATEUR_CELESTRAK", 5, emptyList())))
+        files().writeTextAtomic(file(KepsSource.AMATEUR_CELESTRAK), KepsJson.encode(StoredKeps("AMATEUR_CELESTRAK", 5, emptyList())))
         assertTrue(repo().load().isBundled)
     }
 
     @Test
     fun aWrongSchemaFallsBackToBundled() {
-        files().writeTextAtomic(KepsRepository.KEPS_FILE, """{"schema":99,"source":"X","fetchedAtMillis":1,"elements":[]}""")
+        files().writeTextAtomic(file(KepsSource.DEFAULT), """{"schema":99,"source":"X","fetchedAtMillis":1,"elements":[]}""")
         assertTrue(repo().load().isBundled)
+    }
+
+    // ---- each source keeps its own copy ----
+
+    /** Downloads the amateur set, then a different set an hour later (the situation a tester found). */
+    private fun downloadAmateurThenAmsat(): Long {
+        downloader.next = ok(celestrakJson)
+        repo().refresh(KepsSource.AMATEUR_CELESTRAK)
+        val amateurFetchedAt = now
+        now += hour
+        downloader.next = ok(bundledTle) // 60 satellites, a different list from the 8 amateur ones
+        assertTrue(repo(KepsSource.AMATEUR_AMSAT).refresh(KepsSource.AMATEUR_AMSAT) is RefreshResult.Updated)
+        return amateurFetchedAt
+    }
+
+    @Test
+    fun downloadingASecondSourceDoesNotDiscardTheFirst() {
+        downloadAmateurThenAmsat()
+        assertEquals(8, repo(KepsSource.AMATEUR_CELESTRAK).load().tles.size)
+        assertEquals(60, repo(KepsSource.AMATEUR_AMSAT).load().tles.size)
+    }
+
+    @Test
+    fun theChosenSourceDecidesWhichListIsLoaded() {
+        downloadAmateurThenAmsat()
+        assertEquals("AMATEUR_CELESTRAK", repo(KepsSource.AMATEUR_CELESTRAK).load().source)
+        assertEquals("AMATEUR_AMSAT", repo(KepsSource.AMATEUR_AMSAT).load().source)
+    }
+
+    @Test
+    fun goingBackToASourceInsideTheWindowNeedsNoDownload() {
+        // The report: amateur downloaded, then another source, then back to amateur inside the two hours.
+        val amateurFetchedAt = downloadAmateurThenAmsat()
+        now += 30 * 60 * 1000
+        downloader.requested.clear()
+
+        val result = repo(KepsSource.AMATEUR_CELESTRAK).refresh(KepsSource.AMATEUR_CELESTRAK)
+        assertEquals(RefreshResult.TooSoon(amateurFetchedAt + 2 * hour, amateurFetchedAt), result)
+        assertTrue(downloader.requested.isEmpty())
+        // and the amateur list is there to show
+        val shown = repo(KepsSource.AMATEUR_CELESTRAK).load()
+        assertEquals(8, shown.tles.size)
+        assertEquals(amateurFetchedAt, shown.fetchedAtMillis)
+    }
+
+    @Test
+    fun theTooSoonAnswerGivesTheTimeThatSourceWasFetchedNotTheLastDownloadOfAnySource() {
+        val amateurFetchedAt = downloadAmateurThenAmsat()
+        val result = repo().refresh(KepsSource.AMATEUR_CELESTRAK) as RefreshResult.TooSoon
+        assertEquals(amateurFetchedAt, result.lastSuccessMillis)
+    }
+
+    @Test
+    fun aSourceNeverDownloadedShowsTheMostRecentlyFetchedOtherSourceNotTheBundledSet() {
+        downloader.next = ok(celestrakJson)
+        repo().refresh(KepsSource.AMATEUR_CELESTRAK)
+        val shown = repo(KepsSource.WEATHER_CELESTRAK).load()
+        assertFalse(shown.isBundled)
+        assertEquals("AMATEUR_CELESTRAK", shown.source)
+        assertEquals(8, shown.tles.size)
+    }
+
+    @Test
+    fun ofSeveralOtherSourcesTheMostRecentlyWrittenIsShown() {
+        files().writeTextAtomic(file(KepsSource.AMATEUR_CELESTRAK), KepsJson.encode(StoredKeps("AMATEUR_CELESTRAK", 1, elementsOf(2))))
+        files().writeTextAtomic(file(KepsSource.AMATEUR_AMSAT), KepsJson.encode(StoredKeps("AMATEUR_AMSAT", 2, elementsOf(3))))
+        java.io.File(tmp.root, "data/${file(KepsSource.AMATEUR_CELESTRAK)}").setLastModified(1_000)
+        java.io.File(tmp.root, "data/${file(KepsSource.AMATEUR_AMSAT)}").setLastModified(2_000)
+        assertEquals("AMATEUR_AMSAT", repo(KepsSource.WEATHER_CELESTRAK).load().source)
+    }
+
+    @Test
+    fun lastModifiedFollowsTheChosenSource() {
+        downloadAmateurThenAmsat()
+        val amateurFile = java.io.File(tmp.root, "data/${file(KepsSource.AMATEUR_CELESTRAK)}")
+        val newFile = java.io.File(tmp.root, "data/${file(KepsSource.AMATEUR_AMSAT)}")
+        amateurFile.setLastModified(1_000)
+        newFile.setLastModified(2_000)
+        assertEquals(1_000L, repo(KepsSource.AMATEUR_CELESTRAK).lastModifiedMillis())
+        assertEquals(2_000L, repo(KepsSource.AMATEUR_AMSAT).lastModifiedMillis())
+    }
+
+    // ---- the single file earlier versions used ----
+
+    private fun elementsOf(count: Int): List<OrbitalElements> =
+        TleTextParser.parse(bundledTle).elements.take(count)
+
+    @Test
+    fun anOldKepsFileIsMovedToItsSourcesOwnFile() {
+        files().writeTextAtomic("keps.json", KepsJson.encode(StoredKeps("AMATEUR_CELESTRAK", 5, elementsOf(4))))
+
+        val loaded = repo().load()
+        assertEquals("AMATEUR_CELESTRAK", loaded.source)
+        assertEquals(4, loaded.tles.size)
+        assertEquals(5L, loaded.fetchedAtMillis)
+        assertFalse(files().exists("keps.json"))
+        assertTrue(files().exists(file(KepsSource.AMATEUR_CELESTRAK)))
+    }
+
+    @Test
+    fun anOldFileForAnotherSourceStillShowsWhenItIsNotTheChosenOne() {
+        files().writeTextAtomic("keps.json", KepsJson.encode(StoredKeps("AMATEUR_AMSAT", 5, elementsOf(4))))
+        val loaded = repo(KepsSource.AMATEUR_CELESTRAK).load()
+        assertEquals("AMATEUR_AMSAT", loaded.source)
+        assertEquals(4, loaded.tles.size)
+    }
+
+    @Test
+    fun anOldFileDoesNotOverwriteACopyThatSourceAlreadyHas() {
+        files().writeTextAtomic(file(KepsSource.AMATEUR_CELESTRAK), KepsJson.encode(StoredKeps("AMATEUR_CELESTRAK", 9, elementsOf(2))))
+        files().writeTextAtomic("keps.json", KepsJson.encode(StoredKeps("AMATEUR_CELESTRAK", 5, elementsOf(4))))
+        val loaded = repo().load()
+        assertEquals(2, loaded.tles.size)
+        assertEquals(9L, loaded.fetchedAtMillis)
+        assertFalse(files().exists("keps.json"))
+    }
+
+    @Test
+    fun anOldFileThatIsBundledOrUnreadableIsJustRemoved() {
+        files().writeTextAtomic("keps.json", KepsJson.encode(StoredKeps(StoredKeps.BUNDLED, 0, elementsOf(4))))
+        assertTrue(repo().load().isBundled)
+        assertFalse(files().exists("keps.json"))
+
+        files().writeTextAtomic("keps.json", "{ not json")
+        assertTrue(repo().load().isBundled)
+        assertFalse(files().exists("keps.json"))
+    }
+
+    @Test
+    fun refreshingAfterUpgradingKeepsTheMigratedCopyOfAnotherSource() {
+        files().writeTextAtomic("keps.json", KepsJson.encode(StoredKeps("AMATEUR_CELESTRAK", 5, elementsOf(4))))
+        downloader.next = ok(bundledTle)
+        assertTrue(repo(KepsSource.AMATEUR_AMSAT).refresh(KepsSource.AMATEUR_AMSAT) is RefreshResult.Updated)
+        assertEquals(4, repo(KepsSource.AMATEUR_CELESTRAK).load().tles.size) // not thrown away by the new download
+        assertEquals(60, repo(KepsSource.AMATEUR_AMSAT).load().tles.size)
+    }
+
+    @Test
+    fun anOldFileThatCannotBeMovedIsStillShownNotTheBundledSet() {
+        files().writeTextAtomic("keps.json", KepsJson.encode(StoredKeps("AMATEUR_CELESTRAK", 5, elementsOf(4))))
+        // A directory where the move's temporary file must go makes the write fail, as a full disk would.
+        File(tmp.root, "data/${file(KepsSource.AMATEUR_CELESTRAK)}.tmp").mkdirs()
+
+        val loaded = repo().load()
+        assertFalse(loaded.isBundled)
+        assertEquals("AMATEUR_CELESTRAK", loaded.source)
+        assertEquals(4, loaded.tles.size)
+        assertTrue("the old file is kept until it can be moved", files().exists("keps.json"))
+        assertNotNull(repo().lastModifiedMillis())
+    }
+
+    @Test
+    fun loadingDoesNotWaitForADownloadInProgress() {
+        downloader.next = ok(celestrakJson)
+        repo().refresh(KepsSource.AMATEUR_CELESTRAK) // something is stored, and there is no old file
+
+        val started = java.util.concurrent.CountDownLatch(1)
+        val release = java.util.concurrent.CountDownLatch(1)
+        val slow = KepsRepository(
+            files(),
+            KepsDownloader {
+                started.countDown()
+                release.await(5, java.util.concurrent.TimeUnit.SECONDS)
+                DownloadResponse(200, celestrakJson)
+            },
+            { bundledTle }, { now + 3 * hour }, { KepsSource.AMATEUR_CELESTRAK },
+        )
+        val downloading = Thread { slow.refresh(KepsSource.AMATEUR_CELESTRAK) }
+        downloading.start()
+        try {
+            assertTrue(started.await(5, java.util.concurrent.TimeUnit.SECONDS))
+            // the refresh holds its lock while it waits for the network; an ordinary load must still answer
+            val result = java.util.concurrent.atomic.AtomicReference<LoadedKeps?>()
+            val reader = Thread { result.set(repo().load()) }
+            reader.start()
+            reader.join(2000)
+            assertNotNull("load waited for the download", result.get())
+            assertEquals(8, result.get()!!.tles.size)
+        } finally {
+            release.countDown()
+            downloading.join()
+        }
     }
 
     // ---- successful refresh ----
@@ -250,7 +431,7 @@ class KepsRepositoryTest {
     fun aFailureToSaveKeepsTheOldFileAndReportsATemporaryProblem() {
         val oldCats = seedWithGoodData()
         // A directory in the way of the temporary file makes the write fail.
-        File(tmp.root, "data/keps.json.tmp").mkdirs()
+        File(tmp.root, "data/${file(KepsSource.AMATEUR_CELESTRAK)}.tmp").mkdirs()
         downloader.next = ok(celestrakJson.replace("OSCAR 7 (AO-7)", "CHANGED"))
         val result = repo().refresh(KepsSource.AMATEUR_CELESTRAK)
         assertTrue(result is RefreshResult.Failed && result.outcome is DownloadOutcome.Transient)
@@ -304,9 +485,13 @@ class KepsRepositoryTest {
     // ---- misc ----
 
     @Test
-    fun lastModifiedChangesWhenTheElementsAreReplaced() {
+    fun lastModifiedIsNullUntilSomethingIsStoredAndThenFollowsIt() {
         assertNull(repo().lastModifiedMillis())
-        repo().load()
+        repo().load() // the bundled set is not written, so there is still nothing stored
+        assertNull(repo().lastModifiedMillis())
+
+        downloader.next = ok(celestrakJson)
+        repo().refresh(KepsSource.AMATEUR_CELESTRAK)
         assertNotNull(repo().lastModifiedMillis())
     }
 

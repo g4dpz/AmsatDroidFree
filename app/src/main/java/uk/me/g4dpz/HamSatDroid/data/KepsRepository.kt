@@ -46,9 +46,9 @@ sealed interface RefreshResult {
 /**
  * Keeps the app's orbital elements: loads them, downloads new ones politely, and remembers what happened.
  *
- * Files (in the [FileStore] directory): `keps.json` (the elements, see [KepsJson]) and `keps_status.json`.
- * The existing elements are only ever replaced by a download that was received, parsed and found to contain at least
- * one satellite, and the replacement is atomic.
+ * Files (in the [FileStore] directory): one `keps_<SOURCE>.json` per source that has been downloaded (the elements, see
+ * [KepsJson]) and `keps_status.json`. A source's elements are only ever replaced by a new download of **that source**
+ * that was received, parsed and found to contain at least one satellite, and the replacement is atomic.
  *
  * @param bundledText returns the TLE text of the elements shipped inside the app
  * @param clock current time in milliseconds
@@ -58,31 +58,85 @@ class KepsRepository(
     private val downloader: KepsDownloader,
     private val bundledText: () -> String,
     private val clock: () -> Long = System::currentTimeMillis,
+    /** The source the user has chosen; read each time, so a change is seen at once. */
+    private val activeSource: () -> KepsSource = { KepsSource.DEFAULT },
 ) {
 
     /**
-     * The elements to use. If nothing valid is stored (first run, or the file is unreadable) the bundled elements are
-     * used and saved so later runs read the same file; no error is reported.
+     * The elements to use: the chosen source's stored copy; if that source has never been downloaded, the stored copy
+     * of whichever other source was fetched most recently; if nothing valid is stored, the bundled elements. No error
+     * is reported for any of these.
+     *
+     * Each source keeps its own copy (see [fileName]), so downloading one never discards another. Celestrak refuses a
+     * repeat download of the same data inside two hours, so a copy that was thrown away could not be fetched again.
      */
     fun load(): LoadedKeps {
-        val stored = files.readTextOrNull(KEPS_FILE)?.let(KepsJson::decode)
-        if (stored != null && stored.elements.isNotEmpty()) {
+        migrateLegacyFile()
+        for (name in candidateFiles()) {
+            val stored = files.readTextOrNull(name)?.let(KepsJson::decode) ?: continue
+            if (stored.elements.isEmpty()) continue
             val tles = toTles(stored.elements)
-            if (tles.isNotEmpty()) {
-                return LoadedKeps(tles, stored.source, stored.fetchedAtMillis.takeIf { it > 0 })
-            }
+            if (tles.isNotEmpty()) return LoadedKeps(tles, stored.source, stored.fetchedAtMillis.takeIf { it > 0 })
         }
-        val bundled = TleTextParser.parse(bundledText()).elements
-        try {
-            files.writeTextAtomic(KEPS_FILE, KepsJson.encode(StoredKeps(StoredKeps.BUNDLED, 0, bundled)))
-        } catch (e: IOException) {
-            // Saving is only a convenience here; the app can still run from the bundled elements.
-        }
-        return LoadedKeps(toTles(bundled), StoredKeps.BUNDLED, null)
+        return LoadedKeps(toTles(TleTextParser.parse(bundledText()).elements), StoredKeps.BUNDLED, null)
     }
 
-    /** When `keps.json` last changed, used to notice a background update. Null if there is no file yet. */
-    fun lastModifiedMillis(): Long? = files.lastModified(KEPS_FILE)
+    /**
+     * When the file [load] would read last changed, used to notice a background update or a change of source. Null if
+     * there is no stored copy yet.
+     */
+    fun lastModifiedMillis(): Long? {
+        migrateLegacyFile()
+        return candidateFiles().firstOrNull()?.let(files::lastModified)
+    }
+
+    /**
+     * The stored files to try, best first: the chosen source's, then the others, most recently written first. The old
+     * single file comes last, so that if it could not be moved (see [migrateLegacyFile]) its elements are still shown
+     * and not replaced by the bundled set while the download window may stop them being fetched again.
+     */
+    private fun candidateFiles(): List<String> {
+        val active = fileName(activeSource())
+        val others = KepsSource.entries.map(::fileName).filter { it != active }
+            .mapNotNull { name -> files.lastModified(name)?.let { name to it } }
+            .sortedByDescending { it.second }
+            .map { it.first }
+        val legacy = if (files.exists(LEGACY_KEPS_FILE)) listOf(LEGACY_KEPS_FILE) else emptyList()
+        return (if (files.exists(active)) listOf(active) else emptyList()) + others + legacy
+    }
+
+    /**
+     * Earlier versions kept every download in one file, `keps.json`, replacing it each time. Moves such a file to its
+     * own source's name (unless that source already has one) and removes it. A file that cannot be moved is left in
+     * place, still readable by [load], and tried again on the next call.
+     *
+     * The usual case, no old file, returns at once without taking [REFRESH_LOCK], so ordinary loads never wait for a
+     * download. When there is an old file the move runs under the lock: otherwise it could check that the destination
+     * is free, a download of that source could then finish and save its new elements, and the move would overwrite
+     * them with the old copy.
+     */
+    private fun migrateLegacyFile() {
+        if (!files.exists(LEGACY_KEPS_FILE)) return
+        synchronized(REFRESH_LOCK) { migrateLegacyFileLocked() }
+    }
+
+    private fun migrateLegacyFileLocked() {
+        val text = files.readTextOrNull(LEGACY_KEPS_FILE) ?: return
+        val stored = KepsJson.decode(text)
+        val source = stored?.let { s -> KepsSource.entries.firstOrNull { it.key == s.source } }
+        if (stored != null && source != null && stored.elements.isNotEmpty() && !files.exists(fileName(source))) {
+            try {
+                files.writeTextAtomic(fileName(source), text)
+            } catch (e: IOException) {
+                return
+            }
+        }
+        files.delete(LEGACY_KEPS_FILE)
+    }
+
+    /** When the stored copy of [source] was downloaded, or null if it has none. */
+    private fun storedFetchedAt(source: KepsSource): Long? =
+        files.readTextOrNull(fileName(source))?.let(KepsJson::decode)?.fetchedAtMillis?.takeIf { it > 0 }
 
     fun status(): KepsStatus = files.readTextOrNull(STATUS_FILE)?.let(::decodeStatus) ?: KepsStatus()
 
@@ -94,11 +148,13 @@ class KepsRepository(
     fun refresh(source: KepsSource): RefreshResult = synchronized(REFRESH_LOCK) { refreshLocked(source) }
 
     private fun refreshLocked(source: KepsSource): RefreshResult {
+        migrateLegacyFile()
         val now = clock()
         val before = status()
         val lastAnswer = before.lastAnswerMillis[source.key]
         if (!KepsDownloadPolicy.canDownload(lastAnswer, now)) {
-            val success = before.lastSuccess?.takeIf { it.source == source.key }?.millis
+            // When this source's own copy was fetched (not the last download of any source)
+            val success = storedFetchedAt(source)
             return RefreshResult.TooSoon(KepsDownloadPolicy.nextAllowedAtMillis(lastAnswer, now), success)
         }
 
@@ -130,7 +186,7 @@ class KepsRepository(
         }
 
         try {
-            files.writeTextAtomic(KEPS_FILE, KepsJson.encode(StoredKeps(source.key, now, parsed.elements)))
+            files.writeTextAtomic(fileName(source), KepsJson.encode(StoredKeps(source.key, now, parsed.elements)))
         } catch (e: IOException) {
             return fail(source, now, DownloadOutcome.Transient("Could not save the elements: ${e.message}"), answered = true)
         }
@@ -215,7 +271,11 @@ class KepsRepository(
          */
         private val REFRESH_LOCK = Any()
 
-        const val KEPS_FILE = "keps.json"
+        /** The single file earlier versions used for every download; migrated to a per-source file on first use. */
+        const val LEGACY_KEPS_FILE = "keps.json"
         const val STATUS_FILE = "keps_status.json"
+
+        /** The file holding the elements last downloaded from [source]. */
+        fun fileName(source: KepsSource): String = "keps_${source.key}.json"
     }
 }
