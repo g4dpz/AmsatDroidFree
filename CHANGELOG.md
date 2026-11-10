@@ -2,12 +2,12 @@
 
 What changed in each version of AmsatDroid, newest first. Each entry says what a user would notice; it is not a list of every commit. Version numbers follow [semantic versioning](https://semver.org/): fixes bump the last number, new functionality the middle one. `versionCode` is Google Play's ordering number and goes up with every upload.
 
-The text of the newest entry is also what goes into the Play Console release notes (500 characters per language), so keep each entry short and in plain words.
+The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
 ## [2.0.2] - 2026-11-10 (versionCode 22)
 
 ### Fixed
-- Switching between keps sources (for example Amateur, then New launches) no longer discards the list you came from. Each source keeps its own copy, so you can go back to it straight away instead of waiting two hours for Celestrak to allow another download. Choosing a source in the menu or in Settings shows its stored copy at once.
+- Switching keps sources (for example Amateur, then New launches) no longer discards the list you came from. Each source keeps its own copy, so you can go straight back instead of waiting two hours for another download.
 - The sky screen uses much less processing power when the compass is on. It used to redraw about 50 times a second on a still screen.
 
 ## [2.0.1] - 2026-11-10 (versionCode 21)

@@ -109,8 +109,8 @@ For later production updates you can use a staged rollout (for example 20 percen
 
 Release notes are typed in the Play Console for each release, not built into the bundle, so they must be written every time.
 
-1. In the same pull request as the version bump, add a section for the new version at the top of `CHANGELOG.md` (what a user would notice, in plain words).
-2. On the release page in the Play Console, paste that section into the release notes box for English. The limit is 500 characters per language. Play offers to copy the previous release's notes, so replace them, or the new release will repeat the old text.
+1. In the same pull request as the version bump, add a section for the new version at the top of `CHANGELOG.md` (what a user would notice, in plain words). Keep the bullet points of a release under about 450 characters, so they fit Play's limit with room to spare.
+2. On the release page in the Play Console, paste the **bullet points only** into the release notes box for English, not the version heading line and not the markdown headings such as `### Fixed`: Play shows plain text, so those symbols would appear literally and the heading would use up characters. The limit is 500 characters per language. Play offers to copy the previous release's notes, so replace them, or the new release will repeat the old text.
 3. The wiki Home page and the tester emails can reuse the same wording.
 
 ## 10. Common rejections
