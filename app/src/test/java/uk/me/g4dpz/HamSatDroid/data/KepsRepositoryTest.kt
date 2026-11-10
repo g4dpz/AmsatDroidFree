@@ -211,6 +211,53 @@ class KepsRepositoryTest {
         assertEquals(60, repo(KepsSource.AMATEUR_AMSAT).load().tles.size)
     }
 
+    @Test
+    fun anOldFileThatCannotBeMovedIsStillShownNotTheBundledSet() {
+        files().writeTextAtomic("keps.json", KepsJson.encode(StoredKeps("AMATEUR_CELESTRAK", 5, elementsOf(4))))
+        // A directory where the move's temporary file must go makes the write fail, as a full disk would.
+        File(tmp.root, "data/${file(KepsSource.AMATEUR_CELESTRAK)}.tmp").mkdirs()
+
+        val loaded = repo().load()
+        assertFalse(loaded.isBundled)
+        assertEquals("AMATEUR_CELESTRAK", loaded.source)
+        assertEquals(4, loaded.tles.size)
+        assertTrue("the old file is kept until it can be moved", files().exists("keps.json"))
+        assertNotNull(repo().lastModifiedMillis())
+    }
+
+    @Test
+    fun loadingDoesNotWaitForADownloadInProgress() {
+        downloader.next = ok(celestrakJson)
+        repo().refresh(KepsSource.AMATEUR_CELESTRAK) // something is stored, and there is no old file
+
+        val started = java.util.concurrent.CountDownLatch(1)
+        val release = java.util.concurrent.CountDownLatch(1)
+        val slow = KepsRepository(
+            files(),
+            KepsDownloader {
+                started.countDown()
+                release.await(5, java.util.concurrent.TimeUnit.SECONDS)
+                DownloadResponse(200, celestrakJson)
+            },
+            { bundledTle }, { now + 3 * hour }, { KepsSource.AMATEUR_CELESTRAK },
+        )
+        val downloading = Thread { slow.refresh(KepsSource.AMATEUR_CELESTRAK) }
+        downloading.start()
+        try {
+            assertTrue(started.await(5, java.util.concurrent.TimeUnit.SECONDS))
+            // the refresh holds its lock while it waits for the network; an ordinary load must still answer
+            val result = java.util.concurrent.atomic.AtomicReference<LoadedKeps?>()
+            val reader = Thread { result.set(repo().load()) }
+            reader.start()
+            reader.join(2000)
+            assertNotNull("load waited for the download", result.get())
+            assertEquals(8, result.get()!!.tles.size)
+        } finally {
+            release.countDown()
+            downloading.join()
+        }
+    }
+
     // ---- successful refresh ----
 
     @Test

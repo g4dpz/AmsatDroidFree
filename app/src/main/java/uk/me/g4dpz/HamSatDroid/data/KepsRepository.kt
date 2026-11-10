@@ -90,22 +90,37 @@ class KepsRepository(
         return candidateFiles().firstOrNull()?.let(files::lastModified)
     }
 
-    /** The stored files to try, best first: the chosen source's, then the others, most recently written first. */
+    /**
+     * The stored files to try, best first: the chosen source's, then the others, most recently written first. The old
+     * single file comes last, so that if it could not be moved (see [migrateLegacyFile]) its elements are still shown
+     * and not replaced by the bundled set while the download window may stop them being fetched again.
+     */
     private fun candidateFiles(): List<String> {
         val active = fileName(activeSource())
         val others = KepsSource.entries.map(::fileName).filter { it != active }
             .mapNotNull { name -> files.lastModified(name)?.let { name to it } }
             .sortedByDescending { it.second }
             .map { it.first }
-        return (if (files.exists(active)) listOf(active) else emptyList()) + others
+        val legacy = if (files.exists(LEGACY_KEPS_FILE)) listOf(LEGACY_KEPS_FILE) else emptyList()
+        return (if (files.exists(active)) listOf(active) else emptyList()) + others + legacy
     }
 
     /**
      * Earlier versions kept every download in one file, `keps.json`, replacing it each time. Moves such a file to its
-     * own source's name (unless that source already has one) and removes it. A file that cannot be moved is left for
-     * the next call.
+     * own source's name (unless that source already has one) and removes it. A file that cannot be moved is left in
+     * place, still readable by [load], and tried again on the next call.
+     *
+     * The usual case, no old file, returns at once without taking [REFRESH_LOCK], so ordinary loads never wait for a
+     * download. When there is an old file the move runs under the lock: otherwise it could check that the destination
+     * is free, a download of that source could then finish and save its new elements, and the move would overwrite
+     * them with the old copy.
      */
     private fun migrateLegacyFile() {
+        if (!files.exists(LEGACY_KEPS_FILE)) return
+        synchronized(REFRESH_LOCK) { migrateLegacyFileLocked() }
+    }
+
+    private fun migrateLegacyFileLocked() {
         val text = files.readTextOrNull(LEGACY_KEPS_FILE) ?: return
         val stored = KepsJson.decode(text)
         val source = stored?.let { s -> KepsSource.entries.firstOrNull { it.key == s.source } }
