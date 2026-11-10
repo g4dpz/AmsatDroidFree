@@ -151,6 +151,7 @@ class AppViewModel(
             ++calcGeneration
             showFailure(PassHeader.LocationNotSet) // also drops any passes from an earlier location
             _state.update { it.copy(calculating = false) }
+            passStore.clear() // so they do not come back after a restart
             return
         }
         if (lat == null || lon == null) {

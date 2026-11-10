@@ -267,6 +267,18 @@ class AppViewModelTest {
     }
 
     @Test
+    fun passesFromBeforeDoNotComeBackAfterARestartWhenTheLocationWasUnset() {
+        val first = viewModel()
+        first.calculate()
+        assertTrue(first.state.value.passes.isNotEmpty())
+        settings.homeLat.value = "0"
+        settings.homeLon.value = "0"
+        first.calculate()
+        val restarted = viewModel()
+        assertTrue(restarted.state.value.passes.isEmpty())
+    }
+
+    @Test
     fun unsettingTheLocationWhileACalculationIsRunningDiscardsItsResult() {
         lateinit var vm: AppViewModel
         val real = PassCalculator()
