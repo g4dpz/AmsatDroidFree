@@ -267,6 +267,29 @@ class AppViewModelTest {
     }
 
     @Test
+    fun unsettingTheLocationWhileACalculationIsRunningDiscardsItsResult() {
+        lateinit var vm: AppViewModel
+        val real = PassCalculator()
+        var unsetOnce = true
+        val spy = object : PassCalculator() {
+            override fun calculate(tle: TLE, latitude: Double, longitude: Double, start: Date, hoursAhead: Int): CalcResult {
+                if (unsetOnce) { // the user clears the location while this calculation is still running
+                    unsetOnce = false
+                    settings.homeLat.value = "0"
+                    settings.homeLon.value = "0"
+                    vm.calculate()
+                }
+                return real.calculate(tle, latitude, longitude, start, hoursAhead)
+            }
+        }
+        vm = viewModel(spy)
+        vm.calculate()
+        assertEquals(PassHeader.LocationNotSet, vm.state.value.header)
+        assertTrue(vm.state.value.passes.isEmpty())
+        assertFalse(vm.state.value.calculating)
+    }
+
+    @Test
     fun aCommaDecimalLocationFromAnOldVersionStillWorks() {
         settings.homeLat.value = "51,5"
         settings.homeLon.value = "-0,1"

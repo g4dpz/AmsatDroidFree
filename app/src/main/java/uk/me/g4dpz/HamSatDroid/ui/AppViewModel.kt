@@ -146,7 +146,11 @@ class AppViewModel(
         val lat = LocationText.toDegrees(settings.homeLat.value)
         val lon = LocationText.toDegrees(settings.homeLon.value)
         if (lat != null && lon != null && !HomeLocation.isSet(settings.homeLat.value, settings.homeLon.value)) {
+            // Drop a calculation still running for the old location, so it cannot overwrite this state
+            calcJob?.cancel()
+            ++calcGeneration
             showFailure(PassHeader.LocationNotSet) // also drops any passes from an earlier location
+            _state.update { it.copy(calculating = false) }
             return
         }
         if (lat == null || lon == null) {
@@ -166,6 +170,7 @@ class AppViewModel(
             try {
                 val result = calculator.calculate(tle, lat, lon, Date.from(start), hours)
                 ensureActive() // a newer calculation has replaced this one
+                if (generation != calcGeneration) return@launch // or the location was unset meanwhile
                 val locator = IaruLocator(lat, lon).toMaidenhead()
                 when (result) {
                     is CalcResult.Passes -> {
