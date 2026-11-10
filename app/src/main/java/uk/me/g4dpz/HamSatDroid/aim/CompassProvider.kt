@@ -7,6 +7,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.SystemClock
 import android.view.Surface
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -81,6 +82,8 @@ class CompassProvider(context: Context) {
 
         val alpha = if (source == CompassSource.ROTATION_VECTOR) 0.35 else 0.15 // noisier sources smoothed more
         var smoothed = Double.NaN
+        // The sensors report far more often than the screen needs; see OrientationThrottle.
+        val throttle = OrientationThrottle()
 
         val gravity = FloatArray(3)
         val geomagnetic = FloatArray(3)
@@ -96,8 +99,11 @@ class CompassProvider(context: Context) {
             SensorManager.getOrientation(worldFromDevice, orientationAngles)
             val magneticHeading = Math.toDegrees(orientationAngles[0].toDouble())
             val trueHeading = HeadingMath.trueHeading(magneticHeading, declination)
+            // Every reading goes through the filter, so smoothing is unchanged; only some are passed on to the screen.
             smoothed = if (smoothed.isNaN()) trueHeading else HeadingMath.smoothHeading(smoothed, trueHeading, alpha)
-            trySend(Orientation(worldFromDevice.copyOf(), smoothed, accuracy, source))
+            if (throttle.shouldEmit(worldFromDevice, accuracy, SystemClock.elapsedRealtime())) {
+                trySend(Orientation(worldFromDevice.copyOf(), smoothed, accuracy, source))
+            }
         }
 
         val listener = object : SensorEventListener {

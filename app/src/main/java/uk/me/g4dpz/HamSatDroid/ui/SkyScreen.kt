@@ -25,6 +25,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -117,11 +119,16 @@ fun SkyContent(viewModel: AppViewModel, state: AppUiState, keepScreenOn: Boolean
     val pointingAxis by settings.pointingAxis.state.collectAsStateWithLifecycle()
     var aimOn by rememberSaveable { mutableStateOf(false) }
     val sensorsNeeded = compassProvider.isAvailable && (compassEnabled || aimOn)
-    val orientation by rememberCompassOrientation(
+    // The State itself is passed down, not its value: reading `.value` here would make this whole function run again
+    // for every compass reading. Each reader below reads it in the smallest place that needs it (the chart's draw
+    // step, the calibration hint, the aim panel).
+    val orientation = rememberCompassOrientation(
         compassProvider, enabled = sensorsNeeded, latitude = home?.latitude, longitude = home?.longitude,
     )
-    // Rotate the chart only when the compass is on; aim alone leaves the chart north-up.
-    val chartRotation = if (compassEnabled && orientation != null) orientation!!.headingDeg.toFloat() else 0f
+    // Rotate the chart only when the compass is on; aim alone leaves the chart north-up. Read at draw time.
+    val chartRotation: () -> Float = { if (compassEnabled) orientation.value?.headingDeg?.toFloat() ?: 0f else 0f }
+    // Changes only when the accuracy crosses the "needs calibration" line, not with every reading.
+    val needsCalibration by remember(orientation) { derivedStateOf { orientation.value?.needsCalibration == true } }
     val declination = remember(home) {
         if (home == null) 0.0 else android.hardware.GeomagneticField(
             home.latitude.toFloat(), home.longitude.toFloat(), 0f, System.currentTimeMillis(),
@@ -146,7 +153,7 @@ fun SkyContent(viewModel: AppViewModel, state: AppUiState, keepScreenOn: Boolean
                     leadingIcon = { Icon(Icons.Filled.LocationOn, contentDescription = null) },
                 )
             }
-            if ((compassEnabled || aimOn) && orientation?.needsCalibration == true) {
+            if ((compassEnabled || aimOn) && needsCalibration) {
                 Text(
                     stringResource(R.string.compass_calibrate),
                     style = MaterialTheme.typography.bodySmall,
@@ -181,13 +188,13 @@ fun SkyContent(viewModel: AppViewModel, state: AppUiState, keepScreenOn: Boolean
             SkyChart(
                 track = track, current = reading?.azEl,
                 modifier = Modifier.widthIn(max = MAX_CHART_WIDTH),
-                rotationDegrees = { chartRotation },
+                rotationDegrees = chartRotation,
             )
         }
 
         if (aimOn) {
             AimPanel(
-                orientation = orientation,
+                orientationState = orientation,
                 pointingAxis = pointingAxis,
                 declination = declination,
                 target = reading?.azEl,
@@ -313,7 +320,7 @@ private fun FrequencyLines(mode: TransponderMode, rangeRateKmS: Double?, formats
  */
 @Composable
 private fun AimPanel(
-    orientation: Orientation?,
+    orientationState: State<Orientation?>,
     pointingAxis: PointingAxis,
     declination: Double,
     target: AzEl?,
@@ -322,6 +329,8 @@ private fun AimPanel(
     formats: DisplayFormats,
     compassAvailable: Boolean,
 ) {
+    // Read here, inside the panel, so a compass reading redraws only this panel and not the whole sky screen.
+    val orientation = orientationState.value
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (!compassAvailable) {
             Text(stringResource(R.string.aim_no_compass), style = MaterialTheme.typography.bodyMedium)
