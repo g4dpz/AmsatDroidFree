@@ -101,7 +101,7 @@ class CompassProvider(context: Context) {
             val trueHeading = HeadingMath.trueHeading(magneticHeading, declination)
             // Every reading goes through the filter, so smoothing is unchanged; only some are passed on to the screen.
             smoothed = if (smoothed.isNaN()) trueHeading else HeadingMath.smoothHeading(smoothed, trueHeading, alpha)
-            if (throttle.shouldEmit(worldFromDevice, accuracy, SystemClock.elapsedRealtime())) {
+            if (throttle.shouldEmit(worldFromDevice, smoothed, accuracy, SystemClock.elapsedRealtime())) {
                 trySend(Orientation(worldFromDevice.copyOf(), smoothed, accuracy, source))
             }
         }
