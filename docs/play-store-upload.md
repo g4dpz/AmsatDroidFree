@@ -105,6 +105,14 @@ For later production updates you can use a staged rollout (for example 20 percen
 3. Build the bundle from the merged `master` (section 2).
 4. Create a new release on the track and upload it.
 
+### Release notes
+
+Release notes are typed in the Play Console for each release, not built into the bundle, so they must be written every time.
+
+1. In the same pull request as the version bump, add a section for the new version at the top of `CHANGELOG.md` (what a user would notice, in plain words).
+2. On the release page in the Play Console, paste that section into the release notes box for English. The limit is 500 characters per language. Play offers to copy the previous release's notes, so replace them, or the new release will repeat the old text.
+3. The wiki Home page and the tester emails can reuse the same wording.
+
 ## 10. Common rejections
 
 | Message | Cause and fix |
