@@ -95,6 +95,7 @@ fun PassHeader.text(formats: DisplayFormats): String = when (this) {
     PassHeader.BadElements -> stringResource(R.string.header_bad_elements)
     PassHeader.UnknownSatellite -> stringResource(R.string.header_unknown_satellite)
     PassHeader.InvalidLocation -> stringResource(R.string.header_invalid_location)
+    PassHeader.LocationNotSet -> stringResource(R.string.header_location_not_set)
     is PassHeader.Restored -> stringResource(R.string.header_restored, satName, formats.dateTime(computedAt))
     is PassHeader.Error -> stringResource(R.string.header_error, message)
 }

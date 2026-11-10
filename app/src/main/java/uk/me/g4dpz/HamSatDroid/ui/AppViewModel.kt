@@ -27,6 +27,7 @@ import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.data.StoredPasses
 import uk.me.g4dpz.HamSatDroid.domain.CalcResult
 import uk.me.g4dpz.HamSatDroid.domain.ElementAge
+import uk.me.g4dpz.HamSatDroid.domain.HomeLocation
 import uk.me.g4dpz.HamSatDroid.domain.PassCalculator
 import uk.me.g4dpz.HamSatDroid.domain.PassHeader
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
@@ -144,6 +145,15 @@ class AppViewModel(
         val tle = _tles.value.firstOrNull { it.catnum == current.selectedCatnum } ?: return
         val lat = LocationText.toDegrees(settings.homeLat.value)
         val lon = LocationText.toDegrees(settings.homeLon.value)
+        if (lat != null && lon != null && !HomeLocation.isSet(settings.homeLat.value, settings.homeLon.value)) {
+            // Drop a calculation still running for the old location, so it cannot overwrite this state
+            calcJob?.cancel()
+            ++calcGeneration
+            showFailure(PassHeader.LocationNotSet) // also drops any passes from an earlier location
+            _state.update { it.copy(calculating = false) }
+            passStore.clear() // so they do not come back after a restart
+            return
+        }
         if (lat == null || lon == null) {
             _state.update { it.copy(header = PassHeader.InvalidLocation) }
             return
@@ -161,6 +171,7 @@ class AppViewModel(
             try {
                 val result = calculator.calculate(tle, lat, lon, Date.from(start), hours)
                 ensureActive() // a newer calculation has replaced this one
+                if (generation != calcGeneration) return@launch // or the location was unset meanwhile
                 val locator = IaruLocator(lat, lon).toMaidenhead()
                 when (result) {
                     is CalcResult.Passes -> {

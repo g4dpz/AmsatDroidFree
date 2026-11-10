@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import uk.me.g4dpz.HamSatDroid.data.LocationText
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.domain.AzEl
+import uk.me.g4dpz.HamSatDroid.domain.HomeLocation
 import uk.me.g4dpz.HamSatDroid.domain.OverviewCalculator
 import uk.me.g4dpz.HamSatDroid.domain.OverviewItem
 import uk.me.g4dpz.HamSatDroid.domain.OverviewRows
@@ -35,7 +36,7 @@ import java.util.Date
 data class OverviewUiState(
     val hours: Int,
     val minElevation: Int,
-    /** False when the home location in settings is not valid; nothing is calculated then. */
+    /** False when the home location in settings is not valid or not set; nothing is calculated then. */
     val locationValid: Boolean = true,
     val calculating: Boolean = false,
     val done: Int = 0,
@@ -100,10 +101,10 @@ class OverviewViewModel(
         job?.cancel()
         val lat = LocationText.toDegrees(key.lat)
         val lon = LocationText.toDegrees(key.lon)
-        if (lat == null || lon == null || key.tles.isEmpty()) {
+        if (lat == null || lon == null || !HomeLocation.isSet(key.lat, key.lon) || key.tles.isEmpty()) {
             _state.update {
                 it.copy(
-                    locationValid = lat != null && lon != null, calculating = false, done = 0, total = 0,
+                    locationValid = HomeLocation.isSet(key.lat, key.lon), calculating = false, done = 0, total = 0,
                     results = emptyMap(), elapsedMillis = null,
                 )
             }

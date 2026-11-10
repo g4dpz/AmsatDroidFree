@@ -5,6 +5,7 @@ import android.content.Context
 import uk.me.g4dpz.HamSatDroid.HamSatDroidApp
 import uk.me.g4dpz.HamSatDroid.data.LocationText
 import uk.me.g4dpz.HamSatDroid.data.createKepsRepository
+import uk.me.g4dpz.HamSatDroid.domain.HomeLocation
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
 import uk.me.g4dpz.HamSatDroid.domain.SatelliteMotion
 import uk.me.g4dpz.satellite.GroundStationPosition
@@ -46,6 +47,7 @@ object WidgetUpdater {
         val latitude = LocationText.toDegrees(settings.homeLat.value)
         val longitude = LocationText.toDegrees(settings.homeLon.value)
         if (latitude == null || longitude == null) return WidgetState.NoLocation
+        if (!HomeLocation.isSet(settings.homeLat.value, settings.homeLon.value)) return WidgetState.NoLocation
 
         val catnum = settings.selectedCatnum.value.takeIf { it > 0 }
         val tle = catnum?.let { c -> createKepsRepository(context).load().tles.firstOrNull { it.catnum == c } }
