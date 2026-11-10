@@ -242,9 +242,14 @@ class AppViewModel(
                     _events.trySend(UiEvent.KepsUpdated(result.count))
                 }
                 is RefreshResult.TooSoon -> if (userRequested) {
-                    _events.trySend(UiEvent.KepsTooSoon(result.lastSuccessMillis, result.nextAllowedAtMillis))
+                    // Nothing to download, but the user chose this source: show its stored copy (each source keeps its
+                    // own, so choosing a source never needs a download and is never locked out by the two-hour rule)
+                    reload(_state.value.selectedCatnum)
+                    _events.trySend(UiEvent.KepsTooSoon(source, result.lastSuccessMillis, result.nextAllowedAtMillis))
                 }
                 is RefreshResult.Failed -> if (userRequested) {
+                    // Failed: the chosen source's stored copy if it has one, otherwise the list stays as it was
+                    reload(_state.value.selectedCatnum)
                     val reason = when (val o = result.outcome) {
                         is DownloadOutcome.Transient -> o.reason
                         is DownloadOutcome.Permanent -> o.reason

@@ -180,8 +180,8 @@
         <item quantity="one">Keps updated (%1$d satellite)</item>
         <item quantity="other">Keps updated (%1$d satellites)</item>
     </plurals>
-    <string name="keps_too_soon">Keps are already up to date. Fetched %1$s. They can be downloaded again after %2$s.</string>
-    <string name="keps_too_soon_no_time">Keps cannot be downloaded again yet. Try again after %1$s.</string>
+    <string name="keps_too_soon">Showing the %1$s keps, fetched %2$s. They can be downloaded again after %3$s.</string>
+    <string name="keps_too_soon_no_time">The %1$s keps cannot be downloaded again yet, and none are stored. Try again after %2$s.</string>
     <string name="keps_failed">Could not download keps (%1$s). Kept existing element data.</string>
     <string name="about_version">Version %1$s</string>
     <string name="about_keps_bundled">Keps: bundled with the app (may be out of date)</string>

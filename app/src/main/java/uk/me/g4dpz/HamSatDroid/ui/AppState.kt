@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package uk.me.g4dpz.HamSatDroid.ui
 
+import uk.me.g4dpz.HamSatDroid.data.KepsSource
 import uk.me.g4dpz.HamSatDroid.data.KepsStatus
 import uk.me.g4dpz.HamSatDroid.domain.PassHeader
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
@@ -49,8 +50,11 @@ data class AppUiState(
 sealed interface UiEvent {
     data class KepsUpdated(val satelliteCount: Int) : UiEvent
 
-    /** The same source was fetched less than two hours ago, so nothing was downloaded. */
-    data class KepsTooSoon(val lastSuccessMillis: Long?, val nextAllowedAtMillis: Long) : UiEvent
+    /**
+     * The same source was fetched less than two hours ago, so nothing was downloaded and its stored copy (fetched at
+     * [lastSuccessMillis], null if it has none) is shown instead.
+     */
+    data class KepsTooSoon(val source: KepsSource, val lastSuccessMillis: Long?, val nextAllowedAtMillis: Long) : UiEvent
 
     data class KepsFailed(val reason: String) : UiEvent
 }
