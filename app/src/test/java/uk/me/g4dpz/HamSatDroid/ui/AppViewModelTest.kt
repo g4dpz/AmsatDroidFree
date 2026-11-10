@@ -254,6 +254,19 @@ class AppViewModelTest {
     }
 
     @Test
+    fun unsettingTheLocationClearsPassesFromBefore() {
+        val vm = viewModel()
+        vm.calculate()
+        assertTrue(vm.state.value.passes.isNotEmpty())
+        settings.homeLat.value = "0"
+        settings.homeLon.value = "0"
+        vm.calculate()
+        assertEquals(PassHeader.LocationNotSet, vm.state.value.header)
+        assertTrue(vm.state.value.passes.isEmpty())
+        assertNull(vm.state.value.selectedPassId)
+    }
+
+    @Test
     fun aCommaDecimalLocationFromAnOldVersionStillWorks() {
         settings.homeLat.value = "51,5"
         settings.homeLon.value = "-0,1"

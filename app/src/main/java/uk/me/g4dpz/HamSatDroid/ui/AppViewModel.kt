@@ -146,7 +146,7 @@ class AppViewModel(
         val lat = LocationText.toDegrees(settings.homeLat.value)
         val lon = LocationText.toDegrees(settings.homeLon.value)
         if (lat != null && lon != null && !HomeLocation.isSet(settings.homeLat.value, settings.homeLon.value)) {
-            _state.update { it.copy(header = PassHeader.LocationNotSet) }
+            showFailure(PassHeader.LocationNotSet) // also drops any passes from an earlier location
             return
         }
         if (lat == null || lon == null) {
