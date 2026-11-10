@@ -237,6 +237,23 @@ class AppViewModelTest {
     }
 
     @Test
+    fun anUnsetHomeLocationIsReportedWithoutCalculating() {
+        var called = false
+        val spy = object : PassCalculator() {
+            override fun calculate(tle: TLE, latitude: Double, longitude: Double, start: Date, hoursAhead: Int): CalcResult {
+                called = true
+                return CalcResult.NoPasses
+            }
+        }
+        val vm = viewModel(spy)
+        settings.homeLat.value = "0"
+        settings.homeLon.value = "0"
+        vm.calculate()
+        assertEquals(PassHeader.LocationNotSet, vm.state.value.header)
+        assertFalse(called)
+    }
+
+    @Test
     fun aCommaDecimalLocationFromAnOldVersionStillWorks() {
         settings.homeLat.value = "51,5"
         settings.homeLon.value = "-0,1"

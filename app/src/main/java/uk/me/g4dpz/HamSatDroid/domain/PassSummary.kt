@@ -104,6 +104,8 @@ sealed interface PassHeader {
 
     /** The home latitude or longitude in settings is not a number. */
     data object InvalidLocation : PassHeader
+    /** The home location has not been set (it is still the default 0, 0), so nothing is calculated. */
+    data object LocationNotSet : PassHeader
 
     /** The list shown was restored from the previous session; the location it was calculated for is not kept. */
     data class Restored(val satName: String, val computedAt: Instant) : PassHeader

@@ -98,6 +98,19 @@ class OverviewViewModelTest {
     }
 
     @Test
+    fun `an unset home location calculates nothing`() {
+        settings.homeLat.value = "0"
+        settings.homeLon.value = "0"
+        val vm = viewModel()
+        assertFalse(vm.state.value.locationValid)
+        assertTrue(vm.state.value.results.isEmpty())
+        assertEquals(0, completed.size)
+        settings.homeLat.value = "51.5"
+        assertTrue(vm.state.value.locationValid)
+        assertEquals(1, completed.size)
+    }
+
+    @Test
     fun `an invalid home location calculates nothing`() {
         settings.homeLat.value = "north"
         val vm = viewModel()

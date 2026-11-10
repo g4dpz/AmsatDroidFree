@@ -27,6 +27,7 @@ import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.data.StoredPasses
 import uk.me.g4dpz.HamSatDroid.domain.CalcResult
 import uk.me.g4dpz.HamSatDroid.domain.ElementAge
+import uk.me.g4dpz.HamSatDroid.domain.HomeLocation
 import uk.me.g4dpz.HamSatDroid.domain.PassCalculator
 import uk.me.g4dpz.HamSatDroid.domain.PassHeader
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
@@ -144,6 +145,10 @@ class AppViewModel(
         val tle = _tles.value.firstOrNull { it.catnum == current.selectedCatnum } ?: return
         val lat = LocationText.toDegrees(settings.homeLat.value)
         val lon = LocationText.toDegrees(settings.homeLon.value)
+        if (lat != null && lon != null && !HomeLocation.isSet(settings.homeLat.value, settings.homeLon.value)) {
+            _state.update { it.copy(header = PassHeader.LocationNotSet) }
+            return
+        }
         if (lat == null || lon == null) {
             _state.update { it.copy(header = PassHeader.InvalidLocation) }
             return

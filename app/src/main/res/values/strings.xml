@@ -96,7 +96,7 @@
     <string name="overview_hours_option">%1$d h</string>
     <string name="overview_min_elevation">Minimum elevation</string>
     <string name="overview_degrees_option">%1$d°</string>
-    <string name="overview_no_location">Set a valid home location to see the overview.</string>
+    <string name="overview_no_location">Set your home location in Settings to see the overview.</string>
     <plurals name="overview_progress">
         <item quantity="one">Calculating: %1$d of %2$d satellite</item>
         <item quantity="other">Calculating: %1$d of %2$d satellites</item>
@@ -163,6 +163,7 @@
     <string name="header_stationary_down">%1$s is stationary in the sky (geostationary) and below the horizon at your location, so it can never be seen from here.</string>
     <string name="header_bad_elements">The orbital elements for this satellite could not be used.</string>
     <string name="header_unknown_satellite">This satellite never rises above the horizon at your location.</string>
+    <string name="header_location_not_set">Your home location is not set yet. Set it in Settings to see passes for where you are.</string>
     <string name="header_invalid_location">Your home latitude or longitude is not a valid number. Please check the settings.</string>
     <string name="header_restored">Passes for %1$s, calculated %2$s:</string>
     <string name="header_error">Could not calculate passes: %1$s</string>
