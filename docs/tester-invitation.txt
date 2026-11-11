@@ -10,6 +10,12 @@ Flow (closed testing with the Google Group as the tester list):
 
 Fill in before posting:
   [TEST_LINK]   the closed-test opt-in link from Play Console (Copy link on the track)
+
+Internal-test link (already filled in below, in the welcome email, the
+"Item not found" email and the closed-test opt-in email):
+  https://play.google.com/apps/internaltest/4701559935413793333
+Once testers have moved to the closed test, replace it in the welcome and
+"Item not found" emails with the closed-test link; keep it in the opt-in email.
   [YOUR_EMAIL]  dave@g4dpz.me.uk, or a dedicated address, for people who cannot use the group
 
 Group:     https://groups.google.com/g/amsatdroid
@@ -214,7 +220,7 @@ To install:
 
 1. Paste this link into Chrome on your Android device and tap "Become a tester":
 
-[TEST_LINK]
+https://play.google.com/apps/internaltest/4701559935413793333
 
 2. Tap "Download it on Google Play" on that page and install as normal.
 
@@ -269,7 +275,7 @@ Google account, it's usually one of these:
    picture (top right) shows the account you gave me. Then tap "Become a
    tester":
 
-   [TEST_LINK]
+   https://play.google.com/apps/internaltest/4701559935413793333
 
 2. Android version. AmsatDroid needs Android 11 or later. On older versions
    the Play Store shows "Item not found" instead of saying so.
@@ -290,8 +296,8 @@ EMAIL ASKING TESTERS TO OPT IN TO THE CLOSED TEST (send with everyone in Bcc)
 
 Before sending: create the closed track, add the testers (the same email
 list as the internal track), promote 2.0.3 (23) and wait until it has passed
-review. Then copy the opt-in link from the closed track into [CLOSED_TEST_LINK],
-and the internal-test link into [INTERNAL_TEST_LINK].
+review. Then copy the opt-in link from the closed track into [CLOSED_TEST_LINK].
+The internal-test link is already filled in.
 If you use the Google Group as the tester list instead, add a step asking
 people to join the group first, with the same account.
 
@@ -319,7 +325,7 @@ before, for both:
 1. Leave the internal test. Paste this link into Chrome and tap "Leave the
    program" (or "Leave the test"):
 
-   [INTERNAL_TEST_LINK]
+   https://play.google.com/apps/internaltest/4701559935413793333
 
 2. Join the closed test. Paste this link into Chrome and tap "Become a
    tester":
