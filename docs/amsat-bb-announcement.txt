@@ -1,0 +1,37 @@
+Subject: AmsatDroid Free resurrected - new Android satellite tracker
+
+Hi all,
+
+I'm pleased to say I've resurrected AmsatDroid Free as a completely new
+implementation. The old app had aged out with the Android platform, so rather
+than patch it I rebuilt it from the ground up in Kotlin with a modern Jetpack
+Compose interface, while keeping the same proven SGP4/SDP4 orbit-prediction
+core (predict4java) under a regression test so predictions stay faithful.
+
+What it does:
+
+- Pass prediction for your location, with a sky view and a ground-track map
+- Doppler-corrected downlink and uplink frequencies, updated live during a
+  pass, including inverting (U/V) transponders
+- Transponder frequencies come from Peter Goodhall's (MM9SQL) OscarWatch
+  database, synced automatically so they stay current
+- Pass alerts with a countdown notification and optional spoken announcements
+- Compass-oriented sky chart and an aiming aid for hand-held antennas
+- An all-satellite overview of what's up now and coming soon
+- A home-screen widget for your next pass
+- Automatic Keplerian element updates (Celestrak or AMSAT)
+- Tablet and foldable layouts, per-app language, and a red night mode for
+  observing without spoiling your night vision
+
+It runs on Android 11 and later and is free and open source (GPL-3.0). The
+source, with screenshots, is on GitHub:
+
+https://github.com/g4dpz/AmsatDroidFree
+
+It will also be available on the Google Play Store in a few days, once account
+setup completes - I'll follow up here with the link when it's live.
+
+Feedback, bug reports and pull requests are all welcome.
+
+73,
+Dave, G4DPZ

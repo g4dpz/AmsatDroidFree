@@ -1,0 +1,16 @@
+AmsatDroid Free is back! 🛰️
+
+I've resurrected AmsatDroid Free as a brand-new Android app - rebuilt from the
+ground up in Kotlin with a modern interface, keeping the proven SGP4/SDP4 orbit
+maths underneath.
+
+Track amateur satellite passes with a live sky view and ground-track map,
+Doppler-corrected up/downlink frequencies (from Peter Goodhall MM9SQL's
+OscarWatch database), pass alerts, a compass sky chart and aiming aid, a next-
+pass widget, and a red night mode for observing after dark.
+
+Free and open source (GPL-3.0), for Android 11+. Source and screenshots here:
+https://github.com/g4dpz/AmsatDroidFree
+
+Coming to the Google Play Store in a few days - I'll post the link when it's
+live. 73, Dave G4DPZ
