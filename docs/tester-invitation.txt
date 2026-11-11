@@ -290,9 +290,17 @@ EMAIL ASKING TESTERS TO OPT IN TO THE CLOSED TEST (send with everyone in Bcc)
 
 Before sending: create the closed track, add the testers (the same email
 list as the internal track), promote 2.0.3 (23) and wait until it has passed
-review. Then copy the opt-in link from the closed track into [CLOSED_TEST_LINK].
+review. Then copy the opt-in link from the closed track into [CLOSED_TEST_LINK],
+and the internal-test link into [INTERNAL_TEST_LINK].
 If you use the Google Group as the tester list instead, add a step asking
 people to join the group first, with the same account.
+
+Google Play does not let anyone opted in to the internal test join a closed
+test: they must leave the internal test first. Copying the email list to the
+closed track does not move anyone. Once everyone has moved, consider removing
+the testers' list from the internal track (keep yourself on it), so nobody
+opts back in to internal by mistake. From then on, send new testers the
+closed-test link, not the internal one.
 
 Subject: AmsatDroid test: one more tap, please
 
@@ -303,17 +311,26 @@ more than I hoped for.
 
 To publish the app on Google Play, Google needs at least 12 testers to stay
 opted in to a "closed test" for 14 days in a row. The test you joined is an
-"internal test", which doesn't count, so I need you to opt in once more:
+"internal test", which doesn't count. Google won't let you join the closed
+test while you're still in the internal one, so it takes two steps. Use
+Chrome on your Android device, signed in with the same Google account as
+before, for both:
 
-1. Copy this link and paste it into Chrome on your Android device, signed in
-   with the same Google account as before:
+1. Leave the internal test. Paste this link into Chrome and tap "Leave the
+   program" (or "Leave the test"):
+
+   [INTERNAL_TEST_LINK]
+
+2. Join the closed test. Paste this link into Chrome and tap "Become a
+   tester":
 
    [CLOSED_TEST_LINK]
 
-2. Tap "Become a tester". That's all.
+Please do both, in that order. Step 2 on its own won't work.
 
-You don't need to reinstall anything. The app you have keeps working, and
-updates still come through the Play Store.
+You don't need to uninstall or reinstall anything. The app you have keeps
+working, and updates come through the Play Store once you've joined the
+closed test.
 
 Please stay opted in, with the app installed, for at least the next 14 days.
 The 14 days only start once enough people have tapped the new link, so the

@@ -47,12 +47,18 @@ The menu is the three dots at the top right of the main screen.
 3. Keps (orbital data)
 ----------------------
 
-3.1  Menu, Update keps. It should report that the keps were updated, or say
-     when they can be downloaded again.
+3.1  Open the menu. Under the Update keps heading, tap
+     "Amateur (celestrak.org)". It should report that the keps were updated,
+     or say when they can be downloaded again.
 
-3.2  In Settings, under Orbital elements (keps), change Keps source to
-     "New launches (celestrak.org)", then back to "Amateur (celestrak.org)".
-     The satellite list should change each time, with no wait to go back.
+3.2  Open the menu again and, under Update keps, tap
+     "New launches (celestrak.org)". The satellite list should change to the
+     new launches.
+
+3.3  Now both sources are stored. In Settings, under Orbital elements (keps),
+     change Keps source back to "Amateur (celestrak.org)", then to
+     "New launches (celestrak.org)" again. The satellite list should change
+     straight away each time, with no download or wait.
 
 
 4. Passes

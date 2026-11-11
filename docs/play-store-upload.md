@@ -28,7 +28,7 @@ Every new release needs a higher `versionCode` in `app/build.gradle.kts`. Play r
 
 Bump the name once per **release**, not once per feature. A release can carry several features under one number, and the release notes list them. Version numbers that climb with every small change stop telling users anything.
 
-**versionCode** goes up by at least 1 on **every** upload to Play, including a fix and including a test-track upload. It never goes down and is never reused. The simplest scheme is to add 1 each time. A derived scheme (major x 10000 + minor x 100 + patch, so 2.1.0 is 20100) is also fine, because it is above any code used so far, but once chosen it must not be changed back.
+**versionCode** goes up by at least 1 on **every** upload to Play, including a fix and including a test-track upload. It never goes down and is never reused. Add 1 each time; that is the scheme used here. Do not derive the code from the name (for example major x 10000 + minor x 100 + patch): several test uploads can share one `versionName`, and they would then need the same code, which Play rejects.
 
 While testing, several uploads may share one `versionName` (for example 2.0.0) with rising codes. Move the name up when a release goes to production.
 
