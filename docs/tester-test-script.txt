@@ -60,6 +60,10 @@ The menu is the three dots at the top right of the main screen.
      "New launches (celestrak.org)" again. The satellite list should change
      straight away each time, with no download or wait.
 
+3.4  Finally, set Keps source back to "Amateur (celestrak.org)". New
+     launches only lists satellites launched in the last 30 days, so the
+     rest of this script needs Amateur.
+
 
 4. Passes
 ---------
@@ -71,7 +75,8 @@ The menu is the three dots at the top right of the main screen.
      website). Note any that differ by more than a minute.
 
 4.3  Press Change start time, pick tomorrow, and calculate again. Then press
-     Use current time.
+     Use current time and press Calculate pass once more, so the list shows
+     passes from now again.
 
 4.4  Rotate the device. The list and your choices should stay.
 
@@ -109,7 +114,8 @@ The menu is the three dots at the top right of the main screen.
 ----------------
 
 7.1  Menu, Map view. You should see the ground track, the footprint and your
-     home position.
+     home position. On a tablet held sideways, the map is already on the main
+     screen, so Map view isn't in the menu; check the map there instead.
 
 7.2  Menu, All satellites. "Up now" and the coming passes should fill in
      after a few seconds.
