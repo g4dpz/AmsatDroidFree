@@ -114,8 +114,9 @@ The menu is the three dots at the top right of the main screen.
 ----------------
 
 7.1  Menu, Map view. You should see the ground track, the footprint and your
-     home position. On a tablet held sideways, the map is already on the main
-     screen, so Map view isn't in the menu; check the map there instead.
+     home position. If the main screen already shows the map (on some large
+     tablets held sideways), Map view isn't in the menu; check that map
+     instead.
 
 7.2  Menu, All satellites. "Up now" and the coming passes should fill in
      after a few seconds.
