@@ -1,0 +1,49 @@
+Group description (Group settings, About)
+==========================================
+
+Users and testers of AmsatDroid, the amateur radio satellite pass predictor for Android. Support, testing and news. Please do not post your exact location or any email addresses here.
+
+
+Subject
+=======
+
+AmsatDroid is back: testers welcome
+
+
+Message
+=======
+
+Hello all,
+
+This group started in 2014 for the beta testers of the original app. AmsatDroid is back, rebuilt from the ground up for current Android, and it's now being tested on Google Play. The old test links in the 2014 posts below no longer work for it.
+
+What it does: pass prediction with a sky chart and a ground-track map, Doppler-corrected up and down link frequencies (from Peter Goodhall MM9SQL's OscarWatch database), pass alerts, a compass and aiming aid, a next-pass widget, an all-satellites overview and a red night mode. It needs Android 11 or later. It's free and open source (GPL-3.0), with no ads, accounts or tracking.
+
+More about the app, including a short guide to setting your location and the privacy policy:
+https://github.com/g4dpz/AmsatDroidFree/wiki
+
+Want to test it?
+
+One thing first: the Google account you give me must be the one signed in to the Play Store on your device (profile picture at the top right shows which). Open the test link in Chrome signed in with that same account, not by tapping it inside an email or social media app. A wrong account in either place is the usual reason the link says "Item not found".
+
+Please email me directly, not here, with the address of the Google account you use on your Android device, to dave@g4dpz.me.uk. I'll add you and send you the test link. I use your address only for the test and delete it when the test ends. Please don't post email addresses or test links in the group.
+
+What I'd like to hear about:
+
+- Setting your location (typed locator, GPS or network)
+
+- Pass times compared with a tracker you trust
+
+- Pass alerts arriving on time
+
+- The Doppler card during a real pass
+
+- The widget, and how it looks on your phone or tablet
+
+For a bug report, the form at https://github.com/g4dpz/AmsatDroidFree/issues/new/choose asks for the right details (version, device, Android version). Replies in this group are fine too. Please include your device and Android version, and don't post your exact home coordinates; a four-character locator such as IO91 is enough.
+
+Already on the list from the feedback so far: a first-start setup guide, clearer layout of the pass information, and passes for several satellites at once. Ideas are welcome.
+
+Thanks for being here,
+
+73, Dave G4DPZ

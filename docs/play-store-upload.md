@@ -14,6 +14,33 @@ How to build the Android App Bundle (AAB) and upload it in the Play Console. Pla
 
 Every new release needs a higher `versionCode` in `app/build.gradle.kts`. Play rejects a bundle whose code was already used, even from an earlier draft or test track.
 
+### Version numbering
+
+`versionName` is the text users see. `versionCode` is the whole number Play uses to order uploads. They are separate and both live in `app/build.gradle.kts`.
+
+**versionName** follows semantic versioning, MAJOR.MINOR.PATCH:
+
+| Change | Bump | Example |
+|---|---|---|
+| Bug fixes and small corrections, no new feature | PATCH | 2.0.0 to 2.0.1 |
+| New functionality | MINOR, and PATCH back to 0 | 2.0.1 to 2.1.0 |
+| A breaking change, or what users would see as a different app | MAJOR | 2.1.0 to 3.0.0 |
+
+Bump the name once per **release**, not once per feature. A release can carry several features under one number, and the release notes list them. Version numbers that climb with every small change stop telling users anything.
+
+**versionCode** goes up by at least 1 on **every** upload to Play, including a fix and including a test-track upload. It never goes down and is never reused. Add 1 each time; that is the scheme used here. Do not derive the code from the name (for example major x 10000 + minor x 100 + patch): several test uploads can share one `versionName`, and they would then need the same code, which Play rejects.
+
+While testing, several uploads may share one `versionName` (for example 2.0.0) with rising codes. Move the name up when a release goes to production.
+
+Current plan, as an example:
+
+| Release | Contents | versionName |
+|---|---|---|
+| Test track now | features as built | 2.0.0 |
+| Fixes from tester reports and the new launcher icon | no new features | 2.0.1 |
+| First-run setup and pass-card layout | new functionality | 2.1.0 |
+| My satellites | new functionality | 2.2.0 |
+
 ## 2. Build the signed bundle
 
 Release signing reads a gitignored `keystore.properties` in the project root (see `keystore.properties.template`). It points at your upload keystore, `~/keystores/amsatdroid-upload.jks`. Never commit either file. Back the keystore up somewhere safe: losing the upload key means a reset request to Google.
@@ -100,7 +127,7 @@ For later production updates you can use a staged rollout (for example 20 percen
 
 ## 9. Releasing updates
 
-1. Raise `versionCode` (and `versionName` if user-visible) in `app/build.gradle.kts`.
+1. Raise `versionCode` by at least 1 in `app/build.gradle.kts` for every upload, and raise `versionName` when the release changes what users see (see "Version numbering" in section 1: fixes bump PATCH, new functionality bumps MINOR).
 2. Merge through a pull request as usual and wait for CI to pass.
 3. Build the bundle from the merged `master` (section 2).
 4. Create a new release on the track and upload it.

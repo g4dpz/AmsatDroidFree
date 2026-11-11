@@ -1,0 +1,354 @@
+Tester invitation drafts: AMSAT-BB, Facebook, X, and an email to existing testers
+
+Flow (closed testing with the Google Group as the tester list):
+  1. In Play Console, Test and release, Testing, Closed testing: on the Testers tab choose
+     Google Groups and enter amsatdroid@googlegroups.com. Promote or upload a release.
+  2. Copy the closed-test opt-in link from that track.
+  3. People join the group, then open the opt-in link signed in with the SAME Google account,
+     and install from the Play Store. Nobody has to send you an email address, and you keep
+     no list of addresses.
+
+Fill in before posting:
+  [TEST_LINK]   the closed-test opt-in link from Play Console (Copy link on the track)
+
+Internal-test link (already filled in below, in the welcome email, the
+"Item not found" email and the closed-test opt-in email):
+  https://play.google.com/apps/internaltest/4701559935413793333
+Once testers have moved to the closed test, replace it in the welcome and
+"Item not found" emails with the closed-test link; keep it in the opt-in email.
+  [YOUR_EMAIL]  dave@g4dpz.me.uk, or a dedicated address, for people who cannot use the group
+
+Group:     https://groups.google.com/g/amsatdroid
+Feedback:  https://github.com/g4dpz/AmsatDroidFree/issues/new/choose   (bug form)
+Wiki:      https://github.com/g4dpz/AmsatDroidFree/wiki
+
+*** The Google account that joins the group must be the one signed in to the Play Store on the
+*** tester's device. People with more than one account on a device often hit "Item not found".
+*** The opt-in page also checks the account signed in to the BROWSER that opens the link, not the
+*** Play Store's. Links opened from Gmail, Facebook or WhatsApp often use a different account.
+*** Tell people to copy the link into Chrome, signed in with the tester account.
+*** Gmail is the usual case; a work or custom-domain address only works if it is a Google account.
+
+Group settings to check: member list hidden, posting limited to members, joining open or by
+request. Google counts only testers who have opted in with the link, so remind people to open it.
+
+Privacy: no test link or addresses in public posts. Do not post anyone's address anywhere.
+
+======================================================================
+AMSAT-BB (plain text email)
+======================================================================
+
+Subject: Testers wanted: AmsatDroid satellite tracker for Android
+
+Hi all,
+
+AmsatDroid (previously AmsatDroid Free) is a satellite pass predictor for
+Android that I've rebuilt from the ground up. It's heading for the Google
+Play Store and I'd like some testers to try it first.
+
+What it does: pass prediction with a sky chart and ground-track map,
+Doppler-corrected up/downlink frequencies from Peter Goodhall's (MM9SQL)
+OscarWatch database, pass alerts, a compass/aiming aid, a next-pass widget
+and a red night mode.
+
+To test you need:
+
+  - An Android phone or tablet running Android 11 or later
+  - A Google account (Google requires one to join a Play test)
+
+How to join:
+
+  1. Join the AmsatDroid group, using the Google account you use on your
+     device:
+     https://groups.google.com/g/amsatdroid
+
+  2. Open this link on your device, signed in with that same account, and
+     tap "Become a tester":
+     [TEST_LINK]
+
+  3. Install AmsatDroid from the Play Store as normal.
+
+  >>> IMPORTANT: USE THE GOOGLE ACCOUNT THAT IS SIGNED IN TO THE PLAY STORE
+  >>> ON YOUR DEVICE. If you have more than one account on the device, switch
+  >>> to it with your profile picture at the top right of the Play Store.
+  >>> If the link says "Item not found", this is almost always why.
+  >>> The link also checks the account in your BROWSER. Copy the link into
+  >>> Chrome, signed in with the same account, rather than tapping it in an
+  >>> email or social media app.
+
+If you can't use the group, email me directly (not a reply to the list) at
+[YOUR_EMAIL] with the address of your Google account, and I'll add you
+another way.
+
+Please keep it installed and opted in for the next couple of weeks if you can;
+Google asks for testers to stay opted in during the test period.
+
+What I'd most like to hear about: setting your location (typed locator, GPS
+or network), pass times against another tracker you trust, pass alerts
+arriving on time, the Doppler card during a real pass, the widget, and how it
+looks on your device.
+
+How to send feedback:
+
+  - Questions, ideas and chat: the AmsatDroid group,
+    https://groups.google.com/g/amsatdroid
+  - Bugs and feature requests: the GitHub form, which asks for the details
+    that help (needs a free GitHub account):
+    https://github.com/g4dpz/AmsatDroidFree/issues/new/choose
+  - Or just email me at [YOUR_EMAIL]
+
+With any report please say which device and Android version you have, and the
+app version (menu, then About). Please don't post your exact home
+coordinates; a four-character locator such as IO91 is enough.
+
+The app is open source (GPL-3.0) and has no ads, accounts or tracking. More
+information, including features and the privacy policy, is on the project wiki:
+https://github.com/g4dpz/AmsatDroidFree/wiki
+
+Thanks, and 73,
+Dave, G4DPZ
+
+======================================================================
+FACEBOOK
+======================================================================
+
+Testers wanted for AmsatDroid! 🛰️
+
+My rebuilt Android satellite tracker is heading for the Google Play Store and
+I'd love some amateur radio folk to try it first.
+
+Pass predictions with a sky chart and map, Doppler-corrected frequencies
+(from Peter Goodhall MM9SQL's OscarWatch database), pass alerts, a compass
+aiming aid, a next-pass widget and a red night mode.
+
+You'll need an Android 11+ phone or tablet and a Google account. To join:
+1) Join the AmsatDroid group with that Google account:
+   https://groups.google.com/g/amsatdroid
+2) Open this link on your device, signed in with the same account, and tap
+   Become a tester: [TEST_LINK]
+3) Install it from the Play Store
+
+⚠️ IMPORTANT: use the Google account that is signed in to the Play Store on your
+device. If the link says "Item not found", you're probably in the wrong
+account; switch with your profile picture in the Play Store. Open the link in
+Chrome signed in with that same account, not inside Facebook.
+
+Please stay opted in for a couple of weeks if you can. Feedback: questions and
+ideas in the group, bugs and requests on GitHub
+(https://github.com/g4dpz/AmsatDroidFree/issues/new/choose), or message me. Tell
+me your device and Android version. Free, open source, no ads, no tracking.
+
+More information: https://github.com/g4dpz/AmsatDroidFree/wiki
+Source: https://github.com/g4dpz/AmsatDroidFree
+73, Dave G4DPZ
+
+======================================================================
+X (under 280 characters)
+======================================================================
+
+Testers wanted: AmsatDroid, my Android amateur satellite tracker, is heading to Google Play. Needs Android 11+ and a Google account. Join the group https://groups.google.com/g/amsatdroid then the test link [TEST_LINK]. Free, open source. 73 de G4DPZ #hamradio
+
+(Replace [TEST_LINK] with the real link, then check the count. X counts every link as 23 characters.)
+
+======================================================================
+EMAIL TO EXISTING TESTERS (send with everyone in Bcc)
+======================================================================
+
+Subject: AmsatDroid test: how to send feedback
+
+Hi
+
+Thanks for testing AmsatDroid. Two ways to send feedback, and a few things that help.
+
+1. The AmsatDroid group (optional)
+
+If you'd like to ask questions, see updates or compare notes with other testers, you're welcome to join the group:
+
+https://groups.google.com/g/amsatdroid
+
+There's no obligation. I haven't added anyone, and your email address isn't passed to the group.
+
+2. GitHub issues
+
+For a bug or an idea, the form asks for the details I need:
+
+https://github.com/g4dpz/AmsatDroidFree/issues/new/choose
+
+It needs a free GitHub account. If you'd rather not use GitHub, just reply to this email.
+
+What helps most in a report:
+
+- Your device and Android version
+- The app version (menu, then About)
+- What you did, what you expected and what happened
+
+Please don't post your exact home coordinates or any email addresses in the group or on GitHub. A four-character locator such as IO91 is enough.
+
+If the test link says "Item not found", a different Google account is being used from the one you gave me. Check two places: the Play Store (tap your profile picture at the top right) and the browser that opens the link. Copy the link into Chrome signed in with the right account, rather than tapping it inside an email or social media app. If it still fails, reply with a screenshot.
+
+More about the app, including a short guide to setting your location and the privacy policy:
+
+https://github.com/g4dpz/AmsatDroidFree/wiki
+
+I use your email address only for this test and will delete it when the test ends.
+
+Thanks again
+
+73
+Dave, G4DPZ
+
+======================================================================
+WELCOME EMAIL FOR NEWLY SIGNED-UP TESTERS (one person, or Bcc for several)
+======================================================================
+
+Subject: Welcome to the AmsatDroid test
+
+Hi
+
+Thanks for signing up to test AmsatDroid, the amateur radio satellite pass predictor for Android. It needs Android 11 or later.
+
+FIRST, CHECK YOUR ACCOUNT (this is where most people get stuck)
+
+The Google account you gave me must be the one in use in two places:
+
+- The Play Store: tap your profile picture at the top right. If it shows another account, tap the account name and switch.
+- The browser that opens the link: the test page checks the browser's Google account, not the Play Store's, and a link tapped inside Gmail, Facebook or WhatsApp often opens with a different account. So copy the link, paste it into Chrome, and check that Chrome's profile picture shows the same account.
+
+If either is wrong, the link says "Item not found". That means the wrong account somewhere, not that the test is broken.
+
+To install:
+
+1. Paste this link into Chrome on your Android device and tap "Become a tester":
+
+https://play.google.com/apps/internaltest/4701559935413793333
+
+2. Tap "Download it on Google Play" on that page and install as normal.
+
+The link can take an hour or two to work after you sign up. If it still says "Item not found" after that, reply with a screenshot, the account shown in the Play Store and in Chrome, and your Android version, and I'll sort it out.
+
+What to try:
+
+Please follow the test script, a guided tour of everything to try. It takes about 20 minutes, plus one real pass:
+
+https://github.com/g4dpz/AmsatDroidFree/wiki/Test-Script
+
+If you only have a few minutes: set your home location (menu, Set home location), pick a satellite and press Calculate pass, then tap a pass for the sky view. Long-press a pass to set an alert.
+
+Please keep it installed for the next couple of weeks if you can. Google asks testers to stay opted in during the test period, and it really helps.
+
+Feedback:
+
+- Questions, ideas and chat: the AmsatDroid group. It's optional, and I haven't added you:
+  https://groups.google.com/g/amsatdroid
+- Bugs and feature requests: the GitHub form, which asks for the details that help (needs a free GitHub account):
+  https://github.com/g4dpz/AmsatDroidFree/issues/new/choose
+- Or just reply to this email.
+
+With any report, please tell me your device, your Android version and the app version (menu, then About). Please don't post your exact home coordinates or any email addresses in the group or on GitHub. A four-character locator such as IO91 is enough.
+
+More about the app, including the privacy policy:
+
+https://github.com/g4dpz/AmsatDroidFree/wiki
+
+I use your email address only for this test and will delete it when the test ends.
+
+Thanks again, and welcome aboard
+
+73
+Dave, G4DPZ
+
+======================================================================
+EMAIL TO TESTERS STUCK ON "ITEM NOT FOUND" (send with everyone in Bcc)
+======================================================================
+
+Subject: AmsatDroid test: fixing "Item not found"
+
+Hi
+
+If the test link shows "Item not found" even though you're using the right
+Google account, it's usually one of these:
+
+1. The browser's account. The test page checks the Google account signed in
+   to the browser that opens the link, not the Play Store's. A link tapped
+   inside Gmail, Facebook or WhatsApp often opens with a different account.
+   Please copy the link, paste it into Chrome, and check Chrome's profile
+   picture (top right) shows the account you gave me. Then tap "Become a
+   tester":
+
+   https://play.google.com/apps/internaltest/4701559935413793333
+
+2. Android version. AmsatDroid needs Android 11 or later. On older versions
+   the Play Store shows "Item not found" instead of saying so.
+
+3. Timing. It can take a few hours after you're added before the link works.
+
+If it still fails, please reply with your Android version and a screenshot
+of the page, and I'll check your entry on my side.
+
+Thanks for your patience
+
+73
+Dave, G4DPZ
+
+======================================================================
+EMAIL ASKING TESTERS TO OPT IN TO THE CLOSED TEST (send with everyone in Bcc)
+======================================================================
+
+Before sending: create the closed track, add the testers (the same email
+list as the internal track), promote 2.0.3 (23) and wait until it has passed
+review. Then copy the opt-in link from the closed track into [CLOSED_TEST_LINK].
+The internal-test link is already filled in.
+If you use the Google Group as the tester list instead, add a step asking
+people to join the group first, with the same account.
+
+Google Play does not let anyone opted in to the internal test join a closed
+test: they must leave the internal test first. Copying the email list to the
+closed track does not move anyone. Once everyone has moved, consider removing
+the testers' list from the internal track (keep yourself on it), so nobody
+opts back in to internal by mistake. From then on, send new testers the
+closed-test link, not the internal one.
+
+Subject: AmsatDroid test: one more tap, please
+
+Hi
+
+Thank you for testing AmsatDroid. Nineteen of you have signed up, which is
+more than I hoped for.
+
+To publish the app on Google Play, Google needs at least 12 testers to stay
+opted in to a "closed test" for 14 days in a row. The test you joined is an
+"internal test", which doesn't count. Google won't let you join the closed
+test while you're still in the internal one, so it takes two steps. Use
+Chrome on your Android device, signed in with the same Google account as
+before, for both:
+
+1. Leave the internal test. Paste this link into Chrome and tap "Leave the
+   program" (or "Leave the test"):
+
+   https://play.google.com/apps/internaltest/4701559935413793333
+
+2. Join the closed test. Paste this link into Chrome and tap "Become a
+   tester":
+
+   [CLOSED_TEST_LINK]
+
+Please do both, in that order. Step 2 on its own won't work.
+
+You don't need to uninstall or reinstall anything. The app you have keeps
+working, and updates come through the Play Store once you've joined the
+closed test.
+
+Please stay opted in, with the app installed, for at least the next 14 days.
+The 14 days only start once enough people have tapped the new link, so the
+sooner the better.
+
+If the link says "Item not found", check that Chrome is signed in with the
+right account (profile picture at the top right), and wait an hour or two
+in case it isn't live yet. If it still fails, reply with a screenshot.
+
+If you built the app from source, you don't need to do anything.
+
+Thanks again
+
+73
+Dave, G4DPZ

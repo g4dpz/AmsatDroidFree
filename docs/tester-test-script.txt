@@ -1,0 +1,143 @@
+AmsatDroid test script (version 2.0.3)
+======================================
+
+This takes about 20 minutes, plus one real satellite pass for part 5. You don't
+have to do it all at once, or in this order. For each step, note:
+
+  OK       it did what the step says
+  PROBLEM  it didn't, or something looked wrong (say what you saw)
+  SKIPPED  you couldn't try it
+
+Then send me your results by replying to my email, in the AmsatDroid group, or
+using the bug form: https://github.com/g4dpz/AmsatDroidFree/issues/new/choose
+
+Please include your device, your Android version, and the app version (menu,
+then About). Don't send your exact home coordinates; a four-character locator
+such as IO91 is enough. A screenshot helps with anything that looks wrong.
+
+The menu is the three dots at the top right of the main screen.
+
+
+1. First start (new installs only)
+----------------------------------
+
+1.1  Open the app before setting your location. Choose a satellite and press
+     Calculate pass. It should ask you to set your home location, and show no
+     passes.
+
+1.2  Was it clear what to do next? Tell me either way.
+
+
+2. Home location
+----------------
+
+2.1  Menu, Set home location. Type your locator (for example IO91wm). The
+     latitude and longitude should fill in to match.
+
+2.2  Type a latitude and longitude instead. The locator should update.
+
+2.3  Press Use GPS, then Use network location. Each should fill in your
+     position (GPS can take a minute outdoors). Allow the permission when
+     asked.
+
+2.4  Optional: deny the location permission. The app should explain, not
+     crash, and you should still be able to type a locator.
+
+
+3. Keps (orbital data)
+----------------------
+
+3.1  Open the menu. Under the Update keps heading, tap
+     "Amateur (celestrak.org)". It should report that the keps were updated,
+     or say when they can be downloaded again.
+
+3.2  Open the menu again and, under Update keps, tap
+     "New launches (celestrak.org)". The satellite list should change to the
+     new launches.
+
+3.3  Now both sources are stored. In Settings, under Orbital elements (keps),
+     change Keps source back to "Amateur (celestrak.org)", then to
+     "New launches (celestrak.org)" again. The satellite list should change
+     straight away each time, with no download or wait.
+
+3.4  Finally, set Keps source back to "Amateur (celestrak.org)". New
+     launches only lists satellites launched in the last 30 days, so the
+     rest of this script needs Amateur.
+
+
+4. Passes
+---------
+
+4.1  Choose a satellite you know, such as ISS or SO-50, set "Calculate passes
+     for the next" to 24 hours, and press Calculate pass.
+
+4.2  Compare a few pass times with a tracker you trust (another app or a
+     website). Note any that differ by more than a minute.
+
+4.3  Press Change start time, pick tomorrow, and calculate again. Then press
+     Use current time and press Calculate pass once more, so the list shows
+     passes from now again.
+
+4.4  Rotate the device. The list and your choices should stay.
+
+
+5. Sky view, Doppler and Aim (best during a real pass)
+------------------------------------------------------
+
+5.1  Tap a pass. The sky chart should show the track from AOS to LOS.
+
+5.2  Turn Compass on. The chart should turn as you turn the device. If it
+     asks, move the device in a figure of eight to calibrate.
+
+5.3  During a pass, check the Frequencies (Doppler) card below the chart.
+     If you can, tune to the "Tune" frequency and say whether you hear the
+     satellite.
+
+5.4  Turn Aim on and follow the arrows. Does "On target" match where the
+     satellite really is? Keep the phone away from your radio while doing
+     this, because metal disturbs the compass.
+
+
+6. Alerts
+---------
+
+6.1  Long-press a pass in the next hour or two to set an alert. Allow
+     notifications when asked.
+
+6.2  Did the alert arrive at the time set in Settings, Alert lead time?
+     Note how early or late it was.
+
+6.3  Optional: turn on Speak pass alerts in Settings and check you hear it.
+
+
+7. Other screens
+----------------
+
+7.1  Menu, Map view. You should see the ground track, the footprint and your
+     home position. If the main screen already shows the map (on some large
+     tablets held sideways), Map view isn't in the menu; check that map
+     instead.
+
+7.2  Menu, All satellites. "Up now" and the coming passes should fill in
+     after a few seconds.
+
+7.3  Add the AmsatDroid widget to your home screen. It should show the next
+     pass of your selected satellite.
+
+7.4  In Settings, set Theme to Red night. Everything should be readable in red.
+
+
+8. Anything else
+----------------
+
+8.1  Did anything look cramped, cut off or hard to read on your device?
+
+8.2  Did the app close unexpectedly at any point? If so, what were you doing?
+
+8.3  What did you like, and what would you change?
+
+
+Thank you for testing.
+
+73
+Dave, G4DPZ
