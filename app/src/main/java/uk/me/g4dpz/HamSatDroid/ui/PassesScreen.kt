@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -376,17 +377,21 @@ private fun PassesControls(
             }
         }
 
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        // The start time gets a line of its own and the buttons sit below it. In one row the buttons took the width
+        // they needed and squeezed the text into a narrow column (one or two characters a line on a phone with a
+        // larger font). The buttons wrap onto a further line when even they do not fit side by side.
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 text = state.startTime?.let { stringResource(R.string.passes_starting_at, formats.dateTime(it)) }
                     ?: stringResource(R.string.passes_starting_now),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(1f),
             )
-            TextButton(onClick = onChangeStartTime) { Text(stringResource(R.string.passes_change_start_time)) }
-            if (state.startTime != null) {
-                TextButton(onClick = { viewModel.setStartTime(null) }) {
-                    Text(stringResource(R.string.passes_use_current_time))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(onClick = onChangeStartTime) { Text(stringResource(R.string.passes_change_start_time)) }
+                if (state.startTime != null) {
+                    TextButton(onClick = { viewModel.setStartTime(null) }) {
+                        Text(stringResource(R.string.passes_use_current_time))
+                    }
                 }
             }
         }
