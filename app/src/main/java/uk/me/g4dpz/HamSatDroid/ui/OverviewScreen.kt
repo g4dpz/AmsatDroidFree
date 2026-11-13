@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -57,7 +58,13 @@ private const val COUNTDOWN_TICK_MILLIS = 1_000L
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OverviewScreen(viewModel: OverviewViewModel, onOpenPass: (PassSummary) -> Unit, onBack: () -> Unit) {
+fun OverviewScreen(
+    viewModel: OverviewViewModel,
+    onOpenPass: (PassSummary) -> Unit,
+    onBack: () -> Unit,
+    /** Opens the setup guide; offered while no home location is set. */
+    onOpenSetup: () -> Unit,
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val upNow by viewModel.upNow.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
@@ -134,6 +141,9 @@ fun OverviewScreen(viewModel: OverviewViewModel, onOpenPass: (PassSummary) -> Un
                 )
             }
 
+            if (!state.locationValid) {
+                item(key = "set-up") { Button(onClick = onOpenSetup) { Text(stringResource(R.string.banner_set_up)) } }
+            }
             item(key = "up-now-title") { SectionHeading(stringResource(R.string.overview_up_now)) }
             if (upNow.isEmpty()) {
                 item(key = "up-now-none") {

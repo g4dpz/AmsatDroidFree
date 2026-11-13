@@ -35,9 +35,10 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
     - _Requirements: 2.2, 2.3, 2.4, 9.3_
 
 - [ ] 4. Banner and menu item
-  - [ ] 4.1 Add `LocationNotSetBanner` to the passes controls, driven by the live `homeLat` and `homeLon`; add the same button to the overview's not-set message
+  - [x] 4.1 Add `LocationNotSetBanner` to the passes controls, driven by the live `homeLat` and `homeLon`; add the same button to the overview's not-set message
     - _Requirements: 6.1, 6.3, 6.5_
-  - [ ] 4.2 Add the "Setup guide" overflow item and `Routes.SETUP` (placeholder screen until task 5)
+  - [x] 4.2 Add the "Setup guide" overflow item and `Routes.SETUP` (placeholder screen until task 5)
+    - Built as a usable location-only screen (why-text and the shared `LocationEditor`); task 5 turns it into the two-step guide
     - _Requirements: 1.5_
   - [ ] 4.3 Rename the menu item "Set home location" to "Settings" (`menu_settings`); reword `header_location_not_set` and `overview_no_location` to point at the banner and Setup guide; update `docs/tester-test-script.txt` and the README to the new names
     - _Requirements: 10.1, 10.2, 10.3, 10.4_

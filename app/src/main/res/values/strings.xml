@@ -87,6 +87,12 @@
     </plurals>
     <string name="menu_more">More options</string>
     <string name="menu_set_home_location">Set home location</string>
+    <string name="menu_setup_guide">Setup guide</string>
+    <!-- First-run setup: the banner on the passes screen while no home location is set, and the guide screen. -->
+    <string name="banner_location_not_set">Your home location is not set, so passes can\'t be calculated.</string>
+    <string name="banner_set_up">Set up</string>
+    <string name="setup_title">Setup guide</string>
+    <string name="setup_location_why">Passes are worked out for where you are. Enter your IARU locator or your latitude and longitude, or let the device find your position. Your location stays on this device.</string>
     <string name="menu_update_keps">Update keps</string>
     <string name="menu_map_view">Map view</string>
     <string name="menu_overview">All satellites</string>

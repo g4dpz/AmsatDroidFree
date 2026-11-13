@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
+import uk.me.g4dpz.HamSatDroid.domain.HomeLocation
 import uk.me.g4dpz.HamSatDroid.location.LocationFetcher
 
 /** Leaves [route]: pops it when something is behind it, otherwise replaces it with the passes screen. */
@@ -32,6 +33,7 @@ object Routes {
     const val MAP = "map"
     const val SETTINGS = "settings"
     const val OVERVIEW = "overview"
+    const val SETUP = "setup"
 }
 
 /**
@@ -67,6 +69,8 @@ fun AppNavHost(
     NavHost(navController = navController, startDestination = startRoute) {
         composable(Routes.PASSES) {
             val keepScreenOn by settings.keepScreenOn.state.collectAsStateWithLifecycle()
+            val homeLat by settings.homeLat.state.collectAsStateWithLifecycle()
+            val homeLon by settings.homeLon.state.collectAsStateWithLifecycle()
             HomeScreen(
                 viewModel = viewModel,
                 layout = layout,
@@ -75,6 +79,8 @@ fun AppNavHost(
                 onOpenMap = { navController.navigate(Routes.MAP) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenOverview = { navController.navigate(Routes.OVERVIEW) },
+                locationSet = HomeLocation.isSet(homeLat, homeLon),
+                onOpenSetup = { navController.navigate(Routes.SETUP) },
             )
         }
         composable(Routes.SKY) {
@@ -104,7 +110,13 @@ fun AppNavHost(
                     }
                 },
                 onBack = { navController.popBackStack() },
+                onOpenSetup = { navController.navigate(Routes.SETUP) },
             )
+        }
+        composable(Routes.SETUP) {
+            // Opened from another screen for now, so Back returns there (task 5 adds opening it by itself at start-up,
+            // when nothing is behind it and the passes screen replaces it).
+            SetupScreen(settings, locationFetcher, onBack = { navController.popOrGoHome(Routes.SETUP) })
         }
         composable(Routes.SETTINGS) {
             val context = LocalContext.current
