@@ -76,7 +76,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-private const val HELP_URL = "https://sites.google.com/site/hamsatdroid/installation-and-user-guide-1"
+/** The user guide on the project wiki (the old Google Sites page no longer exists). */
+private const val HELP_URL = "https://github.com/g4dpz/AmsatDroidFree/wiki/Help"
 
 /** The range choices, in the same order as the labels in `R.array.Times`. */
 private val RANGE_HOURS = listOf(0, 6, 12, 24)
