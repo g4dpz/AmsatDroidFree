@@ -15,7 +15,9 @@ Please include your device, your Android version, and the app version (menu,
 then About). Don't send your exact home coordinates; a four-character locator
 such as IO91 is enough. A screenshot helps with anything that looks wrong.
 
-The menu is the three dots at the top right of the main screen.
+The menu is the three dots at the top right of the main screen. There is no
+Settings entry in it: Set home location opens the Settings screen, which
+holds all the other settings too.
 
 
 1. First start (new installs only)
@@ -55,10 +57,11 @@ The menu is the three dots at the top right of the main screen.
      "New launches (celestrak.org)". The satellite list should change to the
      new launches.
 
-3.3  Now both sources are stored. In Settings, under Orbital elements (keps),
-     change Keps source back to "Amateur (celestrak.org)", then to
-     "New launches (celestrak.org)" again. The satellite list should change
-     straight away each time, with no download or wait.
+3.3  Now both sources are stored. Open Settings (menu, Set home location) and,
+     under Orbital elements (keps), change Keps source back to
+     "Amateur (celestrak.org)", then to "New launches (celestrak.org)" again.
+     The satellite list should change straight away each time, with no
+     download or wait.
 
 3.4  Finally, set Keps source back to "Amateur (celestrak.org)". New
      launches only lists satellites launched in the last 30 days, so the
@@ -104,10 +107,12 @@ The menu is the three dots at the top right of the main screen.
 6.1  Long-press a pass in the next hour or two to set an alert. Allow
      notifications when asked.
 
-6.2  Did the alert arrive at the time set in Settings, Alert lead time?
+6.2  Did the alert arrive at the time set in Settings (menu, Set home
+     location), Alert lead time?
      Note how early or late it was.
 
-6.3  Optional: turn on Speak pass alerts in Settings and check you hear it.
+6.3  Optional: turn on Speak pass alerts in Settings (menu, Set home location)
+     and check you hear it.
 
 
 7. Other screens
@@ -124,7 +129,8 @@ The menu is the three dots at the top right of the main screen.
 7.3  Add the AmsatDroid widget to your home screen. It should show the next
      pass of your selected satellite.
 
-7.4  In Settings, set Theme to Red night. Everything should be readable in red.
+7.4  In Settings (menu, Set home location), set Theme to Red night. Everything
+     should be readable in red.
 
 
 8. Anything else
