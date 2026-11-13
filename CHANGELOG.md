@@ -4,6 +4,15 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
+## [2.0.6] - 2026-11-13 (versionCode 26)
+
+### Added
+- A short setup guide opens on a fresh install: set your home location, then pick a first satellite. You can skip it, and reopen it any time from Setup guide in the menu.
+- Until your location is set, the passes screen and overview show a Set up button.
+
+### Changed
+- The Set home location menu item is now called Settings.
+
 ## [2.0.5] - 2026-11-13 (versionCode 25)
 
 ### Fixed
