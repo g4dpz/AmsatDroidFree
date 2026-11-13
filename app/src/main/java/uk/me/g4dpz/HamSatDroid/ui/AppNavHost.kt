@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import uk.me.g4dpz.HamSatDroid.HamSatDroidApp
 import uk.me.g4dpz.HamSatDroid.alert.PassAlertScheduler
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel as screenViewModel
 import androidx.navigation.NavController
@@ -50,11 +51,21 @@ fun AppNavHost(
     settings: SettingsRepository,
     locationFetcher: LocationFetcher,
     hasLightSensor: Boolean,
-    startRoute: String = Routes.PASSES,
+    /** The screen a notification or widget tap asked for, or null for an ordinary launch (see [StartRoute]). */
+    requestedRoute: String? = null,
     /** Routes requested while the host is showing (a notification or widget tap into the running app). */
     routeRequests: Flow<String> = emptyFlow(),
 ) {
     val navController = rememberNavController()
+    // Decided once and kept across rotation and process recreation, so the graph's start does not change under a
+    // restored back stack once the guide has been finished.
+    val startRoute = rememberSaveable {
+        StartRoute.choose(
+            requestedRoute,
+            locationSet = HomeLocation.isSet(settings.homeLat.value, settings.homeLon.value),
+            finished = settings.setupFinished.value,
+        )
+    }
     val layout = WindowLayout.forWidth(LocalConfiguration.current.screenWidthDp)
     LaunchedEffect(navController, routeRequests) {
         routeRequests.collect { route ->
@@ -114,9 +125,24 @@ fun AppNavHost(
             )
         }
         composable(Routes.SETUP) {
-            // Opened from another screen for now, so Back returns there (task 5 adds opening it by itself at start-up,
-            // when nothing is behind it and the passes screen replaces it).
-            SetupScreen(settings, locationFetcher, onBack = { navController.popOrGoHome(Routes.SETUP) })
+            // Leaving the guide (requirement 7.5): opened from another screen it returns there; as the first screen of
+            // a fresh install the passes screen replaces it, so nothing is left behind to come back to.
+            SetupScreen(
+                viewModel, settings, locationFetcher,
+                onLeave = {
+                    settings.setupFinished.value = true
+                    navController.popOrGoHome(Routes.SETUP)
+                },
+                onDone = { catnum ->
+                    catnum?.let(viewModel::selectSatellite)
+                    settings.setupFinished.value = true
+                    if (!navController.popBackStack(Routes.PASSES, inclusive = false)) {
+                        navController.navigate(Routes.PASSES) { popUpTo(Routes.SETUP) { inclusive = true } }
+                    }
+                    // Show passes straight away (requirement 5.2); calculate() itself reports an unset location (5.3).
+                    if (HomeLocation.isSet(settings.homeLat.value, settings.homeLon.value)) viewModel.calculate()
+                },
+            )
         }
         composable(Routes.SETTINGS) {
             val context = LocalContext.current

@@ -56,7 +56,9 @@ class MainActivity : ComponentActivity() {
         val settings = (application as HamSatDroidApp).settings
         val locationFetcher = LocationFetcher(this)
         val lightProvider = AmbientLightProvider(this)
-        val startRoute = intent.getStringExtra(EXTRA_ROUTE) ?: Routes.PASSES
+        // Null for an ordinary launch: the navigation host then decides between the setup guide and the passes screen.
+        // Not defaulted to the passes screen, because the widget asks for that one explicitly (see StartRoute).
+        val requestedRoute = intent.getStringExtra(EXTRA_ROUTE)
         setContent {
             val chosen by settings.themeMode.state.collectAsStateWithLifecycle()
             val auto by settings.autoRedNight.state.collectAsStateWithLifecycle()
@@ -66,7 +68,7 @@ class MainActivity : ComponentActivity() {
             val redNight = mode == ThemeMode.RED_NIGHT
             LaunchedEffect(dark, redNight) { applySystemBars(dark, redNight) }
             HamSatDroidTheme(mode) {
-                AppNavHost(viewModel, settings, locationFetcher, lightProvider.available, startRoute, routeRequests)
+                AppNavHost(viewModel, settings, locationFetcher, lightProvider.available, requestedRoute, routeRequests)
             }
         }
     }

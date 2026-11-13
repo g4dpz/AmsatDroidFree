@@ -44,18 +44,18 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
     - The README names no menu item, so it needed no change; `docs/tester-invitation.txt` was updated too
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-- [ ] 5. The guide
-  - [ ] 5.1 `SetupFrame` driven by a list of steps (count from the list, so a step can be added later): step indicator, heading, scrolling content with a 600 dp maximum width, Back, Skip and Next/Done in fixed positions; step in `rememberSaveable`; System Back goes to the previous step
+- [x] 5. The guide
+  - [x] 5.1 `SetupFrame` driven by a list of steps (count from the list, so a step can be added later): step indicator, heading, scrolling content with a 600 dp maximum width, Back, Skip and Next/Done in fixed positions; step in `rememberSaveable`; System Back goes to the previous step
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 8.1, 8.3_
-  - [ ] 5.2 Step 1, location: `LocationEditor`, why-text, summary, Next enabled only when set
+  - [x] 5.2 Step 1, location: `LocationEditor`, why-text, summary, Next enabled only when set
     - _Requirements: 2.1, 2.5, 2.6_
   - [-] 5.3 Withdrawn (decision O2): orbital data step
   - [-] 5.4 Withdrawn (decision O2): alerts step
-  - [ ] 5.5 Step 2, first satellite and Done: choose satellite, save, set `setupFinished`, go to the passes screen, calculate once when the location is set; leave the guide as requirement 7.5 says
+  - [x] 5.5 Step 2, first satellite and Done: choose satellite, save, set `setupFinished`, go to the passes screen, calculate once when the location is set; leave the guide as requirement 7.5 says
     - _Requirements: 5.1, 5.2, 5.3, 7.5_
-  - [ ] 5.6 Start destination: `MainActivity` passes a nullable `requestedRoute` (no longer defaulting a missing `EXTRA_ROUTE` to `Routes.PASSES`, which the widget also requests); `AppNavHost` uses it if not null, then the guide, then the passes screen; Skip and Back leave the guide with `popOrGoHome` (requirement 7.5). Test that a normal launch on a fresh install opens the guide and a widget tap does not
+  - [x] 5.6 Start destination: `MainActivity` passes a nullable `requestedRoute` (no longer defaulting a missing `EXTRA_ROUTE` to `Routes.PASSES`, which the widget also requests); `AppNavHost` uses it if not null, then the guide, then the passes screen; Skip and Back leave the guide with `popOrGoHome` (requirement 7.5). Test that a normal launch on a fresh install opens the guide and a widget tap does not
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.6_
-  - [ ] 5.7 Strings for everything above in `strings.xml`
+  - [x] 5.7 Strings for everything above in `strings.xml`
     - _Requirements: 9.4_
 
 - [ ] 6. Quality
