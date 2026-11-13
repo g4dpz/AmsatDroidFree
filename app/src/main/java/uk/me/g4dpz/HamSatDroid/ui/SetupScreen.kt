@@ -107,7 +107,9 @@ fun SetupScreen(
                 style = MaterialTheme.typography.bodyMedium,
             )
         },
-        SetupStep(R.string.setup_title_satellite, canContinue = true) {
+        // Done waits for the satellite list (after the app is recreated on this step it may still be loading); Done with
+        // nothing to choose from would finish the guide and calculate nothing. Skip stays available.
+        SetupStep(R.string.setup_title_satellite, canContinue = !state.loading && state.satellites.isNotEmpty()) {
             Text(stringResource(R.string.setup_satellite_why), style = MaterialTheme.typography.bodyMedium)
             if (state.satellites.isEmpty()) {
                 Text(stringResource(R.string.passes_loading), style = MaterialTheme.typography.bodyMedium)

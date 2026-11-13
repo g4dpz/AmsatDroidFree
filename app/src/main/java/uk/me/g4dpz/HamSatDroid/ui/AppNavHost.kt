@@ -69,6 +69,14 @@ fun AppNavHost(
     val layout = WindowLayout.forWidth(LocalConfiguration.current.screenWidthDp)
     LaunchedEffect(navController, routeRequests) {
         routeRequests.collect { route ->
+            // On a fresh install the setup guide can be the only screen, with no passes screen below it to return to.
+            // Replace that whole stack with the passes screen first, so Back afterwards cannot reopen the abandoned
+            // guide and Set up cannot stack a second one.
+            val hasPasses = runCatching { navController.getBackStackEntry(Routes.PASSES) }.isSuccess
+            if (!hasPasses) {
+                navController.navigate(Routes.PASSES) { popUpTo(navController.graph.id) { inclusive = true } }
+            }
+            if (route == Routes.PASSES && !hasPasses) return@collect
             // Return to the passes screen first so the requested screen sits directly above it, as it would when
             // opened from the app itself; launchSingleTop stops a repeat request stacking the same screen twice.
             navController.navigate(route) {
