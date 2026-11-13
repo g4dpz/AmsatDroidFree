@@ -379,6 +379,34 @@ class AppViewModelTest {
     }
 
     @Test
+    fun passesStoredForTheDefaultLocationAreNotRestoredAndAreDeleted() {
+        // Up to 2.0.2 Calculate pass saved passes for 0, 0; an upgrade that never set a location still has them.
+        val old = listOf(SatPassTime(Date(now), Date(now + 600_000), Date(now + 300_000), "north", 10, 200, 40.0))
+        passStore().save(StoredPasses(7530, "AO-07", now - 60_000, 12, old))
+        settings.homeLat.value = "0"
+        settings.homeLon.value = "0"
+        val vm = viewModel()
+        assertTrue(vm.state.value.passes.isEmpty())
+        assertNull(vm.state.value.header)
+        assertNull(passStore().load())
+        // Setting a location afterwards does not bring them back.
+        settings.homeLat.value = "51.5"
+        settings.homeLon.value = "-0.1"
+        assertTrue(viewModel().state.value.passes.isEmpty())
+    }
+
+    @Test
+    fun passesStoredWithANonNumericLocationAreNotRestoredAndAreDeleted() {
+        val old = listOf(SatPassTime(Date(now), Date(now + 600_000), Date(now + 300_000), "north", 10, 200, 40.0))
+        passStore().save(StoredPasses(7530, "AO-07", now - 60_000, 12, old))
+        settings.homeLat.value = "not a number"
+        val vm = viewModel()
+        assertTrue(vm.state.value.passes.isEmpty())
+        assertNull(vm.state.value.header)
+        assertNull(passStore().load())
+    }
+
+    @Test
     fun anEmptyStoredListShowsNoHeader() {
         passStore().save(StoredPasses(7530, "AO-07", now, 0, emptyList()))
         val vm = viewModel()

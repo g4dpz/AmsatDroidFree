@@ -296,15 +296,21 @@ class AppViewModel(
     private fun initialLoad() {
         val loaded = loadAndApply(settings.selectedCatnum.value.takeIf { it > 0 })
 
-        // Show the passes from the previous session, if any
-        passStore.load()?.let { stored ->
-            rawPasses = stored.passes
-            _state.update {
-                it.copy(
-                    passes = stored.passes.map { p -> PassSummary.from(p, stored.catnum, stored.satName) },
-                    header = if (stored.passes.isEmpty()) null
-                    else PassHeader.Restored(stored.satName, Instant.ofEpochMilli(stored.computedAtMillis)),
-                )
+        // Show the passes from the previous session, if any. Not while the location is unset (or not a number): up to
+        // version 2.0.2 Calculate pass saved passes for the default 0, 0, and they must not appear under the "location
+        // not set" banner. Delete them so they cannot come back once a location is set.
+        if (!HomeLocation.isSet(settings.homeLat.value, settings.homeLon.value)) {
+            passStore.clear()
+        } else {
+            passStore.load()?.let { stored ->
+                rawPasses = stored.passes
+                _state.update {
+                    it.copy(
+                        passes = stored.passes.map { p -> PassSummary.from(p, stored.catnum, stored.satName) },
+                        header = if (stored.passes.isEmpty()) null
+                        else PassHeader.Restored(stored.satName, Instant.ofEpochMilli(stored.computedAtMillis)),
+                    )
+                }
             }
         }
 

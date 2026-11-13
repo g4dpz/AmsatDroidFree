@@ -112,6 +112,13 @@ class SettingsRepository(private val store: KeyValueStore) {
     /** Whether the one-time "allow exact alarms?" offer has been shown, so it is not shown again. */
     val askedExactAlarm = Setting(store.getBoolean(ASKED_EXACT_ALARM, false)) { store.putBoolean(ASKED_EXACT_ALARM, it) }
 
+    // ---- first-run setup ----
+    /**
+     * Whether the setup guide has been finished or skipped, so it does not open by itself again. False on a fresh
+     * install and on an upgrade (the key is new); see `SetupPolicy` for when the guide opens.
+     */
+    val setupFinished = Setting(store.getBoolean(SETUP_FINISHED, false)) { store.putBoolean(SETUP_FINISHED, it) }
+
     // ---- sky view ----
     val compassEnabled = Setting(store.getBoolean(COMPASS_ENABLED, true)) { store.putBoolean(COMPASS_ENABLED, it) }
     val pointingAxis = Setting(enumOrDefault(store.getString(POINTING_AXIS, PointingAxis.TOP_EDGE.name), PointingAxis.TOP_EDGE)) {
@@ -158,6 +165,7 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val ALERT_LEAD_MINUTES = "alertLeadMinutes"
         const val SPOKEN_ALERTS = "spokenAlerts"
         const val ASKED_EXACT_ALARM = "askedExactAlarm"
+        const val SETUP_FINISHED = "setupFinished"
         const val COMPASS_ENABLED = "compassEnabled"
         const val POINTING_AXIS = "pointingAxis"
         const val KEEP_SCREEN_ON = "keepScreenOn"
