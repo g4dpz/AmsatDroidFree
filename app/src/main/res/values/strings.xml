@@ -93,6 +93,16 @@
     <string name="banner_set_up">Set up</string>
     <string name="setup_title">Setup guide</string>
     <string name="setup_location_why">Passes are worked out for where you are. Enter your IARU locator or your latitude and longitude, or let the device find your position. Your location stays on this device.</string>
+    <string name="setup_step_n_of_m">Step %1$d of %2$d</string>
+    <string name="setup_title_location">Your location</string>
+    <string name="setup_title_satellite">Choose a satellite</string>
+    <string name="setup_location_summary">Your location: %1$s (%2$s, %3$s)</string>
+    <string name="setup_location_needed">Set your location to continue, or press Skip.</string>
+    <string name="setup_satellite_why">Choose a satellite to see its passes. You can pick another at any time on the passes screen.</string>
+    <string name="setup_back">Back</string>
+    <string name="setup_skip">Skip</string>
+    <string name="setup_next">Next</string>
+    <string name="setup_done">Done</string>
     <string name="menu_update_keps">Update keps</string>
     <string name="menu_map_view">Map view</string>
     <string name="menu_overview">All satellites</string>
