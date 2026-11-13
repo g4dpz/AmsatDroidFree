@@ -44,6 +44,7 @@ class SettingsRepositoryTest {
         assertFalse(s.autoRedNight.value)
         assertEquals(12, s.overviewHours.value)
         assertEquals(0, s.overviewMinElevation.value)
+        assertFalse(s.setupFinished.value)
     }
 
     @Test
@@ -76,6 +77,7 @@ class SettingsRepositoryTest {
         a.autoRedNight.value = true
         a.overviewHours.value = 24
         a.overviewMinElevation.value = 20
+        a.setupFinished.value = true
 
         val b = settings()
         assertEquals("52.25", b.homeLat.value)
@@ -91,6 +93,7 @@ class SettingsRepositoryTest {
         assertTrue(b.autoRedNight.value)
         assertEquals(24, b.overviewHours.value)
         assertEquals(20, b.overviewMinElevation.value)
+        assertTrue(b.setupFinished.value)
     }
 
     @Test

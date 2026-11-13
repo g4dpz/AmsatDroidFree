@@ -6,13 +6,13 @@ Order: pure logic and settings first, then the guard (which fixes the silent wro
 
 Branch per task group, one PR at a time, wait for CI and Copilot before merging (merge commit).
 
-Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, branch `fix/unset-location-guard`); task 2.5 was added after the spec review and is not done yet. O1 is decided (option a, requirement 10). O2 is decided: two steps, Location and First satellite (tasks 5.3 and 5.4 withdrawn).
+Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, branch `fix/unset-location-guard`); task 2.5 was added after the spec review. O1 is decided (option a, requirement 10). O2 is decided: two steps, Location and First satellite (tasks 5.3 and 5.4 withdrawn).
 
-- [ ] 1. Logic and settings
+- [x] 1. Logic and settings
   - [x] 1.1 Add `HomeLocation.isSet(latText, lonText)` in `domain`, with `HomeLocationTest`
     - Cover zero, `"0.0"`, `"0,0"`, `"-0.0"`, one zero one not, whitespace, blank, non-numeric, comma decimals
     - _Requirements: 6.1, 6.2_
-  - [ ] 1.2 Add the `setupFinished` setting (default false) and `SetupPolicy.shouldShowAtStart`, with tests
+  - [x] 1.2 Add the `setupFinished` setting (default false) and `SetupPolicy.shouldShowAtStart`, with tests
     - _Requirements: 1.1, 1.2, 1.3_
 
 - [x] 2. Never calculate for an unset location (shipped in 2.0.3)
@@ -25,7 +25,7 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
     - _Requirements: 6.3_
   - [x] 2.4 Checkpoint: build, test, lint; on the emulator after `pm clear`, Calculate pass shows the message and no passes
     - _Requirements: 6.2_
-  - [ ] 2.5 At start-up, do not restore stored passes while the location is unset (or not a number), and clear them from storage; extend `AppViewModelTest` (unset: nothing restored and the store is cleared; set: restored as before)
+  - [x] 2.5 At start-up, do not restore stored passes while the location is unset (or not a number), and clear them from storage; extend `AppViewModelTest` (unset: nothing restored and the store is cleared; set: restored as before)
     - Added after the spec review: passes saved for 0, 0 by version 2.0.2 or earlier would otherwise show under the banner
     - _Requirements: 6.6_
 
