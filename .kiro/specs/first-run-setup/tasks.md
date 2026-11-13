@@ -6,21 +6,24 @@ Order: pure logic and settings first, then the guard (which fixes the silent wro
 
 Branch per task group, one PR at a time, wait for CI and Copilot before merging (merge commit).
 
+Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, branch `fix/unset-location-guard`). O1 is decided (option a, requirement 10). O2 is decided: two steps, Location and First satellite (tasks 5.3 and 5.4 withdrawn).
+
 - [ ] 1. Logic and settings
-  - [ ] 1.1 Add `HomeLocation.isSet(latText, lonText)` in `domain`, with `HomeLocationTest`
+  - [x] 1.1 Add `HomeLocation.isSet(latText, lonText)` in `domain`, with `HomeLocationTest`
     - Cover zero, `"0.0"`, `"0,0"`, `"-0.0"`, one zero one not, whitespace, blank, non-numeric, comma decimals
     - _Requirements: 6.1, 6.2_
   - [ ] 1.2 Add the `setupFinished` setting (default false) and `SetupPolicy.shouldShowAtStart`, with tests
     - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 2. Never calculate for an unset location
-  - [ ] 2.1 Add `PassHeader.LocationNotSet`; check `HomeLocation.isSet` first in `AppViewModel.calculate()`; keep `InvalidLocation` for non-numeric text; add the heading string; extend `AppViewModelTest`
+- [x] 2. Never calculate for an unset location (shipped in 2.0.3)
+  - [x] 2.1 Add `PassHeader.LocationNotSet`; check `HomeLocation.isSet` first in `AppViewModel.calculate()`; keep `InvalidLocation` for non-numeric text; add the heading string; extend `AppViewModelTest`
     - _Requirements: 6.2_
-  - [ ] 2.2 Return `WidgetState.NoLocation` from `WidgetUpdater.compute` when unset; extend the widget test
+  - [x] 2.2 Return `WidgetState.NoLocation` from `WidgetUpdater.compute` when unset; extend the widget test
     - _Requirements: 6.4_
-  - [ ] 2.3 Show the not-set panel in `OverviewScreen` when unset; extend `OverviewViewModelTest`
+  - [x] 2.3 Show the not-set panel in `OverviewScreen` when unset; extend `OverviewViewModelTest`
+    - Shipped as a message only; its button to the guide is part of task 4.1
     - _Requirements: 6.3_
-  - [ ] 2.4 Checkpoint: build, test, lint; on the emulator after `pm clear`, Calculate pass shows the message and no passes
+  - [x] 2.4 Checkpoint: build, test, lint; on the emulator after `pm clear`, Calculate pass shows the message and no passes
     - _Requirements: 6.2_
 
 - [ ] 3. Extract the location editor
@@ -29,21 +32,21 @@ Branch per task group, one PR at a time, wait for CI and Copilot before merging 
     - _Requirements: 2.2, 2.3, 2.4, 9.3_
 
 - [ ] 4. Banner and menu item
-  - [ ] 4.1 Add `LocationNotSetBanner` to the passes controls, driven by the live `homeLat` and `homeLon`
-    - _Requirements: 6.1, 6.5_
+  - [ ] 4.1 Add `LocationNotSetBanner` to the passes controls, driven by the live `homeLat` and `homeLon`; add the same button to the overview's not-set message
+    - _Requirements: 6.1, 6.3, 6.5_
   - [ ] 4.2 Add the "Setup guide" overflow item and `Routes.SETUP` (placeholder screen until task 5)
     - _Requirements: 1.5_
+  - [ ] 4.3 Rename the menu item "Set home location" to "Settings" (`menu_settings`); reword `header_location_not_set` and `overview_no_location` to point at the banner and Setup guide; update `docs/tester-test-script.txt` and the README to the new names
+    - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
 - [ ] 5. The guide
-  - [ ] 5.1 `SetupFrame`: step indicator, heading, scrolling content with a 600 dp maximum width, Back, Skip and Next/Done in fixed positions; step in `rememberSaveable`; System Back goes to the previous step
+  - [ ] 5.1 `SetupFrame` driven by a list of steps (count from the list, so a step can be added later): step indicator, heading, scrolling content with a 600 dp maximum width, Back, Skip and Next/Done in fixed positions; step in `rememberSaveable`; System Back goes to the previous step
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 8.1, 8.3_
   - [ ] 5.2 Step 1, location: `LocationEditor`, why-text, summary, Next enabled only when set
     - _Requirements: 2.1, 2.5, 2.6_
-  - [ ] 5.3 Step 2, orbital data: status line, auto-update switch, source dropdown, Update now with the "already up to date" message
-    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
-  - [ ] 5.4 Step 3, alerts: explanation, Allow notifications (API 33+), lead-time dropdown, denial message
-    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
-  - [ ] 5.5 Step 4, first satellite and Done: choose satellite, save, set `setupFinished`, go to the passes screen, calculate once when the location is set
+  - [-] 5.3 Withdrawn (decision O2): orbital data step
+  - [-] 5.4 Withdrawn (decision O2): alerts step
+  - [ ] 5.5 Step 2, first satellite and Done: choose satellite, save, set `setupFinished`, go to the passes screen, calculate once when the location is set
     - _Requirements: 5.1, 5.2, 5.3_
   - [ ] 5.6 Start destination in `AppNavHost` (requested route wins, then the guide, then the passes screen); Skip behaviour
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.6_
@@ -55,8 +58,8 @@ Branch per task group, one PR at a time, wait for CI and Copilot before merging 
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
   - [ ] 6.2 Upgrade check: install over an existing configured build; the guide does not appear and nothing changes
     - _Requirements: 1.2_
-  - [ ] 6.3 Fresh install check on the A16 emulator and the SM-T225 (`pm clear`), including denying location and notification permissions
-    - _Requirements: 2.4, 4.3_
+  - [ ] 6.3 Fresh install check on the A16 emulator and the SM-T225 (`pm clear`), including denying the location permission
+    - _Requirements: 2.4_
 
 - [ ] 7. Documentation
   - [ ] 7.1 Update the wiki Home page ("Setting your location") and README; recapture screenshots that show the new screens; confirm the privacy policy still holds

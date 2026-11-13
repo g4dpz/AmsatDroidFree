@@ -2,20 +2,22 @@
 
 ## Overview
 
-A four-step guide shown once, plus a guard and a banner so the default location can never produce silent, wrong passes. Everything reuses what exists: `LocatorSync` and `LocationFetcher` for location, `KepsRepository` and `AppViewModel` for keps, `AlertController`'s permission handling for notifications, `SettingsRepository` for storage.
+A two-step guide (Location, First satellite) shown once, plus a guard and a banner so the default location can never produce silent, wrong passes. Everything reuses what exists: `LocatorSync` and `LocationFetcher` for location, `AppViewModel` for the satellite list and the first calculation, `SettingsRepository` for storage. The keps and alerts steps of the first draft were dropped (requirements O2).
 
 New code is small: one pure rule (`HomeLocation.isSet`), one pure policy (`SetupPolicy`), one new setting, one extracted composable, the guide screen, a banner and a new pass heading.
 
-## Findings that shape the design (version 2.0.0)
+## Findings that shape the design (version 2.0.0, updated for 2.0.4)
 
 | Where | What it does today |
 |---|---|
 | `Settings.kt` | `DEFAULT_LATLON = "0"`, `DEFAULT_LOCATOR = "JJ00aa"`; there is no "set" flag |
-| `AppViewModel.calculate()` | accepts 0, 0 as valid; only a non-numeric value gives `PassHeader.InvalidLocation` |
-| `SettingsScreen.kt` | the location UI (drafts, commit, GPS/network fetch, permission launcher) is about 150 lines inside the screen |
+| `AppViewModel.calculate()` | since 2.0.3 checks `HomeLocation.isSet`: unset gives `PassHeader.LocationNotSet`, cancels a running calculation and clears stored passes; non-numeric text still gives `PassHeader.InvalidLocation` |
+| `SettingsScreen.kt` | the location UI (drafts, commit, GPS/network fetch, permission launcher) sits inside the screen, in the section under `settings_section_location` (about lines 231 to 275 of 424), plus the `CommitField` helper |
 | `AppNavHost` | start destination is `Routes.PASSES` or the route requested by a notification or widget |
 | `AlertController.kt` | asks for `POST_NOTIFICATIONS` (API 33+) the first time an alert is set |
-| `WidgetUpdater.compute` | returns `NoLocation` only when the stored text is not a number |
+| `WidgetUpdater.compute` | since 2.0.3 also returns `NoLocation` when the location is unset |
+| Overflow menu (`PassesScreen.kt`) | has no "Settings" item: "Set home location" opens the Settings screen (a tester could not find Settings; see requirements O1) |
+| Messages | `header_location_not_set` and `overview_no_location` say "Set it in Settings"; reword under O1 |
 
 ## Domain and settings
 
@@ -49,9 +51,9 @@ object SetupPolicy {
 
 Upgrade path: an existing install has a non-zero location, so `shouldShowAtStart` is false and nothing is stored. An existing install that never set a location (rare) sees the guide once.
 
-## Guard and heading
+## Guard and heading (shipped in 2.0.3, PR #21)
 
-`PassHeader` gains `data object LocationNotSet`. `AppViewModel.calculate()` checks `HomeLocation.isSet` first, before parsing, and sets that heading instead of calculating. `PassFormatting.text()` maps it to a string. `WidgetUpdater.compute` returns `WidgetState.NoLocation` when the location is unset. `OverviewViewModel` exposes the same condition so `OverviewScreen` shows the shared "set your location" panel.
+`PassHeader` gains `data object LocationNotSet`. `AppViewModel.calculate()` checks `HomeLocation.isSet` first, before parsing, and sets that heading instead of calculating. `PassFormatting.text()` maps it to a string. `WidgetUpdater.compute` returns `WidgetState.NoLocation` when the location is unset. `OverviewViewModel` exposes the same condition (`locationValid`) and `OverviewScreen` shows a message. Still to do: the button on that message that opens the guide, added with the banner. As built, the guard also cancels a calculation already running for the old location (checked by generation) and calls `passStore.clear()` so stale passes do not return after a restart; passes restored at start-up are not gated (requirement 6.6).
 
 ## Shared location editor
 
@@ -76,23 +78,26 @@ startRoute = requested route (notification or widget) if present
 
 `SetupScreen(viewModel, settings, locationFetcher, onFinished)`:
 
-- Step number in `rememberSaveable` (survives rotation and process death at the step start, requirement 7).
+- The steps are a list (`SetupStep` entries, each with a title, content and its own Next condition), so the step count and "Step N of M" come from the list and a step can be added later (for example an analytics consent step, if that work resumes) without changing the frame. Two entries in this version (requirements O2).
+- Step index in `rememberSaveable` (survives rotation and process death at the step start, requirement 7).
 - A common frame (`SetupFrame`): title as a heading, "Step N of 4", scrolling content, and a bottom row with Back, Skip and Next/Done in fixed positions. Content is centred with a 600 dp maximum width.
 - Step 1 `LocationEditor` plus a summary line; Next enabled when `HomeLocation.isSet`.
-- Step 2 keps: collects `AppViewModel.state` (`keps`, `downloadingKeps`) and `events` for the "already up to date" message; switch and source dropdown bind to `settings.autoKepsRefresh` and `settings.kepsSource`; "Update now" calls `viewModel.refreshKeps()`.
-- Step 3 alerts: permission launcher for `POST_NOTIFICATIONS` (guarded for API 33), lead-time dropdown bound to `settings.alertLeadMinutes`.
-- Step 4 satellite: `DropdownField` over `state.satellites`; Done calls `viewModel.selectSatellite(...)`, sets `setupFinished`, navigates to `PASSES` popping `SETUP`, and calls `viewModel.calculate()` when the location is set.
+- Step 2 satellite: `DropdownField` over `state.satellites`; Done calls `viewModel.selectSatellite(...)`, sets `setupFinished`, navigates to `PASSES` popping `SETUP`, and calls `viewModel.calculate()` when the location is set.
 - Skip sets `setupFinished` and navigates to `PASSES`.
 
 The "Setup guide" menu item navigates to `SETUP` without touching `setupFinished` until the user finishes or skips.
 
 ## The banner
 
-`LocationNotSetBanner(onSetUp)` is a `Card` in `PassesControls` above the pickers, shown while `!HomeLocation.isSet` for the live `homeLat` and `homeLon` flows. It uses `errorContainer` colours plus an icon and text, so colour is not the only signal. Its button navigates to `SETUP`.
+`LocationNotSetBanner(onSetUp)` is a `Card` in `PassesControls` above the pickers, shown while `!HomeLocation.isSet` for the live `homeLat` and `homeLon` flows. It uses `errorContainer` colours plus an icon and text, so colour is not the only signal. Its button navigates to `SETUP` at the Location step. The overview's "not set" message gets the same button.
+
+## Menu and messages (requirements O1, decided: option a; requirement 10)
+
+The menu item "Set home location" becomes "Settings" (string `menu_set_home_location` renamed to `menu_settings`), a "Setup guide" item is added, and `header_location_not_set` and `overview_no_location` are reworded to point at the banner and guide rather than at Settings. The tester script (`docs/tester-test-script.txt`, which since 2.0.4 explains "Set home location opens the Settings screen") and the README are updated to the new names in the same release.
 
 ## Strings
 
-New resources (English): `setup_title_*` (four), `setup_step_n_of_m`, `setup_next`, `setup_back`, `setup_skip`, `setup_done`, `setup_location_why`, `setup_location_needed`, `setup_keps_why`, `setup_alerts_why`, `setup_alerts_allow`, `setup_alerts_denied`, `setup_satellite_why`, `menu_setup_guide`, `banner_location_not_set`, `banner_set_up`, `header_location_not_set`.
+New resources (English): `setup_title_location`, `setup_title_satellite`, `setup_step_n_of_m`, `setup_next`, `setup_back`, `setup_skip`, `setup_done`, `setup_location_why`, `setup_location_needed`, `setup_satellite_why`, `menu_setup_guide`, `menu_settings`, `banner_location_not_set`, `banner_set_up`, `header_location_not_set`.
 
 ## Risks
 

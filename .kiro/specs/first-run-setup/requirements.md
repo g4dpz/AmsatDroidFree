@@ -8,25 +8,37 @@ Checked in the code (version 2.0.0): a fresh install opens on the passes screen 
 
 This spec adds:
 
-1. A short **setup guide** on first start: location, orbital data (keps), pass alerts, first satellite.
+1. A short **setup guide** on first start, in two steps: location, then a first satellite.
 2. A **guard** so the app never silently calculates for the default location.
 3. A **banner** on the passes screen that stays until the location is set, even if the guide was skipped.
 
 Related specs: `pass-card-layout` and `multi-satellite-passes` (also from this feedback). This spec is independent of both and should be done first.
+
+## Status (13 November 2026)
+
+- **Shipped in 2.0.3 (PR #21):** the guard. `HomeLocation.isSet` treats 0, 0 as unset; Calculate pass then shows a message and no passes (and clears any passes from an earlier location, also from storage); the all-satellites overview shows a message; the widget shows its "set your location" state. That covers requirements 6.2, 6.4 and 6.6, and 6.3 except its button. A tester confirmed the behaviour on 13 November.
+- **Still to build:** the `setupFinished` setting and start-up rule, the shared location editor, the banner and menu item, and the guide itself (requirements 1, 2, 5, 6.1, 6.3's button, 6.5, 7 to 9).
+- **Found since the spec was written:** the same tester could not find "Settings": the overflow menu has no item of that name, because Settings opens from "Set home location". The 2.0.3 messages ("Set it in Settings to see passes ...", "Set your home location in Settings to see the overview.") point at a name the menu does not show. See open decision O1.
+- **Analytics:** the usage-analytics consent prompt was planned as an extra step of this guide. Analytics is on hold (13 November), so this guide has no consent step. The guide's frame takes its steps as a list (design, "The guide"), so a step can be added later without reworking it.
+
+## Decisions made on 13 November 2026
+
+- **O1. Menu naming and where the messages point.** DECIDED 13 November 2026: option (a). The menu item "Set home location" is renamed **Settings** (it already opens the Settings screen), a **Setup guide** item is added, and the banner and the 2.0.3 messages point at the guide's Location step instead of at Settings (requirement 10). Rejected: (b) keep "Set home location" and only reword the messages; (c) make the banner the only way in.
+- **O2. Number of steps.** DECIDED 13 November 2026: two steps, Location and First satellite. The Orbital data and Alerts steps of the first draft are dropped (requirements 3 and 4 are withdrawn): keps already download by themselves on first start (A3), and the notification permission is already asked for when the first alert is set. Both stay in Settings.
 
 ## Decisions already made
 
 - D1. The guide is shown **once**, only when the home location is not set. Existing users, whose location is already set, never see it.
 - D2. The guide can always be **skipped**. A skipped guide leaves the banner (requirement 6) and a menu item to reopen it.
 - D3. The guide **reuses** the Settings location logic (`LocatorSync`, `LocationFetcher`), so both places behave the same. Nothing is duplicated.
-- D4. **No new permissions.** Location is requested only when the user presses Use GPS or Use network location, as in Settings. Notifications are requested only when the user presses the button on the alerts step (Android 13 and later).
+- D4. **No new permissions.** Location is requested only when the user presses Use GPS or Use network location, as in Settings. The guide does not ask for notifications; that stays where it is, when the first alert is set (Android 13 and later).
 - D5. The guide is **English only**, like the rest of the app (all text in `strings.xml` so translations can follow).
 
 ## Assumptions (please confirm or change)
 
 - A1. "Location not set" means the stored latitude **and** longitude both parse to zero. A user whose home really is 0.0, 0.0 (open ocean) would see the banner; they can enter 0.0001. An explicit "set" flag is a possible alternative but needs a migration for existing installs, so it is not used.
-- A2. The guide has four steps: Location, Orbital data, Alerts, First satellite. Each step after Location can be skipped with its defaults left alone.
-- A3. The first download of keps already happens automatically at start-up when only the bundled elements are loaded (`AppViewModel.initialLoad`). The guide shows its progress and does not start a second one.
+- A2. The guide has two steps: Location, then First satellite (decision O2). Skip is available on both.
+- A3. The first download of keps already happens automatically at start-up when only the bundled elements are loaded (`AppViewModel.initialLoad`). The guide does not start a second one. The satellite list on the second step may still be the bundled one if that download has not finished; it updates in place when it does.
 - A4. The overflow menu gets one new item, "Setup guide", that reopens the guide at any time.
 
 ## Glossary
@@ -63,29 +75,13 @@ Related specs: `pass-card-layout` and `multi-satellite-passes` (also from this f
 5. WHILE the location is unset THEN Next SHALL be disabled with a short reason shown; Skip SHALL stay available.
 6. WHEN a valid location has been entered THEN Next SHALL be enabled and the step SHALL show the locator and the place coordinates it will use.
 
-### Requirement 3: Orbital data step
+### Requirement 3: Orbital data step (withdrawn, decision O2)
 
-**User story:** As an operator, I want current orbital data, so that predictions are accurate.
+Withdrawn. Keps keep downloading by themselves at first start, and their source and automatic update stay in Settings.
 
-#### Acceptance criteria
+### Requirement 4: Alerts step (withdrawn, decision O2)
 
-1. The step SHALL explain that satellite orbits change and that the app downloads fresh elements.
-2. The step SHALL show the keps status: downloading, updated with the satellite count, "bundled with the app, may be out of date", or the last failure in plain words.
-3. The step SHALL offer the automatic-update switch (default on) and the keps source (default Celestrak amateur), writing to the same settings as Settings.
-4. The step SHALL offer "Update now", which follows the existing two-hour download rule and reports "already up to date" when it applies.
-5. A failed or absent download SHALL NOT block Next.
-
-### Requirement 4: Alerts step
-
-**User story:** As an operator, I want to be told about passes I care about, if I choose to.
-
-#### Acceptance criteria
-
-1. The step SHALL explain pass alerts in one or two sentences and say they are optional.
-2. WHEN the device runs Android 13 or later AND notifications are not allowed THEN the step SHALL offer "Allow notifications", which shows the system permission prompt.
-3. WHEN permission is denied THEN the step SHALL say alerts can be enabled later and SHALL still allow Next.
-4. The step SHALL offer the alert lead time (default 5 minutes), writing to the same setting as Settings.
-5. The step SHALL NOT request exact-alarm access; the existing offer when the first alert is set remains.
+Withdrawn. The notification permission is still asked for when the first alert is set, and the lead time stays in Settings.
 
 ### Requirement 5: Finish with a first satellite
 
@@ -105,7 +101,7 @@ Related specs: `pass-card-layout` and `multi-satellite-passes` (also from this f
 
 1. WHILE the home location is unset THEN the passes screen SHALL show a banner at the top: what is missing, and a button that opens the guide at the Location step.
 2. WHEN the user presses Calculate pass while the location is unset THEN the app SHALL NOT calculate and SHALL show the same message in the heading above the list.
-3. WHILE the location is unset THEN the all-satellites overview SHALL show the same message and button instead of results.
+3. WHILE the location is unset THEN the all-satellites overview SHALL show the same message and button instead of results. (The message shipped in 2.0.3; the button comes with the banner.)
 4. WHILE the location is unset THEN the home-screen widget SHALL show its existing "set your location" state.
 5. WHEN the location becomes set THEN the banner SHALL disappear without leaving the screen.
 6. Passes restored from a previous session SHALL be unaffected by this requirement.
@@ -119,7 +115,7 @@ Related specs: `pass-card-layout` and `multi-satellite-passes` (also from this f
 1. WHEN the screen is rotated or resized THEN the guide SHALL keep the current step and everything typed.
 2. WHEN the app process is killed and restarted mid-guide THEN the guide SHALL reopen at the start of the step it was on.
 3. System Back SHALL go to the previous step; on the first step it SHALL leave the guide as Skip does (and the app SHALL then show the passes screen).
-4. Each step SHALL show "Step N of 4" as text, with Back, Next and Skip buttons in the same place on every step.
+4. Each step SHALL show "Step N of M" as text (M is the number of steps, two in this version, see O2), with Back, Next and Skip buttons in the same place on every step.
 
 ### Requirement 8: Accessibility and layouts
 
@@ -142,3 +138,14 @@ Related specs: `pass-card-layout` and `multi-satellite-passes` (also from this f
 2. The wiki privacy policy SHALL need no change; if that stops being true, it SHALL be updated in the same release.
 3. Everything that can be set in the guide SHALL also be changeable in Settings, with the same stored values.
 4. All new text SHALL be in `strings.xml`.
+
+### Requirement 10: Menu names and messages (decision O1)
+
+**User story:** As a user, I want every message that tells me where to go to name something I can find.
+
+#### Acceptance criteria
+
+1. The overflow menu item that opens the Settings screen SHALL be labelled "Settings" (it was "Set home location").
+2. The overflow menu SHALL have the "Setup guide" item (requirement 1.5) as a separate entry.
+3. The passes-screen heading shown when Calculate pass is pressed with no location (`header_location_not_set`) and the overview's message (`overview_no_location`) SHALL point the user at setting up their location through the banner or Setup guide, and SHALL NOT name a menu item that does not exist.
+4. The tester script (`docs/tester-test-script.txt`) and the README SHALL use the new menu names in the same release.
