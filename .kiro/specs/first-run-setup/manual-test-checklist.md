@@ -34,7 +34,7 @@ Mark each box when it passes. Devices: Galaxy A16 emulator (411 x 891 dp), Galax
 
 - [ ] Rotating on each step keeps the step and typed text
 - [ ] With "Don't keep activities" on in Developer options (or: press Home, then `adb shell am kill uk.me.g4dpz.amsatdroid`), returning to the app mid-guide reopens it at the start of that step
-- [ ] After a force stop (`adb shell am force-stop`) and relaunch, the app opens on the guide if the location is still unset, otherwise on the passes screen
+- [ ] After a force stop (`adb shell am force-stop uk.me.g4dpz.amsatdroid`) and relaunch, the app opens on the guide only if the location is still unset and the guide was not finished or skipped; otherwise on the passes screen
 - [ ] System Back goes to the previous step; on step 1 it leaves the guide
 - [ ] Opening the app from a notification or the widget opens that screen, not the guide
 

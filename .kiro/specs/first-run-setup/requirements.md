@@ -113,7 +113,7 @@ Withdrawn. The notification permission is still asked for when the first alert i
 #### Acceptance criteria
 
 1. WHEN the screen is rotated or resized THEN the guide SHALL keep the current step and everything typed.
-2. WHEN the system ends the app's process while the guide is in the background (for example to free memory) AND the user returns to the app THEN the guide SHALL reopen at the start of the step it was on. A force stop or a fresh launch is not covered: it discards that saved state, and the app then opens as requirement 1 says (the guide again while the location is unset, otherwise the passes screen).
+2. WHEN the system ends the app's process while the guide is in the background (for example to free memory) AND the user returns to the app THEN the guide SHALL reopen at the start of the step it was on. A force stop or a fresh launch is not covered: it discards that saved state, and the app then opens as requirement 1 says: on the guide only while the location is unset and the guide has not been finished or skipped, otherwise on the passes screen.
 3. System Back SHALL go to the previous step; on the first step it SHALL leave the guide as Skip does (and the app SHALL then show the passes screen).
 4. Each step SHALL show "Step N of M" as text (M is the number of steps, two in this version, see O2), with Back, Next and Skip buttons in the same place on every step.
 

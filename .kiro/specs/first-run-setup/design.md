@@ -53,7 +53,7 @@ Upgrade path: an existing install has a non-zero location, so `shouldShowAtStart
 
 ## Guard and heading (shipped in 2.0.3, PR #21)
 
-`PassHeader` gains `data object LocationNotSet`. `AppViewModel.calculate()` checks `HomeLocation.isSet` first, before parsing, and sets that heading instead of calculating. `PassFormatting.text()` maps it to a string. `WidgetUpdater.compute` returns `WidgetState.NoLocation` when the location is unset. `OverviewViewModel` exposes the same condition (`locationValid`) and `OverviewScreen` shows a message. Still to do: the button on that message that opens the guide, added with the banner. As built, the guard also cancels a calculation already running for the old location (checked by generation) and calls `passStore.clear()` so stale passes do not return after a restart; passes restored at start-up are not gated (requirement 6.6).
+`PassHeader` gains `data object LocationNotSet`. `AppViewModel.calculate()` parses the stored latitude and longitude first; only when both are numbers does it check `HomeLocation.isSet`, and when that is false it sets this heading instead of calculating. Non-numeric text therefore still gives `PassHeader.InvalidLocation`. `PassFormatting.text()` maps it to a string. `WidgetUpdater.compute` returns `WidgetState.NoLocation` when the location is unset. `OverviewViewModel` exposes the same condition (`locationValid`) and `OverviewScreen` shows a message. Still to do: the button on that message that opens the guide, added with the banner. As built, the guard also cancels a calculation already running for the old location (checked by generation) and calls `passStore.clear()` so stale passes do not return after a restart; passes restored at start-up are not gated (requirement 6.6).
 
 ## Shared location editor
 
@@ -68,10 +68,12 @@ It owns the drafts, `LocatorSync` commits, the fetch state and the permission la
 
 ## The guide
 
-New route `Routes.SETUP`. `AppNavHost` picks the start destination:
+New route `Routes.SETUP`. `AppNavHost` picks the start destination.
+
+Today `MainActivity` turns a missing `EXTRA_ROUTE` into `Routes.PASSES` before calling `AppNavHost`, and the widget asks for `Routes.PASSES` explicitly (`NextPassWidget.kt`), so the host cannot tell a normal launch from a widget tap. `MainActivity` therefore passes the request through unchanged as a nullable `requestedRoute = intent.getStringExtra(EXTRA_ROUTE)`, and `AppNavHost` takes `requestedRoute: String?` instead of `startRoute: String`:
 
 ```
-startRoute = requested route (notification or widget) if present
+startRoute = requestedRoute (notification or widget) if not null
              else SETUP if SetupPolicy.shouldShowAtStart(...)
              else PASSES
 ```

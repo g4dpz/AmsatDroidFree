@@ -16,7 +16,7 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
     - _Requirements: 1.1, 1.2, 1.3_
 
 - [x] 2. Never calculate for an unset location (shipped in 2.0.3)
-  - [x] 2.1 Add `PassHeader.LocationNotSet`; check `HomeLocation.isSet` first in `AppViewModel.calculate()`; keep `InvalidLocation` for non-numeric text; add the heading string; extend `AppViewModelTest`
+  - [x] 2.1 Add `PassHeader.LocationNotSet`; in `AppViewModel.calculate()`, after both values parse as numbers, check `HomeLocation.isSet`; keep `InvalidLocation` for non-numeric text; add the heading string; extend `AppViewModelTest`
     - _Requirements: 6.2_
   - [x] 2.2 Return `WidgetState.NoLocation` from `WidgetUpdater.compute` when unset; extend the widget test
     - _Requirements: 6.4_
@@ -48,7 +48,7 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
   - [-] 5.4 Withdrawn (decision O2): alerts step
   - [ ] 5.5 Step 2, first satellite and Done: choose satellite, save, set `setupFinished`, go to the passes screen, calculate once when the location is set
     - _Requirements: 5.1, 5.2, 5.3_
-  - [ ] 5.6 Start destination in `AppNavHost` (requested route wins, then the guide, then the passes screen); Skip behaviour
+  - [ ] 5.6 Start destination: `MainActivity` passes a nullable `requestedRoute` (no longer defaulting a missing `EXTRA_ROUTE` to `Routes.PASSES`, which the widget also requests); `AppNavHost` uses it if not null, then the guide, then the passes screen; Skip behaviour. Test that a normal launch on a fresh install opens the guide and a widget tap does not
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.6_
   - [ ] 5.7 Strings for everything above in `strings.xml`
     - _Requirements: 9.4_
