@@ -4,6 +4,11 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
+## [2.0.7] - 2026-11-13 (versionCode 27)
+
+### Fixed
+- On the map, the footprint of a satellite whose coverage reaches over a pole no longer has a stray horizontal line running from its lowest point across the map.
+
 ## [2.0.6] - 2026-11-13 (versionCode 26)
 
 ### Added
