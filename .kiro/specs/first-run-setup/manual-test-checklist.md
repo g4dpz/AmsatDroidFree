@@ -25,6 +25,9 @@ Mark each box when it passes. Devices: Galaxy A16 emulator (411 x 891 dp), Galax
 
 ## Upgrade and existing users
 
+- [ ] Upgrade from a 2.0.2 build that calculated passes without a location set: on first start of the new build, no old passes show under the banner, and they do not return after a restart
+- [ ] Upgrade with a location set: last session's passes are restored as before
+
 - [ ] Installing over a configured build does not show the guide
 - [ ] Overflow menu "Setup guide" opens it; leaving it without editing changes nothing
 - [ ] The menu shows "Settings" (not "Set home location") and "Setup guide" as separate items
@@ -36,6 +39,9 @@ Mark each box when it passes. Devices: Galaxy A16 emulator (411 x 891 dp), Galax
 - [ ] With "Don't keep activities" on in Developer options (or: press Home, then `adb shell am kill uk.me.g4dpz.amsatdroid`), returning to the app mid-guide reopens it at the start of that step
 - [ ] After a force stop (`adb shell am force-stop uk.me.g4dpz.amsatdroid`) and relaunch, the app opens on the guide only if the location is still unset and the guide was not finished or skipped; otherwise on the passes screen
 - [ ] System Back goes to the previous step; on step 1 it leaves the guide
+- [ ] Fresh install: after Done (or Skip), Back from the passes screen leaves the app; it does not reopen the guide or show a second passes screen
+- [ ] Opened from the menu: Skip returns to the passes screen; Done returns to it with passes calculated; one Back then leaves the app
+- [ ] Opened from the overview's message: Skip returns to the overview
 - [ ] Opening the app from a notification or the widget opens that screen, not the guide
 
 ## Layout and access

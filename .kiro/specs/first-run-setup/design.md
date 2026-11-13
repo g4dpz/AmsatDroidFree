@@ -53,7 +53,9 @@ Upgrade path: an existing install has a non-zero location, so `shouldShowAtStart
 
 ## Guard and heading (shipped in 2.0.3, PR #21)
 
-`PassHeader` gains `data object LocationNotSet`. `AppViewModel.calculate()` parses the stored latitude and longitude first; only when both are numbers does it check `HomeLocation.isSet`, and when that is false it sets this heading instead of calculating. Non-numeric text therefore still gives `PassHeader.InvalidLocation`. `PassFormatting.text()` maps it to a string. `WidgetUpdater.compute` returns `WidgetState.NoLocation` when the location is unset. `OverviewViewModel` exposes the same condition (`locationValid`) and `OverviewScreen` shows a message. Still to do: the button on that message that opens the guide, added with the banner. As built, the guard also cancels a calculation already running for the old location (checked by generation) and calls `passStore.clear()` so stale passes do not return after a restart; passes restored at start-up are not gated (requirement 6.6).
+`PassHeader` gains `data object LocationNotSet`. `AppViewModel.calculate()` parses the stored latitude and longitude first; only when both are numbers does it check `HomeLocation.isSet`, and when that is false it sets this heading instead of calculating. Non-numeric text therefore still gives `PassHeader.InvalidLocation`. `PassFormatting.text()` maps it to a string. `WidgetUpdater.compute` returns `WidgetState.NoLocation` when the location is unset. `OverviewViewModel` exposes the same condition (`locationValid`) and `OverviewScreen` shows a message. Still to do: the button on that message that opens the guide, added with the banner. As built, the guard also cancels a calculation already running for the old location (checked by generation) and calls `passStore.clear()` so stale passes do not return after a restart.
+
+Still to build (requirement 6.6, changed after review): `AppViewModel.initialLoad()` restores `passStore.load()` without looking at the location, so passes saved for 0, 0 by version 2.0.2 or earlier would appear under the banner. It checks `HomeLocation.isSet` first; when the location is unset it does not restore them and calls `passStore.clear()`. A non-numeric location (`InvalidLocation`) is treated the same way, since such passes cannot be trusted either.
 
 ## Shared location editor
 
@@ -84,8 +86,9 @@ startRoute = requestedRoute (notification or widget) if not null
 - Step index in `rememberSaveable` (survives rotation and process death at the step start, requirement 7).
 - A common frame (`SetupFrame`): title as a heading, "Step N of M" (M is the size of the step list), scrolling content, and a bottom row with Back, Skip and Next/Done in fixed positions. Content is centred with a 600 dp maximum width.
 - Step 1 `LocationEditor` plus a summary line; Next enabled when `HomeLocation.isSet`.
-- Step 2 satellite: `DropdownField` over `state.satellites`; Done calls `viewModel.selectSatellite(...)`, sets `setupFinished`, navigates to `PASSES` popping `SETUP`, and calls `viewModel.calculate()` when the location is set.
-- Skip sets `setupFinished` and navigates to `PASSES`.
+- Step 2 satellite: `DropdownField` over `state.satellites`; Done calls `viewModel.selectSatellite(...)`, sets `setupFinished`, leaves the guide for the passes screen (below), and calls `viewModel.calculate()` when the location is set.
+- Skip sets `setupFinished` and leaves the guide (below).
+- Leaving the guide (requirement 7.5). The guide is either the start destination (fresh install, nothing behind it) or was navigated to from the passes screen, the overview or the banner. `AppNavHost` already has `NavController.popOrGoHome(route)`: pop when something is behind, otherwise replace with `PASSES`. Skip and Back on step 1 call `popOrGoHome(Routes.SETUP)`. Done calls `popBackStack(Routes.PASSES, inclusive = false)` and, when that returns false (the guide was the start destination), navigates to `PASSES` with `popUpTo(Routes.SETUP) { inclusive = true }`. Either way only one passes screen is on the stack, and Back from it leaves the app instead of reopening the guide.
 
 The "Setup guide" menu item navigates to `SETUP` without touching `setupFinished` until the user finishes or skips.
 
