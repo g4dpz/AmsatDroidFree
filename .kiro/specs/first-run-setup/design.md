@@ -80,7 +80,7 @@ startRoute = requested route (notification or widget) if present
 
 - The steps are a list (`SetupStep` entries, each with a title, content and its own Next condition), so the step count and "Step N of M" come from the list and a step can be added later (for example an analytics consent step, if that work resumes) without changing the frame. Two entries in this version (requirements O2).
 - Step index in `rememberSaveable` (survives rotation and process death at the step start, requirement 7).
-- A common frame (`SetupFrame`): title as a heading, "Step N of 4", scrolling content, and a bottom row with Back, Skip and Next/Done in fixed positions. Content is centred with a 600 dp maximum width.
+- A common frame (`SetupFrame`): title as a heading, "Step N of M" (M is the size of the step list), scrolling content, and a bottom row with Back, Skip and Next/Done in fixed positions. Content is centred with a 600 dp maximum width.
 - Step 1 `LocationEditor` plus a summary line; Next enabled when `HomeLocation.isSet`.
 - Step 2 satellite: `DropdownField` over `state.satellites`; Done calls `viewModel.selectSatellite(...)`, sets `setupFinished`, navigates to `PASSES` popping `SETUP`, and calls `viewModel.calculate()` when the location is set.
 - Skip sets `setupFinished` and navigates to `PASSES`.
@@ -103,7 +103,7 @@ New resources (English): `setup_title_location`, `setup_title_satellite`, `setup
 
 - **Moving the location UI** could change Settings behaviour. Mitigation: move without edits, and check Settings on a device before and after (manual checklist).
 - **A user really at 0.0, 0.0** sees the banner. Accepted (A1).
-- **Process death mid-guide** reopens at the start of the step, not mid-field; the typed text was committed when the field lost focus, so little is lost.
+- **Process death mid-guide.** When the system ends the process in the background, `rememberSaveable` brings the guide back at the start of the step, not mid-field; the typed text was committed when the field lost focus, so little is lost. A force stop discards that state, so the app starts afresh by the start-up rule (requirement 7.2); no durable step store is added for that case.
 
 ## Testing
 

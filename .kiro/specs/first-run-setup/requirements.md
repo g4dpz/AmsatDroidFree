@@ -91,7 +91,7 @@ Withdrawn. The notification permission is still asked for when the first alert i
 
 1. The last step SHALL let the user choose a satellite from the current list, with the previously selected satellite (or the default) preselected.
 2. WHEN the user presses Done THEN the app SHALL save the selection, SHALL mark the guide finished, SHALL go to the passes screen, and SHALL calculate the passes once for that satellite.
-3. Done SHALL be available even if earlier steps were skipped; in that case the passes screen SHALL show the location banner and SHALL NOT calculate.
+3. WHEN Done is pressed AND the home location is not set (for example it was cleared in Settings while the guide was open from the menu) THEN the app SHALL go to the passes screen with the location banner and SHALL NOT calculate. (Skip leaves the whole guide; there is no per-step skip, so Done is normally reached only with a location set.)
 
 ### Requirement 6: Never calculate for an unset location
 
@@ -113,7 +113,7 @@ Withdrawn. The notification permission is still asked for when the first alert i
 #### Acceptance criteria
 
 1. WHEN the screen is rotated or resized THEN the guide SHALL keep the current step and everything typed.
-2. WHEN the app process is killed and restarted mid-guide THEN the guide SHALL reopen at the start of the step it was on.
+2. WHEN the system ends the app's process while the guide is in the background (for example to free memory) AND the user returns to the app THEN the guide SHALL reopen at the start of the step it was on. A force stop or a fresh launch is not covered: it discards that saved state, and the app then opens as requirement 1 says (the guide again while the location is unset, otherwise the passes screen).
 3. System Back SHALL go to the previous step; on the first step it SHALL leave the guide as Skip does (and the app SHALL then show the passes screen).
 4. Each step SHALL show "Step N of M" as text (M is the number of steps, two in this version, see O2), with Back, Next and Skip buttons in the same place on every step.
 
@@ -136,7 +136,7 @@ Withdrawn. The notification permission is still asked for when the first alert i
 
 1. The guide SHALL NOT add permissions, network requests or data collection beyond those in version 2.0.0.
 2. The wiki privacy policy SHALL need no change; if that stops being true, it SHALL be updated in the same release.
-3. Everything that can be set in the guide SHALL also be changeable in Settings, with the same stored values.
+3. Everything that can be set in the guide SHALL also be changeable outside it, with the same stored values: the home location in Settings, and the selected satellite with the satellite picker on the passes screen.
 4. All new text SHALL be in `strings.xml`.
 
 ### Requirement 10: Menu names and messages (decision O1)
