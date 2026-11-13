@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -147,7 +148,9 @@ fun SetupScreen(
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.setup_title)) }) },
         bottomBar = {
-            Column(Modifier.navigationBarsPadding()) {
+            // Above the navigation bar, and above the keyboard while a location field is being typed in, so Next and
+            // Skip stay reachable without closing the keyboard first.
+            Column(Modifier.navigationBarsPadding().imePadding()) {
                 HorizontalDivider()
                 // Same places on every step (requirement 7.4). Back stays visible on the first step, disabled, so the
                 // buttons do not move; System Back there leaves the guide.
