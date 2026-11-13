@@ -116,7 +116,7 @@ Withdrawn. The notification permission is still asked for when the first alert i
 2. WHEN the system ends the app's process while the guide is in the background (for example to free memory) AND the user returns to the app THEN the guide SHALL reopen at the start of the step it was on. A force stop or a fresh launch is not covered: it discards that saved state, and the app then opens as requirement 1 says: on the guide only while the location is unset and the guide has not been finished or skipped, otherwise on the passes screen.
 3. System Back SHALL go to the previous step; on the first step it SHALL leave the guide as Skip does (requirement 7.5).
 4. Each step SHALL show "Step N of M" as text (M is the number of steps, two in this version, see O2), with Back, Next and Skip buttons in the same place on every step.
-5. WHEN the user leaves the guide (Skip, Done, or Back on the first step) THEN the app SHALL show the passes screen without leaving a second copy of it behind:
+5. WHEN the user leaves the guide (Skip, Done, or Back on the first step) THEN the app SHALL show the screen given below, and SHALL NOT leave a second copy of any screen on the back stack:
    - WHEN the guide was opened from another screen (the menu, the banner or the overview's message) THEN Skip and Back SHALL return to that screen, and Done SHALL return to the passes screen already behind the guide;
    - WHEN the guide was the first screen shown (a fresh install) THEN the passes screen SHALL replace it, so Back from the passes screen leaves the app and does not reopen the guide.
 
