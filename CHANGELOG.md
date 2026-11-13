@@ -4,6 +4,11 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
+## [2.0.8] - 2026-11-13 (versionCode 28)
+
+### Fixed
+- Help in the menu opens the new user guide instead of a "page not found" error. The guide is on the project wiki, which About now gives as the homepage.
+
 ## [2.0.7] - 2026-11-13 (versionCode 27)
 
 ### Fixed
