@@ -70,6 +70,7 @@ import uk.me.g4dpz.HamSatDroid.data.KepsSource
 import uk.me.g4dpz.HamSatDroid.domain.ElementAge
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
 import uk.me.g4dpz.HamSatDroid.ui.components.DropdownField
+import uk.me.g4dpz.HamSatDroid.ui.components.LocationNotSetBanner
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -97,6 +98,10 @@ fun HomeScreen(
     onOpenMap: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenOverview: () -> Unit,
+    /** Whether the home location is set; while it is not, the controls show the "set up" banner. */
+    locationSet: Boolean,
+    /** Opens the setup guide (menu item and banner). */
+    onOpenSetup: () -> Unit,
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -149,6 +154,10 @@ fun HomeScreen(
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.menu_set_home_location)) },
                                 onClick = { menuOpen = false; onOpenSettings() },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_setup_guide)) },
+                                onClick = { menuOpen = false; onOpenSetup() },
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.menu_overview)) },
@@ -210,12 +219,14 @@ fun HomeScreen(
             WindowLayout.SINGLE_PANE -> PassesPane(
                 viewModel, state, formats, alerts, highlightSelection = false,
                 onChangeStartTime = { showStartPicker = true }, onPassClick = onPassClick, onPassLongClick = onPassLongClick,
+                locationSet = locationSet, onOpenSetup = onOpenSetup,
                 modifier = Modifier.fillMaxSize().padding(padding).then(paneModifier),
             )
             WindowLayout.TWO_PANE -> Row(Modifier.fillMaxSize().padding(padding)) {
                 PassesPane(
                     viewModel, state, formats, alerts, highlightSelection = true,
                     onChangeStartTime = { showStartPicker = true }, onPassClick = onPassClick, onPassLongClick = onPassLongClick,
+                locationSet = locationSet, onOpenSetup = onOpenSetup,
                     modifier = Modifier.weight(0.4f).fillMaxHeight().then(paneModifier),
                 )
                 VerticalDivider()
@@ -228,6 +239,7 @@ fun HomeScreen(
                 PassesPane(
                     viewModel, state, formats, alerts, highlightSelection = true,
                     onChangeStartTime = { showStartPicker = true }, onPassClick = onPassClick, onPassLongClick = onPassLongClick,
+                locationSet = locationSet, onOpenSetup = onOpenSetup,
                     modifier = Modifier.weight(0.3f).fillMaxHeight().then(paneModifier),
                 )
                 VerticalDivider()
@@ -298,13 +310,15 @@ private fun PassesPane(
     onChangeStartTime: () -> Unit,
     onPassClick: (PassSummary) -> Unit,
     onPassLongClick: (PassSummary) -> Unit,
+    locationSet: Boolean,
+    onOpenSetup: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier) {
         val stackPickers = PassesPaneLayout.stackPickers(maxWidth.value)
         val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value)
         val controls: @Composable () -> Unit = {
-            PassesControls(viewModel, state, formats, stackPickers, onChangeStartTime)
+            PassesControls(viewModel, state, formats, stackPickers, onChangeStartTime, locationSet, onOpenSetup)
         }
         val passes: LazyListScope.() -> Unit = {
             items(state.passes, key = { it.id }) { pass ->
@@ -343,8 +357,12 @@ private fun PassesControls(
     formats: DisplayFormats,
     stackPickers: Boolean,
     onChangeStartTime: () -> Unit,
+    locationSet: Boolean,
+    onOpenSetup: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Until a home location is set nothing can be calculated; say so at the top, with the way to fix it.
+        if (!locationSet) LocationNotSetBanner(onSetUp = onOpenSetup)
         val rangeLabels = stringArrayResource(R.array.Times)
         val satellitePicker: @Composable (Modifier) -> Unit = { pickerModifier ->
             DropdownField(
