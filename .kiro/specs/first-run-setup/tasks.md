@@ -29,8 +29,8 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
     - Added after the spec review: passes saved for 0, 0 by version 2.0.2 or earlier would otherwise show under the banner
     - _Requirements: 6.6_
 
-- [ ] 3. Extract the location editor
-  - [ ] 3.1 Move the location section of `SettingsScreen` into `ui/components/LocationEditor.kt` with no behaviour change; Settings calls it
+- [x] 3. Extract the location editor
+  - [x] 3.1 Move the location section of `SettingsScreen` into `ui/components/LocationEditor.kt` with no behaviour change; Settings calls it
     - Check on a device before and after: typing a locator, lat/lon, GPS, network, permission denied, provider disabled
     - _Requirements: 2.2, 2.3, 2.4, 9.3_
 
