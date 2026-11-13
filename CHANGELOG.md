@@ -4,6 +4,9 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
+## [2.0.4] - 2026-11-13 (versionCode 24)
+### Fixed
+- On phones, the chosen start time above the Calculate button is readable again. It used to be squeezed into a narrow column beside the Change start time and Use current time buttons, down to a letter or two per line with a larger font. The time now has its own line, with the buttons below it.
 ## [2.0.3] - 2026-11-10 (versionCode 23)
 ### Fixed
 - Passes are no longer calculated for the default location (0, 0) on a fresh install. Until you set your home location, the passes screen, the overview and the widget ask you to set it instead of showing passes for the wrong place.
