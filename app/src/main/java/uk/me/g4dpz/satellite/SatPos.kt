@@ -138,9 +138,13 @@ class SatPos() {
                 val num = cos(beta) - (sin(latitude) * sin(rangelat))
                 val den = cos(latitude) * cos(rangelat)
                 var rangelong: Double
+                // The north point (azimuth 0) lies beyond the north pole, on the far longitude, only when the
+                // footprint covers the north pole; the south point (azimuth 180) likewise only for the south pole.
+                // The south test used to be the north one, which moved the bottom point half way round the world
+                // and drew a horizontal line from it across the map.
                 if (azi == 0 && beta > ((Math.PI / 2.0) - latitude)) {
                     rangelong = longitude + Math.PI
-                } else if (azi == 180 && beta > ((Math.PI / 2.0) - latitude)) {
+                } else if (azi == 180 && beta > ((Math.PI / 2.0) + latitude)) {
                     rangelong = longitude + Math.PI
                 } else if (abs(num / den) > 1.0) {
                     rangelong = longitude
