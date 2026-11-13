@@ -6,7 +6,7 @@ Order: pure logic and settings first, then the guard (which fixes the silent wro
 
 Branch per task group, one PR at a time, wait for CI and Copilot before merging (merge commit).
 
-Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, branch `fix/unset-location-guard`). O1 is decided (option a, requirement 10). O2 is decided: two steps, Location and First satellite (tasks 5.3 and 5.4 withdrawn).
+Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, branch `fix/unset-location-guard`); task 2.5 was added after the spec review and is not done yet. O1 is decided (option a, requirement 10). O2 is decided: two steps, Location and First satellite (tasks 5.3 and 5.4 withdrawn).
 
 - [ ] 1. Logic and settings
   - [x] 1.1 Add `HomeLocation.isSet(latText, lonText)` in `domain`, with `HomeLocationTest`
@@ -25,6 +25,9 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
     - _Requirements: 6.3_
   - [x] 2.4 Checkpoint: build, test, lint; on the emulator after `pm clear`, Calculate pass shows the message and no passes
     - _Requirements: 6.2_
+  - [ ] 2.5 At start-up, do not restore stored passes while the location is unset (or not a number), and clear them from storage; extend `AppViewModelTest` (unset: nothing restored and the store is cleared; set: restored as before)
+    - Added after the spec review: passes saved for 0, 0 by version 2.0.2 or earlier would otherwise show under the banner
+    - _Requirements: 6.6_
 
 - [ ] 3. Extract the location editor
   - [ ] 3.1 Move the location section of `SettingsScreen` into `ui/components/LocationEditor.kt` with no behaviour change; Settings calls it
@@ -46,9 +49,9 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
     - _Requirements: 2.1, 2.5, 2.6_
   - [-] 5.3 Withdrawn (decision O2): orbital data step
   - [-] 5.4 Withdrawn (decision O2): alerts step
-  - [ ] 5.5 Step 2, first satellite and Done: choose satellite, save, set `setupFinished`, go to the passes screen, calculate once when the location is set
-    - _Requirements: 5.1, 5.2, 5.3_
-  - [ ] 5.6 Start destination: `MainActivity` passes a nullable `requestedRoute` (no longer defaulting a missing `EXTRA_ROUTE` to `Routes.PASSES`, which the widget also requests); `AppNavHost` uses it if not null, then the guide, then the passes screen; Skip behaviour. Test that a normal launch on a fresh install opens the guide and a widget tap does not
+  - [ ] 5.5 Step 2, first satellite and Done: choose satellite, save, set `setupFinished`, go to the passes screen, calculate once when the location is set; leave the guide as requirement 7.5 says
+    - _Requirements: 5.1, 5.2, 5.3, 7.5_
+  - [ ] 5.6 Start destination: `MainActivity` passes a nullable `requestedRoute` (no longer defaulting a missing `EXTRA_ROUTE` to `Routes.PASSES`, which the widget also requests); `AppNavHost` uses it if not null, then the guide, then the passes screen; Skip and Back leave the guide with `popOrGoHome` (requirement 7.5). Test that a normal launch on a fresh install opens the guide and a widget tap does not
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.6_
   - [ ] 5.7 Strings for everything above in `strings.xml`
     - _Requirements: 9.4_

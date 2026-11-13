@@ -16,7 +16,7 @@ Related specs: `pass-card-layout` and `multi-satellite-passes` (also from this f
 
 ## Status (13 November 2026)
 
-- **Shipped in 2.0.3 (PR #21):** the guard. `HomeLocation.isSet` treats 0, 0 as unset; Calculate pass then shows a message and no passes (and clears any passes from an earlier location, also from storage); the all-satellites overview shows a message; the widget shows its "set your location" state. That covers requirements 6.2, 6.4 and 6.6, and 6.3 except its button. A tester confirmed the behaviour on 13 November.
+- **Shipped in 2.0.3 (PR #21):** the guard. `HomeLocation.isSet` treats 0, 0 as unset; Calculate pass then shows a message and no passes (and clears any passes from an earlier location, also from storage); the all-satellites overview shows a message; the widget shows its "set your location" state. That covers requirements 6.2 and 6.4, and 6.3 except its button. Requirement 6.6 was changed after review (see below) and is still to build. A tester confirmed the behaviour on 13 November.
 - **Still to build:** the `setupFinished` setting and start-up rule, the shared location editor, the banner and menu item, and the guide itself (requirements 1, 2, 5, 6.1, 6.3's button, 6.5, 7 to 9).
 - **Found since the spec was written:** the same tester could not find "Settings": the overflow menu has no item of that name, because Settings opens from "Set home location". The 2.0.3 messages ("Set it in Settings to see passes ...", "Set your home location in Settings to see the overview.") point at a name the menu does not show. See open decision O1.
 - **Analytics:** the usage-analytics consent prompt was planned as an extra step of this guide. Analytics is on hold (13 November), so this guide has no consent step. The guide's frame takes its steps as a list (design, "The guide"), so a step can be added later without reworking it.
@@ -104,7 +104,7 @@ Withdrawn. The notification permission is still asked for when the first alert i
 3. WHILE the location is unset THEN the all-satellites overview SHALL show the same message and button instead of results. (The message shipped in 2.0.3; the button comes with the banner.)
 4. WHILE the location is unset THEN the home-screen widget SHALL show its existing "set your location" state.
 5. WHEN the location becomes set THEN the banner SHALL disappear without leaving the screen.
-6. Passes restored from a previous session SHALL be unaffected by this requirement.
+6. WHEN the app starts AND the home location is unset THEN passes stored by a previous session SHALL NOT be shown, and SHALL be deleted from storage. (Up to version 2.0.2 Calculate pass saved passes for the default 0, 0 location, and they would otherwise appear under the banner until Calculate pass is pressed.) WHEN the location is set THEN stored passes SHALL be restored as before.
 
 ### Requirement 7: Navigation and state
 
@@ -114,8 +114,11 @@ Withdrawn. The notification permission is still asked for when the first alert i
 
 1. WHEN the screen is rotated or resized THEN the guide SHALL keep the current step and everything typed.
 2. WHEN the system ends the app's process while the guide is in the background (for example to free memory) AND the user returns to the app THEN the guide SHALL reopen at the start of the step it was on. A force stop or a fresh launch is not covered: it discards that saved state, and the app then opens as requirement 1 says: on the guide only while the location is unset and the guide has not been finished or skipped, otherwise on the passes screen.
-3. System Back SHALL go to the previous step; on the first step it SHALL leave the guide as Skip does (and the app SHALL then show the passes screen).
+3. System Back SHALL go to the previous step; on the first step it SHALL leave the guide as Skip does (requirement 7.5).
 4. Each step SHALL show "Step N of M" as text (M is the number of steps, two in this version, see O2), with Back, Next and Skip buttons in the same place on every step.
+5. WHEN the user leaves the guide (Skip, Done, or Back on the first step) THEN the app SHALL show the screen given below, and SHALL NOT leave a second copy of any screen on the back stack:
+   - WHEN the guide was opened from another screen (the menu, the banner or the overview's message) THEN Skip and Back SHALL return to that screen, and Done SHALL return to the passes screen already behind the guide;
+   - WHEN the guide was the first screen shown (a fresh install) THEN the passes screen SHALL replace it, so Back from the passes screen leaves the app and does not reopen the guide.
 
 ### Requirement 8: Accessibility and layouts
 
