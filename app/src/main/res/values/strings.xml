@@ -86,7 +86,7 @@
         <item quantity="other">The elements for %1$s are %2$d days old, so predictions may be wrong. Update the keps from the menu.</item>
     </plurals>
     <string name="menu_more">More options</string>
-    <string name="menu_set_home_location">Set home location</string>
+    <string name="menu_settings">Settings</string>
     <string name="menu_setup_guide">Setup guide</string>
     <!-- First-run setup: the banner on the passes screen while no home location is set, and the guide screen. -->
     <string name="banner_location_not_set">Your home location is not set, so passes can\'t be calculated.</string>
@@ -102,7 +102,7 @@
     <string name="overview_hours_option">%1$d h</string>
     <string name="overview_min_elevation">Minimum elevation</string>
     <string name="overview_degrees_option">%1$d°</string>
-    <string name="overview_no_location">Set your home location in Settings to see the overview.</string>
+    <string name="overview_no_location">Your home location is not set yet.</string>
     <plurals name="overview_progress">
         <item quantity="one">Calculating: %1$d of %2$d satellite</item>
         <item quantity="other">Calculating: %1$d of %2$d satellites</item>
@@ -169,7 +169,7 @@
     <string name="header_stationary_down">%1$s is stationary in the sky (geostationary) and below the horizon at your location, so it can never be seen from here.</string>
     <string name="header_bad_elements">The orbital elements for this satellite could not be used.</string>
     <string name="header_unknown_satellite">This satellite never rises above the horizon at your location.</string>
-    <string name="header_location_not_set">Your home location is not set yet. Set it in Settings to see passes for where you are.</string>
+    <string name="header_location_not_set">Your home location is not set yet. Use Set up above to choose it, so passes are calculated for where you are.</string>
     <string name="header_invalid_location">Your home latitude or longitude is not a valid number. Please check the settings.</string>
     <string name="header_restored">Passes for %1$s, calculated %2$s:</string>
     <string name="header_error">Could not calculate passes: %1$s</string>

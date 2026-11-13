@@ -232,7 +232,7 @@ Please follow the test script, a guided tour of everything to try. It takes abou
 
 https://github.com/g4dpz/AmsatDroidFree/wiki/Test-Script
 
-If you only have a few minutes: set your home location (menu, Set home location), pick a satellite and press Calculate pass, then tap a pass for the sky view. Long-press a pass to set an alert.
+If you only have a few minutes: set your home location (menu, Settings), pick a satellite and press Calculate pass, then tap a pass for the sky view. Long-press a pass to set an alert.
 
 Please keep it installed for the next couple of weeks if you can. Google asks testers to stay opted in during the test period, and it really helps.
 

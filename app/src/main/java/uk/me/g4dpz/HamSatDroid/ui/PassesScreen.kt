@@ -152,7 +152,7 @@ fun HomeScreen(
                         }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                             DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_set_home_location)) },
+                                text = { Text(stringResource(R.string.menu_settings)) },
                                 onClick = { menuOpen = false; onOpenSettings() },
                             )
                             DropdownMenuItem(
