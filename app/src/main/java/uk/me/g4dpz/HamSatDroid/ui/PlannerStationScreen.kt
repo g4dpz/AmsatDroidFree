@@ -50,6 +50,7 @@ import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.domain.LocatorSync
 import uk.me.g4dpz.HamSatDroid.domain.StationEditing
 import uk.me.g4dpz.HamSatDroid.ui.components.CommitField
+import uk.me.g4dpz.HamSatDroid.ui.components.locatorProblemText
 import java.util.UUID
 
 private val MAX_CONTENT_WIDTH = 600.dp
@@ -192,6 +193,8 @@ fun PlannerStationScreen(settings: SettingsRepository, stationId: String?, onDon
                     onValueChange = { draft = draft.typeLocator(it) },
                     keyboardType = KeyboardType.Ascii,
                     onCommit = { commit(draft.commitLocator()) },
+                    // told as it is typed, as in Settings (a 4-character square such as EM29 is a valid start)
+                    error = locatorProblemText(draft.locator),
                 )
                 draft.squareNote?.let { Text(stringResource(R.string.station_square_note, it), style = MaterialTheme.typography.bodySmall) }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
