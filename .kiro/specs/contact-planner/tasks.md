@@ -11,8 +11,8 @@ Status 14 November 2026: spec written; P1 (the name) decided; P2 to P8 and O1 to
 - [ ] 1. Calculation
   - [ ] 1.1 Add `PlannerStation`, `LookAngle`, `MutualMoment`, `MutualWindow`, `PlannerItem` and `ContactPlanner.windows` in `domain/ContactPlanner.kt`, with `ContactPlannerTest`
     - The pass-intersection search of the design, 5-second steps, the best-moment rule with the path tie-break
-    - Recover a pass already in progress beyond the quarter-orbit wind-back; clip candidates to both ends of the search; `checkpoint` calls; rethrow `CancellationException`
-    - Tests: the RS-44 IO82xk / EM29mm case; a pass begun more than a quarter orbit before the start; a pass running past the search end; brute-force 1-second comparison for ISS, AO-7 and an elliptical orbit; minimum elevation splitting a window; window open at the start; too far apart; same station twice; stationary satellite; tie rule; look angles equal `getPosition`
+    - Recover a pass already in progress beyond the quarter-orbit wind-back; clip candidates to both ends of the search; `checkpoint` calls, including in the in-progress recovery; rethrow `CancellationException`
+    - Tests: the RS-44 IO82xk / EM29mm case; a pass begun more than a quarter orbit before the start; a pass running past the search end; brute-force 1-second comparison for ISS, AO-7 and RS-44 (edges within 5 s, no 60-second window missed); a 10-second window inside a candidate; minimum elevation splitting a window; window open at the start; too far apart; same station twice; stationary satellite; tie rule; look angles equal `getPosition`
     - _Requirements: 3.4, 4.3, 4.4, 4.5, 4.8, 7.1, 7.2, 10.1, 10.2_
   - [ ] 1.2 Add `ContactPlanner.timeline` and `greatCircleKm`, with tests
     - _Requirements: 2.8, 6.3_
@@ -44,7 +44,7 @@ Status 14 November 2026: spec written; P1 (the name) decided; P2 to P8 and O1 to
 - [ ] 5. Quality
   - [ ] 5.1 Layouts: phone portrait and landscape, tablet portrait and landscape, split-screen; red night mode; 200 percent font; TalkBack headings, labels and reading order
     - _Requirements: 6.6, 8.1, 8.2, 8.3, 8.4_
-  - [ ] 5.2 Speed on the SM-T225: one satellite over 72 hours; all Amateur satellites over 24 hours (first results, finish). Record the numbers here
+  - [ ] 5.2 Speed on the SM-T225: one satellite over 72 hours; all Amateur satellites over 24 hours (first results, finish); the longest single `getPasses` call (how long cancellation can lag). Record the numbers here
     - _Requirements: 9.1, 9.2_
   - [ ] 5.3 Compare a few windows with an independent tool and record the result
     - _Requirements: 10.1_

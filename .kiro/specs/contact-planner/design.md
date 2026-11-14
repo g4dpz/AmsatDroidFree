@@ -90,9 +90,22 @@ Let `end = start + hours`.
 
 Window edges are at step resolution, so within 5 seconds (requirement 4.3). Distant stations have few candidates, so most satellites end after step 4.
 
+### What the search guarantees
+
+The candidates come from `PassPredictor`, which the passes screen also uses, and it has two known limits (`PassPredictor.nextSatPass` and `getPasses`):
+
+- it looks for AOS in 60-second steps, so a pass shorter than about a minute can be missed;
+- after each LOS it jumps three quarters of an orbit, so on an orbit where passes last longer than a quarter orbit (highly elliptical or very high orbits) a later pass can be missed.
+
+The 5-second stepping of step 5 finds every window of 5 seconds or more inside a candidate, since such a window must contain a step. So the planner finds every mutual window of at least 60 seconds for satellites whose passes last less than a quarter orbit, which is every low-orbit amateur satellite. That is what requirement 4.3 promises. A window shorter than a minute is too short to make a contact, so these limits do not matter in practice.
+
+A planner-side search that stepped both stations through the whole time range would remove the limits, but costs about 17,000 position calculations per satellite per day and would not meet requirement 9 for all satellites. If the limits ever matter, the right fix is in `PassPredictor` itself, where it would also help the passes screen; that is outside this spec.
+
 ### Cancellation
 
-`ContactPlanner.windows` is synchronous, so cancelling the collector alone would not stop a satellite already being worked on. It takes a `checkpoint: () -> Unit` parameter (default does nothing, for tests and single calls) and calls it after each station's pass search, before each candidate, and every 100 steps. `ContactPlannerCalculator` passes a checkpoint that calls `ensureActive()` on the satellite's coroutine, so a changed choice stops old work within milliseconds instead of leaving it on the limited dispatcher.
+`ContactPlanner.windows` is synchronous, so cancelling the collector alone would not stop a satellite already being worked on. It takes a `checkpoint: () -> Unit` parameter (default does nothing, for tests and single calls) and calls it after each station's pass search, every 20 steps of the in-progress recovery of step 3, before each candidate, and every 100 steps of step 5. `ContactPlannerCalculator` passes a checkpoint that calls `ensureActive()` on the satellite's coroutine.
+
+The planner's own loops therefore stop at the next checkpoint. One call to `getPasses` cannot be interrupted, because it runs inside the orbit library, which this spec does not change. That is the same limit the overview accepts: one satellite's pass search over the time window takes a few milliseconds (to be measured in task 5.2), so old work leaves the dispatcher within about that time.
 
 ### All satellites
 
@@ -192,7 +205,8 @@ All new text in `strings.xml`: the menu item, screen titles, section headings, l
 
 - `ContactPlannerTest` (JVM):
   - the RS-44 IO82xk and EM29mm case with a fixed TLE and start time: three windows with the expected edges and best moments, kept as a regression check;
-  - window edges against a brute-force 1-second search for an LEO (ISS), a high LEO (AO-7) and an elliptical orbit, within 5 seconds (requirement 10.1);
+  - window edges against a brute-force 1-second search for ISS, AO-7 and RS-44, within 5 seconds, and no brute-force window of 60 seconds or more missing (requirement 10.1);
+  - a short mutual window, about 10 seconds, inside a longer candidate: found, because it contains a 5-second step;
   - a minimum elevation above 0° splitting one overlap into two windows, or none;
   - a window open at the start time, including a pass that began more than a quarter orbit before it (an elliptical or high orbit), which `windBack` alone misses;
   - a pass that starts before the search end and finishes after it: the window ends at the search end and the best moment is inside the search;

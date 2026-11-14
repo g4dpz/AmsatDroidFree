@@ -96,7 +96,7 @@ These are the recommendations put to David on 14 November 2026. He chose the nam
 
 1. The search SHALL cover the selected satellite by default, or every satellite in the current keps source when "All satellites" is chosen (P3).
 2. The search SHALL start now (O1) and cover the chosen time window (O2).
-3. The search SHALL find every mutual window in that time, to within 5 seconds at each end.
+3. The search SHALL find every mutual window in that time that lasts at least 60 seconds, to within 5 seconds at each end, for satellites whose passes last less than a quarter of their orbit (every amateur satellite in a low orbit). Shorter windows may be missed; they are too short for a contact. The limit follows from the pass predictor the passes screen also uses (see the design, "What the search guarantees").
 4. WHEN a window is already open at the start THEN it SHALL be shown, starting at the start time.
 5. For a satellite that hardly moves in the sky (as the overview defines it, `SatelliteMotion.isStationary`) the planner SHALL NOT search for windows. It SHALL say whether the satellite is above both minimum elevations now ("Usable from both stations now" with both look angles) and otherwise leave it out.
 6. The search SHALL run in the background, SHALL show progress when searching all satellites, and SHALL stop when the user leaves the screen or changes a choice.
@@ -164,7 +164,7 @@ These are the recommendations put to David on 14 November 2026. He chose the nam
 
 #### Acceptance criteria
 
-1. Window starts and ends SHALL agree within 5 seconds with a brute-force check that steps every second, for low, high and elliptical orbits.
+1. For the windows covered by requirement 4.3, starts and ends SHALL agree within 5 seconds with a brute-force check that steps every second, and the brute-force check SHALL find no window of 60 seconds or more that the planner missed. This SHALL be tested for a low orbit (ISS), a higher one (AO-7) and a slightly elliptical one (RS-44).
 2. The look angles SHALL be the same values the sky screen shows for each station at the same moment.
 3. The orbit prediction code and its golden regression test SHALL NOT change.
 
