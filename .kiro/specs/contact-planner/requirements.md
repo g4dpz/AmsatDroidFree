@@ -8,29 +8,23 @@ A trial calculation with the app's own orbit code showed it is useful. For RS-44
 
 This spec adds a **Contact planner** screen that finds those windows, for the selected satellite or for all of them, and shows both stations' look angles and Doppler.
 
-Related specs: `first-run-setup`, `pass-card-layout` and `multi-satellite-passes`. This spec is independent of them. Proposed release: 2.3.0, after 2.1.0 (first-run setup and pass-card layout) and 2.2.0 (My satellites).
+Related specs: `first-run-setup`, `pass-card-layout` and `multi-satellite-passes`. This spec is independent of them. The release number is chosen when David asks for the bump (P8).
 
-## Proposed decisions (please confirm or change)
+## Decisions (David, 14 November 2026)
 
-These are the recommendations put to David on 14 November 2026. He chose the name; the rest are still to be confirmed.
-
-- **P1. Name and place.** DECIDED 14 November 2026: the feature is called **Contact planner**. Proposed: it opens from an overflow menu item of that name, below All satellites.
-- **P2. The other station.** Entered as an IARU locator or latitude and longitude, with the same rules as Settings (`LocatorSync`), plus an optional name such as a callsign. The app keeps a short list of saved stations.
+- **P1. Name and place.** The feature is called **Contact planner**. It opens from an overflow menu item of that name, below All satellites.
+- **P2. The other station.** Entered as an IARU locator, where a 4-character square such as EM29 is accepted (O5), or as a latitude and longitude, with an optional name such as a callsign. The app keeps a short list of saved stations. David's answer was "4 character maidenhead"; 6- and 8-character locators and latitude and longitude are kept as well, since Settings accepts them (to confirm).
 - **P3. Which satellites.** The selected satellite by default, with a switch to search all satellites in the current keps source.
-- **P4. Minimum elevation.** Set separately for each station, default 0°.
-- **P5. Best moment.** The time at which the lower of the two elevations is highest; the total path is shown beside it.
+- **P4. Minimum elevation.** One minimum elevation, the same for both stations, chosen in the planner, default 0°.
+- **P5. Best moment.** The time at which the lower of the two elevations is highest; the total path is shown beside it. David's answer was "P4 at same elevation"; this is read as "both stations use the one minimum elevation of P4", and the rule here is the one proposed (to confirm).
 - **P6. Detail.** Both stations' azimuth, elevation and range, and each station's own uplink and downlink Doppler, at the best moment and through the window.
-- **P7. Alerts for a mutual window.** Not in this spec; a later addition.
-- **P8. Release.** 2.3.0.
-
-## Open questions
-
-- **O1. Start time.** Proposed: the search always starts now. Alternative: reuse the passes screen's Change start time.
-- **O2. Time window.** Proposed choices 12, 24, 48 and 72 hours, default 24. Mutual windows for distant stations are rare (three in 72 hours in the RS-44 example), so a short window often finds nothing.
-- **O3. Sky chart and map in the detail.** Proposed for a later version: your end of the window on the sky chart, and the map with both stations and the footprint. The first version shows numbers only.
-- **O4. Number of saved stations.** Proposed: up to 20.
-
-- **O5. Four-character locators.** `LocatorSync` accepts only 6- or 8-character locators, but operators often give a 4-character square such as EM29. Proposed: the planner's station editor also accepts a 4-character square and uses its centre (for example EM29 as 39.5° N 95.0° W, stored as EM29mm), saying so under the field. Settings is unchanged. Alternative: 6 and 8 characters only, as in Settings.
+- **P7. Alerts for a mutual window.** None in this spec.
+- **P8. Release.** The version number is chosen when David asks for the release bump; this spec does not name one.
+- **O1. Start time.** The search always starts now.
+- **O2. Time window.** Choices 12, 24 and 48 hours; the maximum is 48 hours and the default is 24. Mutual windows for distant stations are rare (three in 72 hours in the RS-44 example), so a short window often finds nothing.
+- **O3. Sky chart and map in the detail.** Not in the first version, which shows numbers only.
+- **O4. Number of saved stations.** Up to 10 in the first version.
+- **O5. Four-character locators.** `LocatorSync` accepts only 6- or 8-character locators, but operators often give a 4-character square such as EM29. The planner's station editor also accepts a 4-character square and uses its centre (for example EM29 as 39.5° N 95.0° W, stored as EM29mm), saying so under the field. Settings is unchanged.
 
 ## Decisions already made
 
@@ -68,10 +62,10 @@ These are the recommendations put to David on 14 November 2026. He chose the nam
 
 #### Acceptance criteria
 
-1. The user SHALL be able to add a station with a name (optional, up to 20 characters), an IARU locator or a latitude and longitude, and a minimum elevation.
-2. The locator, latitude and longitude SHALL follow the Settings rules (`LocatorSync`): a valid change to one fills in the others, an invalid value is rejected with a message. Whether a 4-character square is also accepted is open question O5.
+1. The user SHALL be able to add a station with a name (optional, up to 20 characters), and an IARU locator or a latitude and longitude.
+2. The locator, latitude and longitude SHALL follow the Settings rules (`LocatorSync`): a valid change to one fills in the others, an invalid value is rejected with a message. A 4-character square such as EM29 SHALL also be accepted, stored as the 6-character locator at its centre (EM29mm), with a line under the field saying so (O5).
 3. A station SHALL NOT be saved without a valid location.
-4. The planner SHALL keep a list of saved stations (O4: up to 20), shown by name, or by locator when it has no name.
+4. The planner SHALL keep a list of saved stations (O4: up to 10), shown by name, or by locator when it has no name.
 5. The user SHALL be able to choose, edit and delete a saved station. Deleting SHALL ask for confirmation.
 6. The planner SHALL remember the chosen station between uses.
 7. WHEN no station is saved THEN the planner SHALL show a short explanation and an "Add station" button instead of results.
@@ -79,14 +73,14 @@ These are the recommendations put to David on 14 November 2026. He chose the nam
 
 ### Requirement 3: Minimum elevation
 
-**User story:** As an operator with trees or buildings in some directions, I want to say how low each station can work, so that the windows are ones we can really use.
+**User story:** As an operator with trees or buildings in some directions, I want to say how low the satellite can be for us to work it, so that the windows are ones we can really use.
 
 #### Acceptance criteria
 
-1. The home station's minimum elevation SHALL be set in the planner and remembered.
-2. Each saved station SHALL have its own minimum elevation.
+1. One minimum elevation, used for both stations, SHALL be set in the planner and remembered (P4).
+2. Saved stations SHALL NOT have an elevation of their own.
 3. The choices SHALL be 0°, 5°, 10°, 15°, 20° and 30°; the default SHALL be 0° (P4).
-4. A moment SHALL count as mutual only when both elevations are at or above their station's minimum.
+4. A moment SHALL count as mutual only when both elevations are at or above the minimum elevation.
 
 ### Requirement 4: Search
 
@@ -95,13 +89,14 @@ These are the recommendations put to David on 14 November 2026. He chose the nam
 #### Acceptance criteria
 
 1. The search SHALL cover the selected satellite by default, or every satellite in the current keps source when "All satellites" is chosen (P3).
-2. The search SHALL start now (O1) and cover the chosen time window (O2).
+2. The search SHALL start now (O1) and cover the chosen time window: 12, 24 or 48 hours, default 24 (O2).
 3. The search SHALL find every mutual window in that time that lasts at least 60 seconds, to within 5 seconds at each end, for satellites whose passes last less than a quarter of their orbit (every amateur satellite in a low orbit). Shorter windows may be missed; they are too short for a contact. The limit follows from the pass predictor the passes screen also uses (see the design, "What the search guarantees").
 4. WHEN a window is already open at the start THEN it SHALL be shown, starting at the start time.
-5. For a satellite that hardly moves in the sky (as the overview defines it, `SatelliteMotion.isStationary`) the planner SHALL NOT search for windows. It SHALL say whether the satellite is above both minimum elevations now ("Usable from both stations now" with both look angles) and otherwise leave it out.
-6. The search SHALL run in the background, SHALL show progress when searching all satellites, and SHALL stop when the user leaves the screen or changes a choice.
+5. For a satellite that hardly moves in the sky (as the overview defines it, `SatelliteMotion.isStationary`) the planner SHALL NOT search for windows. It SHALL say whether the satellite is above the minimum elevation at both stations now ("Usable from both stations now" with both look angles) and otherwise leave it out.
+6. The search SHALL run in the background and SHALL show progress when searching all satellites. It SHALL stop when the planner stops being on screen (the user opens the station editor or another screen, or the app goes to the background) and when a choice changes. WHEN the planner is on screen again THEN a search that did not finish SHALL start again, and finished results SHALL be kept if nothing they depend on has changed.
 7. WHEN the keps are older than the app's existing stale limit THEN the planner SHALL show the existing stale-elements warning.
 8. A satellite whose elements cannot be used SHALL be skipped without stopping the search.
+9. WHEN the selected satellite, the keps, the home location, the other station, the minimum elevation or the time window have changed since results were calculated THEN those results SHALL NOT be shown as current: the planner SHALL search again.
 
 ### Requirement 5: Results
 
@@ -154,7 +149,7 @@ These are the recommendations put to David on 14 November 2026. He chose the nam
 
 #### Acceptance criteria
 
-1. A search for one satellite over 72 hours SHALL finish within 2 seconds on the Galaxy Tab A7 Lite (SM-T225).
+1. A search for one satellite over 48 hours SHALL finish within 2 seconds on the Galaxy Tab A7 Lite (SM-T225).
 2. A search of all satellites in the Amateur source over 24 hours SHALL show its first results within 2 seconds and finish within 15 seconds on the SM-T225.
 3. Results SHALL appear as each satellite finishes.
 
@@ -167,6 +162,7 @@ These are the recommendations put to David on 14 November 2026. He chose the nam
 1. For the windows covered by requirement 4.3, starts and ends SHALL agree within 5 seconds with a brute-force check that steps every second, and the brute-force check SHALL find no window of 60 seconds or more that the planner missed. This SHALL be tested for a low orbit (ISS), a higher one (AO-7) and a slightly elliptical one (RS-44).
 2. The look angles SHALL be the same values the sky screen shows for each station at the same moment.
 3. The orbit prediction code and its golden regression test SHALL NOT change.
+4. The tests SHALL use fixed copies of the orbital elements and fixed start times kept in the repository, never elements downloaded at test time, so that every result is reproducible.
 
 ### Requirement 11: Documentation
 
