@@ -62,6 +62,8 @@ warning. (The exact coordinates are redacted.)*
 
 ## Features
 
+- **Setup guide** on first start: set your home location, then choose a first
+  satellite. It can be skipped, and reopened from the menu at any time.
 - **Pass prediction** for your location, with a selectable time window and start time.
 - **Sky view** of the selected pass, with the live satellite position.
 - **Ground-track map** with footprint, updated each second.
