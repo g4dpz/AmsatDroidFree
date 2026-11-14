@@ -103,6 +103,27 @@ class SavedStationsJsonTest {
     }
 
     @Test
+    fun `a name is cut at a character boundary, so an emoji at the limit is not split`() {
+        val emoji = "\uD83D\uDE00" // one character, two UTF-16 units
+        val atLimit = "a".repeat(SavedStation.MAX_NAME_LENGTH - 1) + emoji // 20 characters, 21 units
+        assertEquals(atLimit, SavedStation.limitName(atLimit))
+        assertEquals(atLimit, SavedStationsJson.read(SavedStationsJson.write(listOf(kansas.copy(name = atLimit)))).single().name)
+        val over = "a".repeat(SavedStation.MAX_NAME_LENGTH - 1) + emoji + "zzz"
+        assertEquals(atLimit, SavedStation.limitName(over))
+        assertEquals(emoji.repeat(SavedStation.MAX_NAME_LENGTH), SavedStation.limitName(emoji.repeat(30)))
+        assertEquals("", SavedStation.limitName(""))
+    }
+
+    @Test
+    fun `only the whole number 1 is accepted as the schema`() {
+        val stations = """[{"id":"a","latitude":"1","longitude":"2"}]"""
+        for (schema in listOf("1.5", "1.0", "\"1\"", "true", "null", "2", "0", "-1")) {
+            assertEquals("schema $schema", emptyList<SavedStation>(), SavedStationsJson.read("""{"schema":$schema,"stations":$stations}"""))
+        }
+        assertEquals(listOf("a"), SavedStationsJson.read("""{"schema":1,"stations":$stations}""").map { it.id })
+    }
+
+    @Test
     fun `a repeated id keeps only the first entry`() {
         val read = SavedStationsJson.read(SavedStationsJson.write(listOf(kansas, kansas.copy(name = "again"), london)))
         assertEquals(listOf(kansas, london), read)

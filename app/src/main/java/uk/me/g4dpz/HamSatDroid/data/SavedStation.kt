@@ -26,6 +26,11 @@ data class SavedStation(
     companion object {
         const val MAX_NAME_LENGTH = 20
 
+        /** [name] cut to [MAX_NAME_LENGTH] characters, counting a symbol such as an emoji as one and never splitting it. */
+        fun limitName(name: String): String =
+            if (name.codePointCount(0, name.length) <= MAX_NAME_LENGTH) name
+            else name.substring(0, name.offsetByCodePoints(0, MAX_NAME_LENGTH))
+
         /** The most stations the planner keeps (open question O4: 10 in the first version). */
         const val MAX_STATIONS = 10
     }
@@ -60,7 +65,7 @@ object SavedStationsJson {
         if (text.isNullOrBlank()) return emptyList()
         return try {
             val root = JSONObject(text)
-            if (root.optInt("schema", -1) != SCHEMA) return emptyList()
+            if (!isCurrentSchema(root.opt("schema"))) return emptyList()
             val array = root.optJSONArray("stations") ?: return emptyList()
             val stations = ArrayList<SavedStation>()
             for (i in 0 until array.length()) {
@@ -74,6 +79,13 @@ object SavedStationsJson {
         }
     }
 
+    /** Only the whole number 1: not 1.5, 1.0, "1" or true, which a coercing accessor would accept. */
+    private fun isCurrentSchema(value: Any?): Boolean = when (value) {
+        is Int -> value == SCHEMA
+        is Long -> value == SCHEMA.toLong()
+        else -> false
+    }
+
     /** One entry, or null when it cannot be used: no id, or a latitude or longitude that is missing or out of range. */
     private fun readStation(o: JSONObject): SavedStation? {
         val id = o.text("id").trim()
@@ -85,7 +97,7 @@ object SavedStationsJson {
         if (lat !in -90.0..90.0 || lon !in -180.0..180.0) return null
         return SavedStation(
             id = id,
-            name = o.text("name").take(SavedStation.MAX_NAME_LENGTH),
+            name = SavedStation.limitName(o.text("name")),
             latitude = latitude,
             longitude = longitude,
             locator = o.text("locator"),
