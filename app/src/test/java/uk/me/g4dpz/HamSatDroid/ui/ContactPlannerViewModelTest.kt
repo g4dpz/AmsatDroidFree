@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package uk.me.g4dpz.HamSatDroid.ui
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -307,6 +309,49 @@ class ContactPlannerViewModelTest {
         assertEquals("RS-44 & BREEZE-KM R/B", stale!!.satelliteName)
         assertEquals(ElementAge.staleDays(ElementAge.epochMillis(rs44), now), stale.days)
         assertTrue(stale.days in 60..70)
+    }
+
+    @Test
+    fun `the stale warning follows the clock while results are kept`() {
+        val vm = viewModel()
+        vm.onStart()
+        assertNull(vm.state.value.staleElements)
+        vm.onStop()
+        val done = checkpoints
+        now = Instant.parse("2026-12-20T00:00:00Z").toEpochMilli() // 36 days after the epoch: now stale
+        vm.onStart()
+        assertEquals("the results were kept, not calculated again", done, checkpoints)
+        val first = vm.state.value.staleElements
+        assertNotNull("the warning appears without a new search", first)
+        assertEquals(ElementAge.staleDays(ElementAge.epochMillis(rs44), now), first!!.days)
+        now = Instant.parse("2026-12-25T00:00:00Z").toEpochMilli()
+        dispatcher.scheduler.advanceTimeBy(ContactPlannerViewModel.TICK_MILLIS + 1)
+        dispatcher.scheduler.runCurrent()
+        assertEquals("the minute tick keeps the day count current", first.days + 5, vm.state.value.staleElements!!.days)
+        assertEquals(done, checkpoints)
+        vm.onStop()
+    }
+
+    @Test
+    fun `no state is ever published with the new selection and the old results`() {
+        settings.plannerHours.value = 48
+        val vm = viewModel()
+        vm.onStart()
+        now = Instant.parse("2027-01-20T00:00:00Z").toEpochMilli()
+        vm.refresh() // an old satellite with a stale warning, results and an open detail
+        vm.toggleDetail(vm.state.value.windows.first())
+        assertNotNull(vm.state.value.staleElements)
+        assertNotNull(vm.state.value.expanded)
+        val seen = mutableListOf<PlannerUiState>()
+        val collector = CoroutineScope(dispatcher).launch { vm.state.collect { seen += it } }
+        selected.value = 7530
+        collector.cancel()
+        assertTrue("states were published: ${seen.size}", seen.size >= 2)
+        for (s in seen.filter { it.selectedCatnum == 7530 }) {
+            assertTrue("old windows under the new selection: ${s.windows.map { it.catnum }}", s.windows.none { it.catnum == 44909 })
+            assertNull("old warning under the new selection", s.staleElements?.takeIf { it.satelliteName.startsWith("RS-44") })
+            assertNull("old detail under the new selection", s.expanded?.takeIf { it.first == 44909 })
+        }
     }
 
     // ---- windows that have ended ----

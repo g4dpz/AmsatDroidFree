@@ -188,11 +188,16 @@ class ContactPlannerViewModel(
         detail.start()
     }
 
-    /** Drops the windows that have ended (requirement 5.5). Called every minute while the planner is on screen. */
+    /**
+     * Drops the windows that have ended (requirement 5.5) and brings the stale-elements warning up to date. Called every
+     * minute while the planner is on screen, and when it comes back with results that were kept.
+     */
     internal fun dropEnded() {
         val now = Instant.ofEpochMilli(clock())
         val open = _state.value.expanded
-        _state.update { s -> s.copy(windows = s.windows.filter { it.end.isAfter(now) }) }
+        // The warning is worked out from the clock again, so results kept across stops and starts do not show an old one
+        val stale = if (searchedKey == lastKey && canSearch(lastKey)) staleFor(lastKey, clock()) else null
+        _state.update { s -> s.copy(windows = s.windows.filter { it.end.isAfter(now) }, staleElements = stale) }
         if (open != null && _state.value.windows.none { it.catnum == open.first && it.start == open.second }) closeDetail()
     }
 
@@ -215,21 +220,26 @@ class ContactPlannerViewModel(
 
     private fun onInputsChanged() {
         val key = currentKey()
-        // the list of saved stations and the selection are shown even when they do not change the search
-        _state.update {
-            it.copy(
-                stations = settings.plannerStations.value,
-                selectedCatnum = selectedCatnum.value ?: 0,
-                selectedName = tles.value.firstOrNull { t -> t.catnum == selectedCatnum.value }?.name,
-            )
+        if (key == lastKey) {
+            // Nothing the search depends on changed. The list of saved stations, and the selection when all satellites
+            // are searched, are still shown, and neither has results of its own to leave behind.
+            _state.update {
+                it.copy(
+                    stations = settings.plannerStations.value,
+                    selectedCatnum = selectedCatnum.value ?: 0,
+                    selectedName = tles.value.firstOrNull { t -> t.catnum == selectedCatnum.value }?.name,
+                )
+            }
+            return
         }
-        if (key == lastKey) return
         lastKey = key
         job?.cancel()
-        closeDetail()
-        _state.update { stateFor(key, selectedCatnum.value ?: 0) }
+        detailJob?.cancel()
         searchedKey = null
         finished = false
+        // One update: the new inputs and the cleared results together, so a state with the new selection never
+        // carries the old satellite's windows, warning or open detail (requirement 4.9).
+        _state.update { stateFor(key, selectedCatnum.value ?: 0) }
         if (active) startSearch(key)
     }
 
@@ -279,21 +289,19 @@ class ContactPlannerViewModel(
         searchedKey = key
         finished = false
         val startedAt = clock()
+        val satellites = satellitesFor(key)
         val home = homeStation(key)
         val other = otherStation(key)
-        val satellites = if (key.all) key.tles else listOfNotNull(key.tles.firstOrNull { it.catnum == key.satellite })
-        if (!HomeLocation.isSet(key.lat, key.lon) || home == null || other == null || satellites.isEmpty()) {
+        if (home == null || other == null || !canSearch(key)) {
             // nothing to search: not set, no station chosen, or no satellite to search
             finished = true
             _state.update { it.copy(searching = false, progress = null, windows = emptyList(), usableNow = emptyList(), staleElements = null) }
             return
         }
-        val stale = if (key.all) null else ElementAge.staleDays(ElementAge.epochMillis(satellites.first()), startedAt)
-            ?.let { StaleElements(satellites.first().name, it) }
         _state.update {
             it.copy(
                 searching = true, progress = if (key.all) 0 to satellites.size else null, windows = emptyList(),
-                usableNow = emptyList(), staleElements = stale,
+                usableNow = emptyList(), staleElements = staleFor(key, startedAt),
             )
         }
         // Assigned before it runs: with an immediate dispatcher the body starts inside launch, and a stop that arrives
@@ -317,6 +325,21 @@ class ContactPlannerViewModel(
         }
         job = search
         search.start()
+    }
+
+    private fun satellitesFor(key: Key): List<TLE> =
+        if (key.all) key.tles else listOfNotNull(key.tles.firstOrNull { it.catnum == key.satellite })
+
+    /** Whether there is anything to search: a location, a station and a satellite. */
+    private fun canSearch(key: Key): Boolean =
+        HomeLocation.isSet(key.lat, key.lon) && homeStation(key) != null && otherStation(key) != null &&
+            satellitesFor(key).isNotEmpty()
+
+    /** The warning for the selected satellite's elements at [nowMillis]; none when all satellites are searched. */
+    private fun staleFor(key: Key, nowMillis: Long): StaleElements? {
+        if (key.all) return null
+        val tle = key.tles.firstOrNull { it.catnum == key.satellite } ?: return null
+        return ElementAge.staleDays(ElementAge.epochMillis(tle), nowMillis)?.let { StaleElements(tle.name, it) }
     }
 
     private fun closeDetail() {
