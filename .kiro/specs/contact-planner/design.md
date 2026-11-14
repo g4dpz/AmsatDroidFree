@@ -58,8 +58,14 @@ sealed interface PlannerItem {
 object ContactPlanner {
     const val STEP_SECONDS = 5
 
-    /** Every mutual window of [tle] between [start] and [start] + [hours]. */
-    fun windows(tle: TLE, home: PlannerStation, other: PlannerStation, start: Instant, hours: Int): PlannerItem
+    /**
+     * Every mutual window of [tle] between [start] and [start] + [hours], clipped to that interval.
+     * [checkpoint] is called regularly so a caller can stop the work (see Cancellation).
+     */
+    fun windows(
+        tle: TLE, home: PlannerStation, other: PlannerStation, start: Instant, hours: Int,
+        checkpoint: () -> Unit = {},
+    ): PlannerItem
 
     /** The moments of a window, one a minute plus the start, best moment and end (requirement 6.3). */
     fun timeline(tle: TLE, home: PlannerStation, other: PlannerStation, window: MutualWindow): List<MutualMoment>
@@ -72,14 +78,21 @@ object ContactPlanner {
 
 Stepping both stations through 24 hours every 5 seconds is 17,280 steps per satellite, too slow for all satellites (requirement 9). The search instead uses the pass predictor to narrow the time down first:
 
-1. If `SatelliteMotion.isStationary(tle)`: take `SatelliteMotion.fixedPosition` for both stations; return `UsableNow` when both are at or above their minimums, otherwise `Windows(emptyList())`.
-2. Get each station's passes with its own `PassPredictor` and `GroundStationPosition`: `getPasses(start, hours, windBack = true)`.
-3. Intersect the two pass lists (both are sorted by time, so a single walk through both). Each overlap of a home pass with an other-station pass is a candidate. Clip candidates to the search start.
-4. Step each candidate every `STEP_SECONDS`, computing both look angles with fresh `GroundStationPosition`s for this call. A window is a run of steps where both elevations are at or above their minimums. A candidate can hold more than one window when a minimum elevation is above 0°.
-5. The best moment is the step with the highest lower elevation; ties within 0.1° go to the shorter total path (requirement 7).
-6. Any exception from the prediction code for one satellite gives `Skipped`, as in the overview.
+Let `end = start + hours`.
 
-Window edges are at step resolution, so within 5 seconds (requirement 4.3). Distant stations have few candidates, so most satellites end after step 3.
+1. If `SatelliteMotion.isStationary(tle)`: compute both stations' full look angles at `start` with `Satellite.getPosition` (fresh `GroundStationPosition`s; `SatelliteMotion.fixedPosition` gives only azimuth and elevation, not range and range rate). Return `UsableNow` when both are at or above their minimums, otherwise `Windows(emptyList())`.
+2. Get each station's passes with its own `PassPredictor` and `GroundStationPosition`: `getPasses(start, hours, windBack = true)`.
+3. **Recover a pass already in progress.** `windBack` rewinds only a quarter orbit, so a pass that began earlier than that is skipped (`PassPredictor.nextSatPass`). For each station, if the satellite is above the horizon at `start` and no returned pass covers `start`, add the interval from `start` to its LOS, found by stepping forward every 30 seconds with `getPosition` and refining to 1 second, bounded by `end`.
+4. Intersect the two stations' interval lists (both sorted by time, so a single walk through both). Each overlap of a home interval with an other-station interval is a candidate. **Clip each candidate to `[start, end]`** and drop empty ones: `getPasses` returns whole passes, including one that starts before `end` but finishes after it.
+5. Step each candidate every `STEP_SECONDS`, computing both look angles with fresh `GroundStationPosition`s for this call. A window is a run of steps where both elevations are at or above their minimums; a run still open at the clipped end closes there. A candidate can hold more than one window when a minimum elevation is above 0°.
+6. The best moment is the step with the highest lower elevation; ties within 0.1° go to the shorter total path (requirement 7).
+7. Any exception from the prediction code for one satellite gives `Skipped`, as in the overview, except `CancellationException`, which is rethrown.
+
+Window edges are at step resolution, so within 5 seconds (requirement 4.3). Distant stations have few candidates, so most satellites end after step 4.
+
+### Cancellation
+
+`ContactPlanner.windows` is synchronous, so cancelling the collector alone would not stop a satellite already being worked on. It takes a `checkpoint: () -> Unit` parameter (default does nothing, for tests and single calls) and calls it after each station's pass search, before each candidate, and every 100 steps. `ContactPlannerCalculator` passes a checkpoint that calls `ensureActive()` on the satellite's coroutine, so a changed choice stops old work within milliseconds instead of leaving it on the limited dispatcher.
 
 ### All satellites
 
@@ -90,7 +103,7 @@ class ContactPlannerCalculator(dispatcher: CoroutineDispatcher = /* as OverviewC
 }
 ```
 
-The same `channelFlow` shape as `OverviewCalculator`: one coroutine per satellite, `ensureActive()` between satellites, cancelled with the collector.
+The same `channelFlow` shape as `OverviewCalculator`: one coroutine per satellite, cancelled with the collector. Each coroutine passes `{ ensureActive() }` as the checkpoint, so work already running stops too.
 
 ## Data and settings
 
@@ -146,7 +159,8 @@ data class PlannerUiState(
 )
 ```
 
-- A search key of (home position, chosen station, minimums, hours, scope, keps generation) restarts the search when any part changes; the old job is cancelled.
+- A search key of (home position, chosen station, minimums, hours, scope, keps generation) starts a search when the screen opens with a station chosen, and again when any part changes; the old job is cancelled.
+- `refresh()` searches again from now with the same choices (the "Calculate again" button, as on the overview).
 - The home position comes from the live `homeLat` and `homeLon` settings flows, checked with `HomeLocation.isSet`.
 - A one-minute tick drops windows whose end has passed (requirement 5.5).
 - The timeline and Doppler for an open window are worked out on demand, off the main thread, and kept while it is open.
@@ -158,7 +172,7 @@ data class PlannerUiState(
 From the top, in a scrolling column with the 600 dp maximum width the setup guide uses:
 
 1. **Stations.** "Your station: IO82xk, minimum 0°" with a minimum-elevation picker. Then "Other station" as a dropdown of saved stations, with Edit and Add station buttons, and the distance between them.
-2. **Search.** Selected satellite or All satellites (a segmented button), and the time window picker.
+2. **Search.** Selected satellite or All satellites (a segmented button), the time window picker, and a "Calculate again" button (the overview's `overview_refresh` string) that searches again from now.
 3. **Results.** Progress while searching. Each window is a card in the passes-list style: satellite name (when searching all), date, start to end, duration, "Best 16:27:34 (16:27:34 UTC), both above 3.7°". "Usable from both stations now" cards for stationary satellites come first.
 4. **Detail.** Tapping a card expands it in place (no new route, so the list keeps its scroll position): a two-column block, home and other, with azimuth, elevation and range at the best moment, the total path, the mode picker and each station's Tune and Transmit frequencies, then the timeline as rows of "16:26 · home az 292° el 2.1° · other az 49° el 3.0°".
 
@@ -168,7 +182,7 @@ The unset-location message and Set up button from the overview are reused (requi
 
 A full screen, not a dialog. Text fields in Compose dialogs are hard to drive from adb, which the emulator checks rely on, and a screen gives room at 200 percent font. It has Name, IARU locator, Latitude, Longitude, Minimum elevation, and Save, Cancel and (when editing) Delete with a confirmation dialog.
 
-The location fields use `LocatorSync` directly, with the same field order, labels and messages as `LocationEditor`. They hold drafts in the editor's own state, not in `SettingsRepository`. There are no GPS or network buttons: the other station is not where the device is. `LocationEditor` itself is not changed; extracting a shared stateless field group from it is possible later but not needed now.
+The location fields use `LocatorSync` directly (plus the 4-character square of O5 if accepted), with the same field order, labels and messages as `LocationEditor`. They hold drafts in the editor's own state, not in `SettingsRepository`. There are no GPS or network buttons: the other station is not where the device is. `LocationEditor` itself is not changed; extracting a shared stateless field group from it is possible later but not needed now.
 
 ## Strings
 
@@ -177,16 +191,17 @@ All new text in `strings.xml`: the menu item, screen titles, section headings, l
 ## Testing
 
 - `ContactPlannerTest` (JVM):
-  - the RS-44 IO82xk and EM29 case with a fixed TLE and start time: three windows with the expected edges and best moments, kept as a regression check;
+  - the RS-44 IO82xk and EM29mm case with a fixed TLE and start time: three windows with the expected edges and best moments, kept as a regression check;
   - window edges against a brute-force 1-second search for an LEO (ISS), a high LEO (AO-7) and an elliptical orbit, within 5 seconds (requirement 10.1);
   - a minimum elevation above 0° splitting one overlap into two windows, or none;
-  - a window open at the start time;
+  - a window open at the start time, including a pass that began more than a quarter orbit before it (an elliptical or high orbit), which `windBack` alone misses;
+  - a pass that starts before the search end and finishes after it: the window ends at the search end and the best moment is inside the search;
   - stations too far apart: no windows;
   - the same station twice: windows equal that station's passes;
   - a stationary satellite: `UsableNow` or nothing;
   - the best-moment tie rule;
   - look angles equal to `getPosition` for each station at the same instant (requirement 10.2).
-- `ContactPlannerCalculatorTest`: all satellites in parallel give the same results as one at a time; cancelling stops the work.
+- `ContactPlannerCalculatorTest`: all satellites in parallel give the same results as one at a time; cancelling after the work has started stops it (a checkpoint that counts calls stops being called), and cancellation is not reported as `Skipped`.
 - `SavedStationsJsonTest`: round trip, corrupt text, a bad entry dropped, unknown fields ignored.
 - `ContactPlannerViewModelTest` (Robolectric, as the overview's): the search restarts on each choice, no search while unset, ended windows dropped.
 - Speed (requirement 9): measured on the SM-T225 with a debug build and a log line, written into the task.

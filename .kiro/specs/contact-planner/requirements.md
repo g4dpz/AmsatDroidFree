@@ -4,7 +4,7 @@
 
 Idea from David (G4DPZ), 14 November 2026: work out when two ground stations can both use a satellite, and the best azimuth, elevation and time for the contact.
 
-A trial calculation with the app's own orbit code showed it is useful. For RS-44 between IO82xk (UK) and EM29 (Kansas City, 6,818 km apart), the next 72 hours from 14 November 2026 held three mutual windows of 1.2, 4.8 and 3.8 minutes. The best one, Sunday 15 November 16:25:34 to 16:30:24 UTC, has both stations at about 3.7° elevation at 16:27:34, the UK pointing at 289° and Kansas at 54°, each about 4,000 km from the satellite. Each end needs its own Doppler correction: at that moment the transponder centre is 145.9635 / 435.6446 MHz for the UK and 145.9657 / 435.6380 MHz for Kansas.
+A trial calculation with the app's own orbit code showed it is useful. For RS-44 between IO82xk (UK) and EM29mm (Kansas City, 39.5° N 95.0° W; 6,818 km apart), the next 72 hours from 14 November 2026 held three mutual windows of 1.2, 4.8 and 3.8 minutes. The best one, Sunday 15 November 16:25:34 to 16:30:24 UTC, has both stations at about 3.7° elevation at 16:27:34, the UK pointing at 289° and Kansas at 54°, each about 4,000 km from the satellite. Each end needs its own Doppler correction: at that moment the transponder centre is 145.9635 / 435.6446 MHz for the UK and 145.9657 / 435.6380 MHz for Kansas.
 
 This spec adds a **Contact planner** screen that finds those windows, for the selected satellite or for all of them, and shows both stations' look angles and Doppler.
 
@@ -29,6 +29,8 @@ These are the recommendations put to David on 14 November 2026. He chose the nam
 - **O2. Time window.** Proposed choices 12, 24, 48 and 72 hours, default 24. Mutual windows for distant stations are rare (three in 72 hours in the RS-44 example), so a short window often finds nothing.
 - **O3. Sky chart and map in the detail.** Proposed for a later version: your end of the window on the sky chart, and the map with both stations and the footprint. The first version shows numbers only.
 - **O4. Number of saved stations.** Proposed: up to 20.
+
+- **O5. Four-character locators.** `LocatorSync` accepts only 6- or 8-character locators, but operators often give a 4-character square such as EM29. Proposed: the planner's station editor also accepts a 4-character square and uses its centre (for example EM29 as 39.5° N 95.0° W, stored as EM29mm), saying so under the field. Settings is unchanged. Alternative: 6 and 8 characters only, as in Settings.
 
 ## Decisions already made
 
@@ -56,8 +58,9 @@ These are the recommendations put to David on 14 November 2026. He chose the nam
 
 1. The overflow menu SHALL have a "Contact planner" item below "All satellites".
 2. WHEN the home location is unset THEN the planner SHALL show the existing "Your home location is not set yet." message with a Set up button that opens the setup guide, and SHALL NOT search.
-3. WHEN the planner is opened THEN it SHALL show the last other station used, the last scope and time window, and SHALL NOT search until the user asks or a choice changes.
+3. WHEN the planner is opened THEN it SHALL show the last other station used, the last scope and time window, and SHALL search straight away when a station is chosen, as the overview does.
 4. Back SHALL return to the screen the planner was opened from.
+5. The planner SHALL have a "Calculate again" button that searches again from now with the same choices.
 
 ### Requirement 2: The other station
 
@@ -66,7 +69,7 @@ These are the recommendations put to David on 14 November 2026. He chose the nam
 #### Acceptance criteria
 
 1. The user SHALL be able to add a station with a name (optional, up to 20 characters), an IARU locator or a latitude and longitude, and a minimum elevation.
-2. The locator, latitude and longitude SHALL follow the Settings rules (`LocatorSync`): a valid change to one fills in the others, an invalid value is rejected with a message.
+2. The locator, latitude and longitude SHALL follow the Settings rules (`LocatorSync`): a valid change to one fills in the others, an invalid value is rejected with a message. Whether a 4-character square is also accepted is open question O5.
 3. A station SHALL NOT be saved without a valid location.
 4. The planner SHALL keep a list of saved stations (O4: up to 20), shown by name, or by locator when it has no name.
 5. The user SHALL be able to choose, edit and delete a saved station. Deleting SHALL ask for confirmation.
