@@ -60,10 +60,13 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
 
 - [ ] 6. Quality
   - [ ] 6.1 Layouts: phone portrait and landscape, tablet portrait and landscape, split-screen; red night mode; 200 percent font; TalkBack headings and labels
+    - Checked 14 November 2026 on master: A16 emulator and SM-T225, both steps in portrait and landscape at 100 and 200 percent font, red night, and a half-height window on the A16; Back, Skip and Next/Done stay on screen and everything is reachable. This found that step 2 opened at step 1's scroll position (heading cut off in landscape at 200 percent), fixed in PR #42. Headings and labels checked in the code. Still to do: a TalkBack listen (David, during 7.2)
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
-  - [ ] 6.2 Upgrade check: install over an existing configured build; the guide does not appear and nothing changes
+  - [x] 6.2 Upgrade check: install over an existing configured build; the guide does not appear and nothing changes
+    - Done 14 November 2026 on the A16 emulator: a configured 2.0.5 debug build, then the current build installed over it. No guide on the first or second start, the passes screen opened with the satellite kept, and the settings file was unchanged
     - _Requirements: 1.2_
-  - [ ] 6.3 Fresh install check on the A16 emulator and the SM-T225 (`pm clear`), including denying the location permission
+  - [x] 6.3 Fresh install check on the A16 emulator and the SM-T225 (`pm clear`), including denying the location permission
+    - Done 14 November 2026 on both: the guide opens; denying the permission shows "Location permission is needed to set your position automatically. You can enter your locator instead."; the app keeps running and typing a locator then works
     - _Requirements: 2.4_
 
 - [ ] 7. Documentation
