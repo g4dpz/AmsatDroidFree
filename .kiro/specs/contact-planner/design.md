@@ -172,13 +172,16 @@ data class PlannerUiState(
     val progress: Pair<Int, Int>?,      // satellites done, total, when searching all
     val windows: List<MutualWindow>,    // sorted by start
     val usableNow: List<PlannerItem.UsableNow>,
-    val staleWarning: String?,
+    val staleElements: StaleElements?,  // satellite name and days; the screen words it with the existing plural string
     val expanded: Pair<Int, Instant>?,  // the window whose detail is open: catnum and start
+    val timeline: List<MutualMoment>,   // its rows, worked out in the background; empty until ready
+    val selectedName: String?,          // the selected satellite's name, or null when it is not in the loaded elements
 )
 ```
 
 - **Search key.** (home position, chosen station, minimum elevation, hours, scope, the selected satellite when the scope is "selected", keps generation). A search starts when the planner is on screen with a station chosen and no results for the current key, and again whenever any part of the key changes; the old job is cancelled. The selected satellite and the keps generation are part of the key because both can change while the planner is not on screen (the selected satellite is chosen on the passes screen), and results for the old key must never be shown as current (requirement 4.9).
-- **Screen lifecycle.** The view model holds the job, but the screen starts and stops it with `repeatOnLifecycle(Lifecycle.State.STARTED)` on the planner's back stack entry. In Navigation Compose an entry below the top of the stack is only CREATED, so opening the station editor, another screen or the home screen cancels the search; returning restarts a search that did not finish and keeps finished results whose key is unchanged. Popping the entry clears the view model.
+- **Screen lifecycle.** The view model holds the job, but the screen starts and stops it by calling `onStart()` and `onStop()` from the planner's back stack entry's STARTED state (`LifecycleStartEffect` or `repeatOnLifecycle(Lifecycle.State.STARTED)`). In Navigation Compose an entry below the top of the stack is only CREATED, so opening the station editor, another screen or the home screen cancels the search; returning restarts a search that did not finish and keeps finished results whose key is unchanged. Popping the entry clears the view model.
+- Only the chosen station is part of the key, with its position: editing or deleting another saved station updates the list but does not search again. The stale-elements warning is for the selected satellite and is shown only when that is what is searched; it is not shown when searching all satellites.
 - `refresh()` searches again from now with the same choices (the "Calculate again" button, as on the overview).
 - The home position comes from the live `homeLat` and `homeLon` settings flows, checked with `HomeLocation.isSet`.
 - A one-minute tick drops windows whose end has passed (requirement 5.5).
