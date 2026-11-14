@@ -67,7 +67,8 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
     - _Requirements: 2.4_
 
 - [ ] 7. Documentation
-  - [ ] 7.1 Update the wiki Home page ("Setting your location") and README; recapture screenshots that show the new screens; confirm the privacy policy still holds
+  - [x] 7.1 Update the wiki Home page ("Setting your location") and README; recapture screenshots that show the new screens; confirm the privacy policy still holds
+    - Done 14 November 2026: README and wiki Home feature lists and "Setting your location"; wiki Test Script 2.1 says Settings. No README screenshot shows a changed screen (the Settings screen is unchanged and no screenshot shows the menu), so none was recaptured. The privacy policy still holds: the guide uses the same location editor and stores one more on-device setting
     - _Requirements: 9.1, 9.2_
   - [ ] 7.2 Run `manual-test-checklist.md` and record results
 
