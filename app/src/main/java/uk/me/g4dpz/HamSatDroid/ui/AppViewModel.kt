@@ -10,10 +10,13 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uk.me.g4dpz.HamSatDroid.data.DownloadOutcome
@@ -67,6 +70,14 @@ class AppViewModel(
 
     private val _state = MutableStateFlow(AppUiState(hoursAhead = settings.calcHoursAhead.value))
     val state: StateFlow<AppUiState> = _state.asStateFlow()
+
+    /** The satellite selected on the passes screen, or the saved one before the first load; null when there is none. */
+    val selectedCatnum: StateFlow<Int?> = _state
+        .map { it.selectedCatnum ?: settings.selectedCatnum.value.takeIf { saved -> saved > 0 } }
+        .stateIn(
+            viewModelScope, SharingStarted.Eagerly,
+            _state.value.selectedCatnum ?: settings.selectedCatnum.value.takeIf { it > 0 },
+        )
 
     private val _events = Channel<UiEvent>(Channel.BUFFERED)
 

@@ -67,6 +67,7 @@ class ContactPlannerViewModelTest {
         Dispatchers.setMain(dispatcher)
         settings.homeLat.value = "52.4375"
         settings.homeLon.value = "-2.04167"
+        settings.homeLocator.value = "IO82xk"
         settings.plannerStations.value = listOf(kansas, paris)
         settings.plannerStationId.value = "kc"
     }
@@ -84,7 +85,9 @@ class ContactPlannerViewModelTest {
         assertEquals(0, checkpoints)
         assertTrue(vm.state.value.windows.isEmpty())
         assertFalse(vm.state.value.searching)
+        assertFalse("not searched yet is not the same as no windows", vm.state.value.done)
         assertEquals(kansas, vm.state.value.chosen)
+        assertEquals("IO82xk", vm.state.value.homeLocator)
     }
 
     @Test
@@ -96,6 +99,7 @@ class ContactPlannerViewModelTest {
         assertFalse(s.allSatellites)
         assertFalse(s.searching)
         assertNull(s.progress)
+        assertTrue(s.done)
         assertEquals(1, s.windows.size) // RS-44 over the UK and Kansas City: Saturday 18:01 UTC in the next 24 hours
         assertEquals(44909, s.windows.single().catnum)
         assertEquals("RS-44 & BREEZE-KM R/B", s.selectedName)
@@ -115,6 +119,7 @@ class ContactPlannerViewModelTest {
         assertEquals(0, checkpoints)
         assertTrue(vm.state.value.windows.isEmpty())
         assertFalse(vm.state.value.searching)
+        assertTrue("nothing to search is a finished answer", vm.state.value.done)
     }
 
     @Test
@@ -233,9 +238,11 @@ class ContactPlannerViewModelTest {
         vm.onStart()
         assertEquals("the work stopped at the checkpoint after the stop", 3, checkpoints)
         assertFalse(vm.state.value.searching)
+        assertFalse("an unfinished search is not an answer", vm.state.value.done)
         onCheckpoint = {}
         vm.onStart()
         assertTrue("a full search ran", checkpoints > 3)
+        assertTrue(vm.state.value.done)
         assertEquals(1, vm.state.value.windows.size)
         assertFalse(vm.state.value.searching)
     }
@@ -249,6 +256,7 @@ class ContactPlannerViewModelTest {
         val done = checkpoints
         settings.plannerMinElevation.value = 5
         assertTrue("old windows are not shown as current", vm.state.value.windows.isEmpty())
+        assertFalse("and the empty list is not an answer", vm.state.value.done)
         assertEquals("no search while stopped", done, checkpoints)
         settings.plannerMinElevation.value = 0
         vm.onStart()

@@ -161,6 +161,7 @@ New settings in `SettingsRepository`, all with defaults so upgrades need no migr
 ```kotlin
 data class PlannerUiState(
     val locationSet: Boolean,
+    val homeLocator: String,            // "your station"
     val stations: List<SavedStation>,
     val chosen: SavedStation?,
     val minElevation: Int,              // one value, used for both stations
@@ -169,6 +170,7 @@ data class PlannerUiState(
     val allSatellites: Boolean,
     val distanceKm: Double?,
     val searching: Boolean,
+    val done: Boolean,                  // the results are complete for the current inputs (so "no windows" is an answer)
     val progress: Pair<Int, Int>?,      // satellites done, total, when searching all
     val windows: List<MutualWindow>,    // sorted by start
     val usableNow: List<PlannerItem.UsableNow>,

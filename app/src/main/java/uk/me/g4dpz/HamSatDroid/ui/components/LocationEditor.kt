@@ -256,7 +256,7 @@ fun LocationEditor(
 
 /** A text field that reports when the user has finished with it: keyboard "Done", or focus moving elsewhere. */
 @Composable
-private fun CommitField(
+internal fun CommitField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,

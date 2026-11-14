@@ -106,6 +106,7 @@
     <string name="menu_update_keps">Update keps</string>
     <string name="menu_map_view">Map view</string>
     <string name="menu_overview">All satellites</string>
+    <string name="menu_contact_planner">Contact planner</string>
     <string name="overview_title">All satellites</string>
     <string name="overview_refresh">Calculate again</string>
     <string name="overview_window">Passes in the next</string>
@@ -296,4 +297,61 @@
     <string name="map_geo_value">%1$s: %2$s° %3$s</string>
     <string name="map_description">World map showing the satellite\'s ground track, its footprint and your home location</string>
     <string name="map_no_satellite">No satellite selected.</string>
+    <!-- Contact planner -->
+    <string name="planner_title">Contact planner</string>
+    <string name="planner_section_stations">Stations</string>
+    <string name="planner_your_station">Your station: %1$s</string>
+    <string name="planner_min_elevation">Minimum elevation (both stations)</string>
+    <string name="planner_other_station">Other station</string>
+    <string name="planner_choose_station">Choose the station you want to make contact with.</string>
+    <string name="planner_no_station">Add the station you want to make contact with. The planner then finds when a satellite is above the horizon at both ends.</string>
+    <string name="planner_add_station">Add station</string>
+    <string name="planner_edit_station">Edit station</string>
+    <plurals name="planner_stations_full">
+        <item quantity="one">You can save only %1$d station. Delete it to add another.</item>
+        <item quantity="other">You can save up to %1$d stations. Delete one to add another.</item>
+    </plurals>
+    <string name="planner_distance">Distance between the stations: %1$s km</string>
+    <string name="planner_section_search">Search</string>
+    <string name="planner_scope_selected">Selected satellite</string>
+    <string name="planner_scope_all">All satellites</string>
+    <string name="planner_selected_is">Satellite: %1$s</string>
+    <string name="planner_no_satellite">No satellite is selected. Choose one on the passes screen, or search all satellites.</string>
+    <string name="planner_window">Time window</string>
+    <string name="planner_searching">Searching…</string>
+    <plurals name="planner_progress">
+        <item quantity="one">Searched %1$d of %2$d satellite</item>
+        <item quantity="other">Searched %1$d of %2$d satellites</item>
+    </plurals>
+    <string name="planner_section_results">Mutual windows</string>
+    <string name="planner_usable_now_title">Usable from both stations now</string>
+    <string name="planner_usable_now_line">You: azimuth %1$s°, elevation %2$s°. Them: azimuth %3$s°, elevation %4$s°.</string>
+    <string name="planner_window_when">%1$s, %2$s to %3$s (%4$s min)</string>
+    <string name="planner_window_best">Best %1$s (%2$s UTC), both above %3$s°</string>
+    <plurals name="planner_none">
+        <item quantity="one">No window in the next %1$d hour. Try a longer time window or a lower minimum elevation.</item>
+        <item quantity="other">No window in the next %1$d hours. Try a longer time window or a lower minimum elevation.</item>
+    </plurals>
+    <plurals name="planner_none_distance">
+        <item quantity="one">No window in the next %1$d hour. The stations are %2$s km apart. Try a longer time window or a lower minimum elevation.</item>
+        <item quantity="other">No window in the next %1$d hours. The stations are %2$s km apart. Try a longer time window or a lower minimum elevation.</item>
+    </plurals>
+    <!-- Contact planner: station editor -->
+    <string name="station_title_add">Add station</string>
+    <string name="station_title_edit">Edit station</string>
+    <string name="station_name_label">Name or callsign (optional)</string>
+    <plurals name="station_name_support">
+        <item quantity="one">Up to %1$d character</item>
+        <item quantity="other">Up to %1$d characters</item>
+    </plurals>
+    <string name="station_square_note">%1$s is the whole square; this uses its centre.</string>
+    <string name="station_need_position">Enter a locator, or a latitude and longitude, to save this station.</string>
+    <plurals name="station_full">
+        <item quantity="one">You can save only %1$d station. Delete it first.</item>
+        <item quantity="other">You can save up to %1$d stations. Delete one first.</item>
+    </plurals>
+    <string name="station_save">Save</string>
+    <string name="station_delete">Delete</string>
+    <string name="station_delete_title">Delete this station?</string>
+    <string name="station_delete_message">%1$s will be removed from your saved stations.</string>
 </resources>

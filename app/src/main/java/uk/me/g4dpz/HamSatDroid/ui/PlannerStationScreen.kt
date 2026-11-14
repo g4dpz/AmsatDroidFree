@@ -1,0 +1,257 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+package uk.me.g4dpz.HamSatDroid.ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import uk.me.g4dpz.HamSatDroid.R
+import uk.me.g4dpz.HamSatDroid.data.SavedStation
+import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
+import uk.me.g4dpz.HamSatDroid.domain.LocatorSync
+import uk.me.g4dpz.HamSatDroid.domain.StationEditing
+import uk.me.g4dpz.HamSatDroid.ui.components.CommitField
+import java.util.UUID
+
+private val MAX_CONTENT_WIDTH = 600.dp
+
+/**
+ * Adds a station for the contact planner, or edits one ([stationId]) with Delete. A full screen, not a dialog, so there
+ * is room at a large font size and the fields work like the home location in Settings: a locator, or a latitude and
+ * longitude, each filling in the others, and a 4-character square such as EM29 accepted (it uses the square's centre).
+ * There are no "use my position" buttons: the other station is not where this device is.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PlannerStationScreen(settings: SettingsRepository, stationId: String?, onDone: () -> Unit) {
+    val existing = remember(stationId) { stationId?.let { id -> settings.plannerStations.value.firstOrNull { it.id == id } } }
+    // Opened for a station that is not there any more: nothing to edit
+    if (stationId != null && existing == null) {
+        LaunchedEffect(Unit) { onDone() }
+        return
+    }
+
+    // The committed position, as Settings keeps it; the drafts are what is being typed
+    var name by rememberSaveable { mutableStateOf(existing?.name ?: "") }
+    var lat by rememberSaveable { mutableStateOf(existing?.latitude ?: LocatorSync.ZERO) }
+    var lon by rememberSaveable { mutableStateOf(existing?.longitude ?: LocatorSync.ZERO) }
+    var locator by rememberSaveable { mutableStateOf(existing?.locator ?: LocatorSync.DEFAULT_LOCATOR) }
+    var latDraft by rememberSaveable(lat) { mutableStateOf(lat) }
+    var lonDraft by rememberSaveable(lon) { mutableStateOf(lon) }
+    var locatorDraft by rememberSaveable(locator) { mutableStateOf(locator) }
+    /** The 4-character square the locator came from, for the line under the field; null otherwise. */
+    var squareNote by rememberSaveable { mutableStateOf<String?>(null) }
+    var confirmDelete by rememberSaveable { mutableStateOf(false) }
+
+    val snackbar = remember { SnackbarHostState() }
+    var message by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(message) {
+        message?.let {
+            snackbar.showSnackbar(it)
+            message = null
+        }
+    }
+    val invalidLatitude = stringResource(R.string.error_invalid_latitude)
+    val invalidLongitude = stringResource(R.string.error_invalid_longitude)
+    val invalidLocator = stringResource(R.string.error_invalid_locator, LocatorSync.DEFAULT_LOCATOR)
+    val needPosition = stringResource(R.string.station_need_position)
+    val full = pluralStringResource(R.plurals.station_full, SavedStation.MAX_STATIONS, SavedStation.MAX_STATIONS)
+
+    fun current() = LocatorSync.Location(lat, lon, locator)
+
+    /** Takes over the result of an edit; a rejected value is reported and its field shows the reset value again. */
+    fun apply(result: LocatorSync.Result, square: String? = null) {
+        val l = when (result) {
+            is LocatorSync.Result.Accepted -> result.location
+            is LocatorSync.Result.Rejected -> result.location
+        }
+        lat = l.latitude
+        lon = l.longitude
+        locator = l.locator
+        squareNote = square
+        if (result is LocatorSync.Result.Rejected) {
+            message = when (result.field) {
+                LocatorSync.Field.LATITUDE -> invalidLatitude
+                LocatorSync.Field.LONGITUDE -> invalidLongitude
+                LocatorSync.Field.LOCATOR -> invalidLocator
+            }
+            // the committed value may be unchanged (already 0); make the field show it again anyway
+            latDraft = l.latitude
+            lonDraft = l.longitude
+            locatorDraft = l.locator
+        }
+    }
+
+    fun commitLocator() {
+        if (locatorDraft == locator) return
+        val square = if (StationEditing.isSquare(locatorDraft)) locatorDraft.trim().uppercase() else null
+        apply(StationEditing.editLocator(locatorDraft, current()), square)
+    }
+
+    fun save() {
+        // Whatever was typed last has not been committed yet if no other field has been touched
+        val pending = when {
+            locatorDraft != locator -> StationEditing.editLocator(locatorDraft, current())
+            latDraft != lat -> LocatorSync.editLatitude(latDraft, current())
+            lonDraft != lon -> LocatorSync.editLongitude(lonDraft, current())
+            else -> null
+        }
+        if (pending != null) {
+            val square = if (locatorDraft != locator && StationEditing.isSquare(locatorDraft)) locatorDraft.trim().uppercase() else null
+            apply(pending, square)
+            if (pending is LocatorSync.Result.Rejected) return
+        }
+        val position = when (pending) {
+            is LocatorSync.Result.Accepted -> pending.location
+            else -> current()
+        }
+        if (!StationEditing.canSave(position)) {
+            message = needPosition
+            return
+        }
+        val station = SavedStation(
+            id = existing?.id ?: UUID.randomUUID().toString(),
+            name = name.trim(),
+            latitude = position.latitude,
+            longitude = position.longitude,
+            locator = position.locator,
+        )
+        val updated = StationEditing.saved(settings.plannerStations.value, station)
+        if (updated == null) {
+            message = full
+            return
+        }
+        settings.plannerStations.value = updated
+        // A station just added is the one to use
+        if (existing == null) settings.plannerStationId.value = station.id
+        onDone()
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(if (existing == null) R.string.station_title_add else R.string.station_title_edit)) },
+                navigationIcon = {
+                    IconButton(onClick = onDone) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                    }
+                },
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbar) },
+    ) { padding ->
+        Box(
+            modifier = Modifier.fillMaxSize().padding(padding).imePadding().verticalScroll(rememberScrollState()),
+            contentAlignment = Alignment.TopCenter,
+        ) {
+            Column(
+                modifier = Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = SavedStation.limitName(it) },
+                    label = { Text(stringResource(R.string.station_name_label)) },
+                    supportingText = {
+                        Text(pluralStringResource(R.plurals.station_name_support, SavedStation.MAX_NAME_LENGTH, SavedStation.MAX_NAME_LENGTH))
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                CommitField(
+                    label = stringResource(R.string.settings_locator_label),
+                    value = locatorDraft,
+                    onValueChange = { locatorDraft = it },
+                    keyboardType = KeyboardType.Ascii,
+                    onCommit = ::commitLocator,
+                )
+                squareNote?.let { Text(stringResource(R.string.station_square_note, it), style = MaterialTheme.typography.bodySmall) }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                    CommitField(
+                        label = stringResource(R.string.settings_latitude_label),
+                        value = latDraft,
+                        onValueChange = { latDraft = it },
+                        keyboardType = KeyboardType.Ascii, // the numeric keypad has no minus sign
+                        modifier = Modifier.weight(1f),
+                        onCommit = { if (latDraft != lat) apply(LocatorSync.editLatitude(latDraft, current())) },
+                    )
+                    CommitField(
+                        label = stringResource(R.string.settings_longitude_label),
+                        value = lonDraft,
+                        onValueChange = { lonDraft = it },
+                        keyboardType = KeyboardType.Ascii,
+                        modifier = Modifier.weight(1f),
+                        onCommit = { if (lonDraft != lon) apply(LocatorSync.editLongitude(lonDraft, current())) },
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedButton(onClick = onDone) { Text(stringResource(R.string.action_cancel)) }
+                    Button(onClick = ::save) { Text(stringResource(R.string.station_save)) }
+                    if (existing != null) {
+                        TextButton(onClick = { confirmDelete = true }) {
+                            Text(stringResource(R.string.station_delete), color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (confirmDelete && existing != null) {
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            title = { Text(stringResource(R.string.station_delete_title)) },
+            text = { Text(stringResource(R.string.station_delete_message, existing.displayName)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmDelete = false
+                    settings.plannerStations.value = StationEditing.without(settings.plannerStations.value, existing.id)
+                    if (settings.plannerStationId.value == existing.id) settings.plannerStationId.value = ""
+                    onDone()
+                }) { Text(stringResource(R.string.station_delete), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.action_cancel)) }
+            },
+        )
+    }
+}

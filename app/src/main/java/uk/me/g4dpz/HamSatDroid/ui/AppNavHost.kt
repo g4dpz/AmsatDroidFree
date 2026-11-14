@@ -13,6 +13,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel as screenViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import androidx.navigation.compose.NavHost
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -35,6 +37,13 @@ object Routes {
     const val SETTINGS = "settings"
     const val OVERVIEW = "overview"
     const val SETUP = "setup"
+    const val PLANNER = "planner"
+
+    /** The station editor; the optional id names the station to edit, none adds a new one. */
+    const val PLANNER_STATION = "planner/station"
+    const val PLANNER_STATION_PATTERN = "$PLANNER_STATION?id={id}"
+
+    fun plannerStation(id: String?): String = if (id == null) PLANNER_STATION else "$PLANNER_STATION?id=$id"
 }
 
 /**
@@ -98,6 +107,7 @@ fun AppNavHost(
                 onOpenMap = { navController.navigate(Routes.MAP) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenOverview = { navController.navigate(Routes.OVERVIEW) },
+                onOpenPlanner = { navController.navigate(Routes.PLANNER) },
                 locationSet = HomeLocation.isSet(homeLat, homeLon),
                 onOpenSetup = { navController.navigate(Routes.SETUP) },
             )
@@ -131,6 +141,23 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
                 onOpenSetup = { navController.navigate(Routes.SETUP) },
             )
+        }
+        composable(Routes.PLANNER) {
+            // Belongs to this screen: popping it clears the view model and stops its work
+            val planner = screenViewModel { ContactPlannerViewModel(viewModel.tles, viewModel.selectedCatnum, settings) }
+            ContactPlannerScreen(
+                planner,
+                onBack = { navController.popBackStack() },
+                onOpenSetup = { navController.navigate(Routes.SETUP) },
+                onAddStation = { navController.navigate(Routes.plannerStation(null)) },
+                onEditStation = { id -> navController.navigate(Routes.plannerStation(id)) },
+            )
+        }
+        composable(
+            Routes.PLANNER_STATION_PATTERN,
+            arguments = listOf(navArgument("id") { type = NavType.StringType; nullable = true; defaultValue = null }),
+        ) { entry ->
+            PlannerStationScreen(settings, entry.arguments?.getString("id"), onDone = { navController.popBackStack() })
         }
         composable(Routes.SETUP) {
             // Leaving the guide (requirement 7.5): opened from another screen it returns there; as the first screen of
