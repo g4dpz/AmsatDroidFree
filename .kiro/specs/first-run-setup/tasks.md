@@ -74,7 +74,7 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
     - Done 14 November 2026: README and wiki Home feature lists and "Setting your location"; wiki Test Script 2.1 says Settings. No README screenshot shows a changed screen (the Settings screen is unchanged and no screenshot shows the menu), so none was recaptured. The privacy policy still holds: the guide uses the same location editor and stores one more on-device setting
     - _Requirements: 9.1, 9.2_
   - [x] 7.2 Run `manual-test-checklist.md` and record results
-    - Marked complete by David on 14 November 2026
+    - Marked complete by David on 14 November 2026, without the checklist outcomes being recorded: every box in `manual-test-checklist.md` is still unticked. What was verified, and where: layouts, the upgrade from 2.0.5 and a fresh install with the location permission denied (task 6, on the A16 emulator and the SM-T225); the guide on 2.0.6 to 2.0.8 by testers. Not recorded as run: the rest of the checklist, including upgrade from 2.0.2, process-death recovery, and notification and widget navigation
 
 - [x] 8. Release
   - [x] 8.1 Bump `versionCode`, build the signed bundle from the merged commit, check the built version, upload to the test track
