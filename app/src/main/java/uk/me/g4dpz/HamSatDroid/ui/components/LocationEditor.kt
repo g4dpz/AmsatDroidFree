@@ -181,6 +181,8 @@ fun LocationEditor(
             onValueChange = { locatorDraft = it },
             keyboardType = KeyboardType.Ascii,
             onCommit = { if (locatorDraft != storedLocator) commit(LocatorSync.editLocator(locatorDraft, current())) },
+            // told as it is typed, not only when the field is left (I082xl: the zero for the letter O)
+            error = locatorProblemText(locatorDraft),
         )
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
             CommitField(
@@ -256,19 +258,23 @@ fun LocationEditor(
 
 /** A text field that reports when the user has finished with it: keyboard "Done", or focus moving elsewhere. */
 @Composable
-private fun CommitField(
+internal fun CommitField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
     keyboardType: KeyboardType,
     onCommit: () -> Unit,
     modifier: Modifier = Modifier,
+    /** What is wrong with the text as it stands, shown under the field in the error colour; null when nothing is. */
+    error: String? = null,
 ) {
     var hadFocus by remember { mutableStateOf(false) }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
+        isError = error != null,
+        supportingText = error?.let { message -> { Text(message) } },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { onCommit() }),

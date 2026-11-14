@@ -38,6 +38,41 @@ object LocatorSync {
         data class Rejected(val field: Field, val location: Location) : Result
     }
 
+    /** What a character of a locator must be at each position: two letters A to R, two digits, two letters A to X, two digits. */
+    enum class Expected { LETTER_A_TO_R, DIGIT, LETTER_A_TO_X, NOTHING }
+
+    /**
+     * Why the text typed so far cannot become a valid locator: the 1-based [position] of the first character that does
+     * not fit, what that position needs, and the character [found] there.
+     */
+    data class TypingProblem(val position: Int, val expected: Expected, val found: Char)
+
+    /**
+     * Checks locator text while it is being typed. Null means the text can still become a valid locator (or already is
+     * one), so a half-typed `IO82x` is fine; otherwise the first character that cannot be right, such as the zero in
+     * `I082xl`. Case is ignored and spaces around the text are ignored, as when the locator is accepted. This is for
+     * telling the user early; [editLocator] still decides what is accepted.
+     */
+    fun typingProblem(text: String): TypingProblem? {
+        val typed = text.trim()
+        for ((i, c) in typed.withIndex()) {
+            val expected = when (i) {
+                0, 1 -> Expected.LETTER_A_TO_R
+                2, 3, 6, 7 -> Expected.DIGIT
+                4, 5 -> Expected.LETTER_A_TO_X
+                else -> Expected.NOTHING
+            }
+            val fits = when (expected) {
+                Expected.LETTER_A_TO_R -> c in 'A'..'R' || c in 'a'..'r'
+                Expected.LETTER_A_TO_X -> c in 'A'..'X' || c in 'a'..'x'
+                Expected.DIGIT -> c in '0'..'9'
+                Expected.NOTHING -> false
+            }
+            if (!fits) return TypingProblem(i + 1, expected, c)
+        }
+        return null
+    }
+
     fun editLatitude(text: String, current: Location): Result {
         val lat = LocationText.toDegrees(text)
         if (lat == null || lat < -90.0 || lat > 90.0) {
