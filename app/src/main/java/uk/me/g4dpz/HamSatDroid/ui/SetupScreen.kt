@@ -28,6 +28,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -169,8 +170,11 @@ fun SetupScreen(
         },
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
+        // One scroll position per step, so a new step opens at its top ("Step N of M" and the title in view) instead
+        // of where the previous step was scrolled to; it is still kept across rotation.
+        val scroll = key(index) { rememberScrollState() }
         Box(
-            modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(scroll),
             contentAlignment = Alignment.TopCenter,
         ) {
             Column(
