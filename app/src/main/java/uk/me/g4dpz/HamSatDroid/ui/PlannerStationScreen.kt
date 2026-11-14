@@ -34,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +54,22 @@ import java.util.UUID
 
 private val MAX_CONTENT_WIDTH = 600.dp
 
+/** Keeps the position being edited across rotation and the process being recreated. */
+private val DRAFT_SAVER = listSaver<StationEditing.Draft, String?>(
+    save = {
+        listOf(
+            it.location.latitude, it.location.longitude, it.location.locator,
+            it.latitude, it.longitude, it.locator, it.squareNote,
+        )
+    },
+    restore = {
+        StationEditing.Draft(
+            LocatorSync.Location(it[0]!!, it[1]!!, it[2]!!),
+            locator = it[5]!!, latitude = it[3]!!, longitude = it[4]!!, squareNote = it[6],
+        )
+    },
+)
+
 /**
  * Adds a station for the contact planner, or edits one ([stationId]) with Delete. A full screen, not a dialog, so there
  * is room at a large font size and the fields work like the home location in Settings: a locator, or a latitude and
@@ -69,16 +86,18 @@ fun PlannerStationScreen(settings: SettingsRepository, stationId: String?, onDon
         return
     }
 
-    // The committed position, as Settings keeps it; the drafts are what is being typed
     var name by rememberSaveable { mutableStateOf(existing?.name ?: "") }
-    var lat by rememberSaveable { mutableStateOf(existing?.latitude ?: LocatorSync.ZERO) }
-    var lon by rememberSaveable { mutableStateOf(existing?.longitude ?: LocatorSync.ZERO) }
-    var locator by rememberSaveable { mutableStateOf(existing?.locator ?: LocatorSync.DEFAULT_LOCATOR) }
-    var latDraft by rememberSaveable(lat) { mutableStateOf(lat) }
-    var lonDraft by rememberSaveable(lon) { mutableStateOf(lon) }
-    var locatorDraft by rememberSaveable(locator) { mutableStateOf(locator) }
-    /** The 4-character square the locator came from, for the line under the field; null otherwise. */
-    var squareNote by rememberSaveable { mutableStateOf<String?>(null) }
+    // The position being edited: what is committed and what each field shows (see StationEditing.Draft)
+    var draft by rememberSaveable(stateSaver = DRAFT_SAVER) {
+        mutableStateOf(
+            StationEditing.Draft(
+                LocatorSync.Location(
+                    existing?.latitude ?: LocatorSync.ZERO, existing?.longitude ?: LocatorSync.ZERO,
+                    existing?.locator ?: LocatorSync.DEFAULT_LOCATOR,
+                )
+            )
+        )
+    }
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
 
     val snackbar = remember { SnackbarHostState() }
@@ -95,55 +114,25 @@ fun PlannerStationScreen(settings: SettingsRepository, stationId: String?, onDon
     val needPosition = stringResource(R.string.station_need_position)
     val full = pluralStringResource(R.plurals.station_full, SavedStation.MAX_STATIONS, SavedStation.MAX_STATIONS)
 
-    fun current() = LocatorSync.Location(lat, lon, locator)
-
-    /** Takes over the result of an edit; a rejected value is reported and its field shows the reset value again. */
-    fun apply(result: LocatorSync.Result, square: String? = null) {
-        val l = when (result) {
-            is LocatorSync.Result.Accepted -> result.location
-            is LocatorSync.Result.Rejected -> result.location
-        }
-        lat = l.latitude
-        lon = l.longitude
-        locator = l.locator
-        squareNote = square
-        if (result is LocatorSync.Result.Rejected) {
-            message = when (result.field) {
+    /** Takes over the result of a commit; a rejected value is reported (its field shows the reset value). */
+    fun commit(committed: StationEditing.Draft.Committed) {
+        draft = committed.draft
+        committed.rejected?.let {
+            message = when (it) {
                 LocatorSync.Field.LATITUDE -> invalidLatitude
                 LocatorSync.Field.LONGITUDE -> invalidLongitude
                 LocatorSync.Field.LOCATOR -> invalidLocator
             }
-            // the committed value may be unchanged (already 0); make the field show it again anyway
-            latDraft = l.latitude
-            lonDraft = l.longitude
-            locatorDraft = l.locator
         }
-    }
-
-    fun commitLocator() {
-        if (locatorDraft == locator) return
-        val square = if (StationEditing.isSquare(locatorDraft)) locatorDraft.trim().uppercase() else null
-        apply(StationEditing.editLocator(locatorDraft, current()), square)
     }
 
     fun save() {
-        // Whatever was typed last has not been committed yet if no other field has been touched
-        val pending = when {
-            locatorDraft != locator -> StationEditing.editLocator(locatorDraft, current())
-            latDraft != lat -> LocatorSync.editLatitude(latDraft, current())
-            lonDraft != lon -> LocatorSync.editLongitude(lonDraft, current())
-            else -> null
-        }
-        if (pending != null) {
-            val square = if (locatorDraft != locator && StationEditing.isSquare(locatorDraft)) locatorDraft.trim().uppercase() else null
-            apply(pending, square)
-            if (pending is LocatorSync.Result.Rejected) return
-        }
-        val position = when (pending) {
-            is LocatorSync.Result.Accepted -> pending.location
-            else -> current()
-        }
-        if (!StationEditing.canSave(position)) {
+        // The field typed in last has not been committed if the user never left it
+        val committed = draft.commitPending()
+        commit(committed)
+        if (committed.rejected != null) return
+        val position = committed.draft.location
+        if (!committed.draft.canSave) {
             message = needPosition
             return
         }
@@ -199,28 +188,28 @@ fun PlannerStationScreen(settings: SettingsRepository, stationId: String?, onDon
                 )
                 CommitField(
                     label = stringResource(R.string.settings_locator_label),
-                    value = locatorDraft,
-                    onValueChange = { locatorDraft = it },
+                    value = draft.locator,
+                    onValueChange = { draft = draft.typeLocator(it) },
                     keyboardType = KeyboardType.Ascii,
-                    onCommit = ::commitLocator,
+                    onCommit = { commit(draft.commitLocator()) },
                 )
-                squareNote?.let { Text(stringResource(R.string.station_square_note, it), style = MaterialTheme.typography.bodySmall) }
+                draft.squareNote?.let { Text(stringResource(R.string.station_square_note, it), style = MaterialTheme.typography.bodySmall) }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                     CommitField(
                         label = stringResource(R.string.settings_latitude_label),
-                        value = latDraft,
-                        onValueChange = { latDraft = it },
+                        value = draft.latitude,
+                        onValueChange = { draft = draft.typeLatitude(it) },
                         keyboardType = KeyboardType.Ascii, // the numeric keypad has no minus sign
                         modifier = Modifier.weight(1f),
-                        onCommit = { if (latDraft != lat) apply(LocatorSync.editLatitude(latDraft, current())) },
+                        onCommit = { commit(draft.commitLatitude()) },
                     )
                     CommitField(
                         label = stringResource(R.string.settings_longitude_label),
-                        value = lonDraft,
-                        onValueChange = { lonDraft = it },
+                        value = draft.longitude,
+                        onValueChange = { draft = draft.typeLongitude(it) },
                         keyboardType = KeyboardType.Ascii,
                         modifier = Modifier.weight(1f),
-                        onCommit = { if (lonDraft != lon) apply(LocatorSync.editLongitude(lonDraft, current())) },
+                        onCommit = { commit(draft.commitLongitude()) },
                     )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
