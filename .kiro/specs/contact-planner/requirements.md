@@ -160,7 +160,7 @@ Related specs: `first-run-setup`, `pass-card-layout` and `multi-satellite-passes
 #### Acceptance criteria
 
 1. For the windows covered by requirement 4.3, starts and ends SHALL agree within 5 seconds with a brute-force check that steps every second, and the brute-force check SHALL find no window of 60 seconds or more that the planner missed. This SHALL be tested for a low orbit (ISS), a higher one (AO-7) and a slightly elliptical one (RS-44).
-2. The look angles SHALL be the same values the sky screen shows for each station at the same moment.
+2. The look angles SHALL be the same values the sky screen shows for each station at the same moment, to the last few decimals (see the design, "Deep-space satellites"), and the same whether a moment is reached by `windows` or by `timeline`.
 3. The orbit prediction code and its golden regression test SHALL NOT change.
 4. The tests SHALL use fixed copies of the orbital elements and fixed start times kept in the repository, never elements downloaded at test time, so that every result is reproducible.
 

@@ -8,16 +8,17 @@ Branch per task group, one PR at a time, wait for CI and Copilot before merging 
 
 Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirmed by David the same day. No open questions remain.
 
-- [ ] 1. Calculation
-  - [ ] 1.1 Add `PlannerStation`, `LookAngle`, `MutualMoment`, `MutualWindow`, `PlannerItem` and `ContactPlanner.windows` in `domain/ContactPlanner.kt`, with `ContactPlannerTest`
+- [x] 1. Calculation
+  - [x] 1.1 Add `PlannerStation`, `LookAngle`, `MutualMoment`, `MutualWindow`, `PlannerItem` and `ContactPlanner.windows` in `domain/ContactPlanner.kt`, with `ContactPlannerTest`
     - The pass-intersection search of the design, 5-second steps, the best-moment rule with the path tie-break
     - Recover a pass already in progress beyond the quarter-orbit wind-back; clip candidates to both ends of the search; `checkpoint` calls, including in the in-progress recovery; rethrow `CancellationException`
     - Tests: the RS-44 IO82xk / EM29mm case; a pass begun more than a quarter orbit before the start; a pass running past the search end; brute-force 1-second comparison for ISS, AO-7 and RS-44 (edges within 5 s, no 60-second window missed); a 10-second window inside a candidate; minimum elevation splitting a window; window open at the start; too far apart; same station twice; stationary satellite; tie rule; look angles equal `getPosition`
     - Put the fixed elements (RS-44 as in the design, ISS, AO-7) in `app/src/test/resources`
     - _Requirements: 3.4, 4.3, 4.4, 4.5, 4.8, 7.1, 7.2, 10.1, 10.2, 10.4_
-  - [ ] 1.2 Add `ContactPlanner.timeline` and `greatCircleKm`, with tests
+    - Done 14 November 2026: `domain/ContactPlanner.kt`, `ContactPlannerTest` (22 tests with 1.2). The one-second comparison covers ISS, AO-7 and RS-44 (UK to Paris, Kansas City and Moscow); the slow-orbit test uses a Molniya-type orbit and fails with the recovery switched off. The first window of that orbit is asserted; its next pass is missed by the predictor, the second limit in the design
+  - [x] 1.2 Add `ContactPlanner.timeline` and `greatCircleKm`, with tests
     - _Requirements: 2.8, 6.3_
-  - [ ] 1.3 Add `ContactPlannerCalculator` (all satellites, one coroutine each), with `ContactPlannerCalculatorTest` (parallel equals sequential; cancelling work already started)
+  - [x] 1.3 Add `ContactPlannerCalculator` (all satellites, one coroutine each), with `ContactPlannerCalculatorTest` (parallel equals sequential; cancelling work already started)
     - _Requirements: 4.1, 4.6, 9.3_
 
 - [ ] 2. Saved stations and settings
