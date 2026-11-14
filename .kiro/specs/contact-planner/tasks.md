@@ -21,11 +21,13 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
   - [x] 1.3 Add `ContactPlannerCalculator` (all satellites, one coroutine each), with `ContactPlannerCalculatorTest` (parallel equals sequential; cancelling work already started)
     - _Requirements: 4.1, 4.6, 9.3_
 
-- [ ] 2. Saved stations and settings
-  - [ ] 2.1 Add `SavedStation` and `SavedStationsJson`, with `SavedStationsJsonTest`
+- [x] 2. Saved stations and settings
+  - [x] 2.1 Add `SavedStation` and `SavedStationsJson`, with `SavedStationsJsonTest`
     - _Requirements: 2.1, 2.4_
-  - [ ] 2.2 Add the five planner settings and the choice lists to `SettingsRepository`, with tests of the defaults
+    - Done 14 November 2026: `data/SavedStation.kt`, `SavedStationsJsonTest` (13 tests)
+  - [x] 2.2 Add the five planner settings and the choice lists to `SettingsRepository`, with tests of the defaults
     - _Requirements: 1.3, 2.6, 3.1, 3.3_
+    - Done 14 November 2026: in `SettingsRepository`, with the defaults, persistence, bad-stored-value and rejected-value cases added to `SettingsRepositoryTest`
 
 - [ ] 3. View model
   - [ ] 3.1 Add `ContactPlannerViewModel` and `PlannerUiState`, with Robolectric tests

@@ -148,6 +148,38 @@ class SettingsRepository(private val store: KeyValueStore) {
         store.putInt(OVERVIEW_MIN_ELEVATION, it)
     }
 
+    // ---- contact planner ----
+    /** The other stations saved for the contact planner, at most [SavedStation.MAX_STATIONS]. */
+    val plannerStations = Setting(SavedStationsJson.read(store.getString(PLANNER_STATIONS, ""))) {
+        require(it.size <= SavedStation.MAX_STATIONS) { "At most ${SavedStation.MAX_STATIONS} stations can be saved: ${it.size}" }
+        store.putString(PLANNER_STATIONS, SavedStationsJson.write(it))
+    }
+
+    /** The id of the station the planner uses, or empty when none is chosen. It may name a station that was deleted. */
+    val plannerStationId = Setting(store.getString(PLANNER_STATION_ID, "")) { store.putString(PLANNER_STATION_ID, it) }
+
+    /** The lowest elevation either station can use; one value for both stations (open decision P4). */
+    val plannerMinElevation = Setting(
+        store.getInt(PLANNER_MIN_ELEVATION, 0).takeIf { it in PLANNER_MIN_ELEVATION_CHOICES } ?: 0
+    ) {
+        require(it in PLANNER_MIN_ELEVATION_CHOICES) {
+            "Planner minimum elevation must be one of $PLANNER_MIN_ELEVATION_CHOICES: $it"
+        }
+        store.putInt(PLANNER_MIN_ELEVATION, it)
+    }
+
+    val plannerHours = Setting(
+        store.getInt(PLANNER_HOURS, DEFAULT_PLANNER_HOURS).takeIf { it in PLANNER_HOUR_CHOICES } ?: DEFAULT_PLANNER_HOURS
+    ) {
+        require(it in PLANNER_HOUR_CHOICES) { "Planner hours must be one of $PLANNER_HOUR_CHOICES: $it" }
+        store.putInt(PLANNER_HOURS, it)
+    }
+
+    /** Whether the planner searches every satellite in the keps source, not just the selected one. */
+    val plannerAllSatellites = Setting(store.getBoolean(PLANNER_ALL_SATELLITES, false)) {
+        store.putBoolean(PLANNER_ALL_SATELLITES, it)
+    }
+
     private inline fun <reified E : Enum<E>> enumOrDefault(name: String, default: E): E =
         enumValues<E>().firstOrNull { it.name == name } ?: default
 
@@ -173,6 +205,11 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val AUTO_RED_NIGHT = "autoRedNight"
         const val OVERVIEW_HOURS = "overviewHours"
         const val OVERVIEW_MIN_ELEVATION = "overviewMinElevation"
+        const val PLANNER_STATIONS = "plannerStations"
+        const val PLANNER_STATION_ID = "plannerStationId"
+        const val PLANNER_MIN_ELEVATION = "plannerMinElevation"
+        const val PLANNER_HOURS = "plannerHours"
+        const val PLANNER_ALL_SATELLITES = "plannerAllSatellites"
 
         const val DEFAULT_ALERT_LEAD_MINUTES = 5
         val ALERT_LEAD_CHOICES = listOf(5, 10, 15, 30)
@@ -180,6 +217,9 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val DEFAULT_OVERVIEW_HOURS = 12
         val OVERVIEW_HOUR_CHOICES = listOf(6, 12, 24)
         val OVERVIEW_MIN_ELEVATION_CHOICES = listOf(0, 10, 20, 30)
+        val PLANNER_MIN_ELEVATION_CHOICES = listOf(0, 5, 10, 15, 20, 30)
+        const val DEFAULT_PLANNER_HOURS = 24
+        val PLANNER_HOUR_CHOICES = listOf(12, 24, 48)
     }
 }
 
