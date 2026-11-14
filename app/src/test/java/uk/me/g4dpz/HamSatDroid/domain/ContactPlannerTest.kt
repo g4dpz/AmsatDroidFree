@@ -198,13 +198,6 @@ class ContactPlannerTest {
     fun `a pass already in progress for more than a quarter orbit is recovered`() {
         // A Molniya-type orbit (period 12 hours, apogee over the northern hemisphere): the UK and Moscow both see it for
         // about 11 hours at a time. Four hours into such a pass is further back than the predictor's quarter-orbit rewind.
-        val molniya = TLE.fromElements(
-            OrbitalElements(
-                name = "MOLNIYA TEST", catnum = 99999, epochYear = 2026, epochDay = 318.0, meanMotion = 2.00623,
-                eccentricity = 0.72, inclination = 63.4, raan = 0.0, argPerigee = 270.0, meanAnomaly = 180.0,
-                elementSetNo = 1, revAtEpoch = 100,
-            )
-        )
         val start = "2026-11-14T22:27:00Z" // four hours into a pass that began at about 18:27
         val firstPassFromPredictor = PassPredictor(molniya, GroundStationPosition(uk.latitudeDeg, uk.longitudeDeg, 0.0))
             .getPasses(Date.from(Instant.parse(start)), 12, true).filter { it.maxEl > 0.0 }
@@ -222,6 +215,45 @@ class ContactPlannerTest {
         val brute = bruteForce(molniya, uk, moscow, 0.0, start, 12).first()
         assertTrue("start ${found[0].start} vs ${brute.first}", seconds(found[0].start, brute.first) <= 5)
         assertTrue("end ${found[0].end} vs ${brute.second}", seconds(found[0].end, brute.second) <= 5)
+    }
+
+    private val molniya = TLE.fromElements(
+        OrbitalElements(
+            name = "MOLNIYA TEST", catnum = 99999, epochYear = 2026, epochDay = 318.0, meanMotion = 2.00623,
+            eccentricity = 0.72, inclination = 63.4, raan = 0.0, argPerigee = 270.0, meanAnomaly = 180.0,
+            elementSetNo = 1, revAtEpoch = 100,
+        )
+    )
+
+    @Test
+    fun `a satellite that never rises at one station gives no windows, not Skipped`() {
+        // the ISS reaches about 51.6 degrees of latitude plus its footprint; it never rises at the North Pole
+        val pole = PlannerStation(89.9, 0.0)
+        assertEquals(PlannerItem.Windows(25544, emptyList()), ContactPlanner.windows(iss, uk, pole, 0.0, Instant.parse("2026-11-14T15:00:00Z"), 24))
+        assertEquals(PlannerItem.Windows(25544, emptyList()), ContactPlanner.windows(iss, pole, uk, 0.0, Instant.parse("2026-11-14T15:00:00Z"), 24))
+    }
+
+    @Test
+    fun `deep-space look angles do not depend on what was calculated before`() {
+        // The orbit model for a slow orbit refreshes its periodic terms only every 30 minutes, so a satellite object
+        // that has been stepped through a window gives slightly different angles from a fresh one for the same instant.
+        // The planner must give the same answer as a fresh calculation, wherever in the search the moment fell.
+        val start = "2026-11-14T22:27:00Z"
+        val w = windows(molniya, uk, moscow, 0.0, start, 12).first()
+        val fresh = { station: PlannerStation, at: Instant ->
+            SatelliteFactory.createSatellite(molniya)
+                .getPosition(GroundStationPosition(station.latitudeDeg, station.longitudeDeg, 0.0), Date.from(at))
+        }
+        for (moment in listOf(w.best) + ContactPlanner.timeline(molniya, uk, moscow, w).filterIndexed { i, _ -> i % 60 == 0 }) {
+            for ((station, look) in listOf(uk to moment.home, moscow to moment.other)) {
+                val position = fresh(station, moment.time)
+                assertEquals("elevation at ${moment.time}", Math.toDegrees(position.elevation), look.elevationDeg, 1e-12)
+                assertEquals("azimuth at ${moment.time}", Math.toDegrees(position.azimuth), look.azimuthDeg, 1e-12)
+                assertEquals("range at ${moment.time}", position.range, look.rangeKm, 1e-9)
+            }
+        }
+        // the stored best moment equals the timeline's row for the same instant
+        assertEquals(w.best, ContactPlanner.timeline(molniya, uk, moscow, w).first { it.time == w.best.time })
     }
 
     // ---- the minimum elevation --------------------------------------------------------------------------

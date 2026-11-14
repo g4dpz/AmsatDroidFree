@@ -86,9 +86,13 @@ Let `end = start + hours`.
 4. Intersect the two stations' interval lists (both sorted by time, so a single walk through both). Each overlap of a home interval with an other-station interval is a candidate. **Clip each candidate to `[start, end]`** and drop empty ones: `getPasses` returns whole passes, including one that starts before `end` but finishes after it.
 5. Step each candidate every `STEP_SECONDS`, computing both look angles with fresh `GroundStationPosition`s for this call. A window is a run of steps where both elevations are at or above `minElevationDeg`; a run still open at the clipped end closes there. A candidate can hold more than one window when the minimum elevation is above 0°.
 6. The best moment is the step with the highest lower elevation; ties within 0.1° go to the shorter total path (requirement 7).
-7. Unusable elements (`InvalidTleException`, `IllegalArgumentException`) give `Skipped`, as in the overview. `SatNotFoundException` from the pass predictor for one station means the satellite never rises there: that station has no spans and the result is an empty window list, not `Skipped`. `CancellationException` is never caught.
+7. Unusable elements (`InvalidTleException`, `IllegalArgumentException`) give `Skipped`, as in the overview. `SatNotFoundException` from the pass predictor has two causes. If the satellite can never be seen from that station (`willBeSeen` is false) that station has no spans and the result is an empty window list, not `Skipped`. Otherwise a horizon search ran out of time, which discards the passes already found, so it is rethrown and the satellite is `Skipped`, never reported as a finished search. `CancellationException` is never caught.
 
 Window edges are at step resolution, so within 5 seconds (requirement 4.3). Distant stations have few candidates, so most satellites end after step 4.
+
+### Deep-space satellites
+
+The orbit model of a slow orbit (period 225 minutes or more, `TLE.isDeepspace`) refreshes its periodic terms only when the time moves 30 minutes from the last refresh, so the angles it gives for an instant depend slightly on the instants asked about before. To keep a result independent of the rest of the search, and `timeline` identical to `windows`, the planner builds a fresh model for every position of a deep-space satellite. A low-orbit satellite has no such state and one model serves every call. The sky screen has the same history dependence in the orbit library, so its values for the same instant can differ in the last decimals; the library is not changed.
 
 ### What the search guarantees
 

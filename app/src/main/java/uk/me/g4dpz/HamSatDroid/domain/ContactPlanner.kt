@@ -5,7 +5,6 @@ import uk.me.g4dpz.satellite.GroundStationPosition
 import uk.me.g4dpz.satellite.InvalidTleException
 import uk.me.g4dpz.satellite.PassPredictor
 import uk.me.g4dpz.satellite.SatNotFoundException
-import uk.me.g4dpz.satellite.Satellite
 import uk.me.g4dpz.satellite.SatelliteFactory
 import uk.me.g4dpz.satellite.TLE
 import java.time.Instant
@@ -112,27 +111,27 @@ object ContactPlanner {
         return try {
             val homeStation = GroundStationPosition(home.latitudeDeg, home.longitudeDeg, 0.0)
             val otherStation = GroundStationPosition(other.latitudeDeg, other.longitudeDeg, 0.0)
-            val satellite = SatelliteFactory.createSatellite(tle)
+            val observer = Observer(tle)
             val startMs = start.toEpochMilli()
             val endMs = start.plusSeconds(hours * 3600L).toEpochMilli()
             if (SatelliteMotion.isStationary(tle)) {
                 // No passes to search for; whether it is usable now is all there is to say.
-                val h = look(satellite, homeStation, startMs)
-                val o = look(satellite, otherStation, startMs)
+                val h = observer.look(homeStation, startMs)
+                val o = observer.look(otherStation, startMs)
                 if (h.elevationDeg >= minElevationDeg && o.elevationDeg >= minElevationDeg) {
                     PlannerItem.UsableNow(tle.catnum, tle.name, h, o)
                 } else {
                     PlannerItem.Windows(tle.catnum, emptyList())
                 }
             } else {
-                val homeSpans = spansOf(tle, satellite, home, homeStation, startMs, endMs, hours, checkpoint)
+                val homeSpans = spansOf(tle, observer, home, homeStation, startMs, endMs, hours, checkpoint)
                 checkpoint()
-                val otherSpans = spansOf(tle, satellite, other, otherStation, startMs, endMs, hours, checkpoint)
+                val otherSpans = spansOf(tle, observer, other, otherStation, startMs, endMs, hours, checkpoint)
                 checkpoint()
                 val found = ArrayList<MutualWindow>()
                 for (candidate in intersect(homeSpans, otherSpans)) {
                     checkpoint()
-                    found += stepThrough(tle, satellite, homeStation, otherStation, candidate, minElevationDeg, checkpoint)
+                    found += stepThrough(tle, observer, homeStation, otherStation, candidate, minElevationDeg, checkpoint)
                 }
                 PlannerItem.Windows(tle.catnum, found)
             }
@@ -150,7 +149,7 @@ object ContactPlanner {
      * and its end (requirement 6.3). [tle] must be the satellite the window was found for.
      */
     fun timeline(tle: TLE, home: PlannerStation, other: PlannerStation, window: MutualWindow): List<MutualMoment> {
-        val satellite = SatelliteFactory.createSatellite(tle)
+        val observer = Observer(tle)
         val homeStation = GroundStationPosition(home.latitudeDeg, home.longitudeDeg, 0.0)
         val otherStation = GroundStationPosition(other.latitudeDeg, other.longitudeDeg, 0.0)
         val startMs = window.start.toEpochMilli()
@@ -162,7 +161,7 @@ object ContactPlanner {
             minute += MINUTE_MS
         }
         return times.filter { it in startMs..endMs }.map {
-            MutualMoment(Instant.ofEpochMilli(it), look(satellite, homeStation, it), look(satellite, otherStation, it))
+            MutualMoment(Instant.ofEpochMilli(it), observer.look(homeStation, it), observer.look(otherStation, it))
         }
     }
 
@@ -192,7 +191,7 @@ object ContactPlanner {
      */
     private fun spansOf(
         tle: TLE,
-        satellite: Satellite,
+        observer: Observer,
         station: PlannerStation,
         position: GroundStationPosition,
         startMs: Long,
@@ -211,23 +210,26 @@ object ContactPlanner {
                 if (e >= startMs && s <= endMs) spans += Span(max(s, startMs), min(e, endMs))
             }
         } catch (e: SatNotFoundException) {
-            // never rises at this station: nothing here, and the other station's spans then meet nothing
+            // The predictor throws this for two reasons: the satellite can never be seen from this station, or a horizon
+            // search ran out of time part-way, which loses the passes already found. Only the first means "no passes
+            // here" (and the other station's spans then meet nothing); the second must not look like a finished search.
+            if (observer.willBeSeen(position)) throw e
         }
         checkpoint()
-        if (look(satellite, position, startMs).elevationDeg > 0.0 && spans.none { it.startMs <= startMs && startMs <= it.endMs }) {
-            spans += Span(startMs, losAfter(satellite, position, startMs, endMs, checkpoint))
+        if (observer.look(position, startMs).elevationDeg > 0.0 && spans.none { it.startMs <= startMs && startMs <= it.endMs }) {
+            spans += Span(startMs, losAfter(observer, position, startMs, endMs, checkpoint))
         }
         return merge(spans)
     }
 
     /** When the satellite, above the horizon at [startMs], next goes below it, stepping 30 s; [endMs] at the latest. */
-    private fun losAfter(satellite: Satellite, position: GroundStationPosition, startMs: Long, endMs: Long, checkpoint: () -> Unit): Long {
+    private fun losAfter(observer: Observer, position: GroundStationPosition, startMs: Long, endMs: Long, checkpoint: () -> Unit): Long {
         var t = startMs
         var steps = 0
         while (t < endMs) {
             if (steps++ % RECOVERY_CHECKPOINT_EVERY == 0) checkpoint()
             t = min(t + RECOVERY_STEP_MS, endMs)
-            if (look(satellite, position, t).elevationDeg <= 0.0) return t
+            if (observer.look(position, t).elevationDeg <= 0.0) return t
         }
         return endMs
     }
@@ -259,7 +261,7 @@ object ContactPlanner {
     /** Steps through [span] every [STEP_SECONDS] and returns the windows (runs with both elevations high enough). */
     private fun stepThrough(
         tle: TLE,
-        satellite: Satellite,
+        observer: Observer,
         home: GroundStationPosition,
         other: GroundStationPosition,
         span: Span,
@@ -276,8 +278,8 @@ object ContactPlanner {
         var steps = 0
         while (t <= span.endMs) {
             if (steps++ % STEP_CHECKPOINT_EVERY == 0) checkpoint()
-            val h = look(satellite, home, t)
-            val o = look(satellite, other, t)
+            val h = observer.look(home, t)
+            val o = observer.look(other, t)
             if (h.elevationDeg >= minElevationDeg && o.elevationDeg >= minElevationDeg) {
                 run += MutualMoment(Instant.ofEpochMilli(t), h, o)
             } else {
@@ -289,8 +291,22 @@ object ContactPlanner {
         return windows
     }
 
-    private fun look(satellite: Satellite, station: GroundStationPosition, timeMs: Long): LookAngle {
-        val p = satellite.getPosition(station, Date(timeMs))
-        return LookAngle(Math.toDegrees(p.azimuth), Math.toDegrees(p.elevation), p.range, p.rangeRate)
+    /**
+     * Where a satellite is seen from a station. The orbit model of a slow orbit (a period of 225 minutes or more)
+     * refreshes its periodic terms only every 30 minutes of satellite time, so the angles it gives for an instant
+     * depend slightly on the instants it was asked about before. Such a satellite is therefore modelled afresh for each
+     * position, so a result never depends on the rest of the search (and `timeline` repeats `windows` exactly). A
+     * low-orbit satellite has no such state and one model serves every call.
+     */
+    private class Observer(private val tle: TLE) {
+        private val shared = SatelliteFactory.createSatellite(tle)
+
+        fun willBeSeen(station: GroundStationPosition): Boolean = shared.willBeSeen(station)
+
+        fun look(station: GroundStationPosition, timeMs: Long): LookAngle {
+            val model = if (tle.isDeepspace) SatelliteFactory.createSatellite(tle) else shared
+            val p = model.getPosition(station, Date(timeMs))
+            return LookAngle(Math.toDegrees(p.azimuth), Math.toDegrees(p.elevation), p.range, p.rangeRate)
+        }
     }
 }
