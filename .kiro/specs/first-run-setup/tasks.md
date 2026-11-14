@@ -69,11 +69,13 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
     - Done 14 November 2026 on both: the guide opens; denying the permission shows "Location permission is needed to set your position automatically. You can enter your locator instead."; the app keeps running and typing a locator then works
     - _Requirements: 2.4_
 
-- [ ] 7. Documentation
+- [x] 7. Documentation
   - [x] 7.1 Update the wiki Home page ("Setting your location") and README; recapture screenshots that show the new screens; confirm the privacy policy still holds
     - Done 14 November 2026: README and wiki Home feature lists and "Setting your location"; wiki Test Script 2.1 says Settings. No README screenshot shows a changed screen (the Settings screen is unchanged and no screenshot shows the menu), so none was recaptured. The privacy policy still holds: the guide uses the same location editor and stores one more on-device setting
     - _Requirements: 9.1, 9.2_
-  - [ ] 7.2 Run `manual-test-checklist.md` and record results
+  - [x] 7.2 Run `manual-test-checklist.md` and record results
+    - Marked complete by David on 14 November 2026
 
-- [ ] 8. Release
-  - [ ] 8.1 Bump `versionCode`, build the signed bundle from the merged commit, check the built version, upload to the test track
+- [x] 8. Release
+  - [x] 8.1 Bump `versionCode`, build the signed bundle from the merged commit, check the built version, upload to the test track
+    - Marked complete by David on 14 November 2026. The guide itself shipped in 2.0.6 (code 26) and later; the step-scroll fix (PR #42) and the docs wait for the next release, which David will ask for later
