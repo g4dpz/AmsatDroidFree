@@ -44,6 +44,13 @@
     <string name="error_invalid_latitude">Invalid latitude, set to 0</string>
     <string name="error_invalid_longitude">Invalid longitude, set to 0</string>
     <string name="error_invalid_locator">Invalid locator, set to %1$s</string>
+    <!-- Locator checked while it is typed -->
+    <string name="locator_problem_letter_ar">Character %1$d: it must be a letter from A to R.</string>
+    <string name="locator_problem_letter_ax">Character %1$d: it must be a letter from A to X.</string>
+    <string name="locator_problem_digit">Character %1$d: it must be a digit.</string>
+    <string name="locator_problem_too_long">A locator has at most 8 characters.</string>
+    <string name="locator_problem_zero_for_o">That is the digit zero. Did you mean the letter O?</string>
+    <string name="locator_problem_o_for_zero">That is the letter O. Did you mean the digit zero?</string>
     <string name="location_set">Location set to %1$s, %2$s (%3$s).</string>
     <string name="location_set_with_accuracy">%1$s %2$s</string>
     <plurals name="location_accuracy">

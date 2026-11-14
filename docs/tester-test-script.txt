@@ -32,7 +32,10 @@ The menu is the three dots at the top right of the main screen.
 ----------------
 
 2.1  Menu, Settings. Type your locator (for example IO91wm). The
-     latitude and longitude should fill in to match.
+     latitude and longitude should fill in to match. Then try a wrong
+     one, such as I091wm (a zero instead of the letter O): the field
+     should turn red as soon as you type the zero, and say which
+     character is wrong.
 
 2.2  Type a latitude and longitude instead. The locator should update.
 
