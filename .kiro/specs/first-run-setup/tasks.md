@@ -58,7 +58,7 @@ Status 13 November 2026: tasks 1.1 and 2.1 to 2.4 shipped in 2.0.3 (PR #21, bran
   - [x] 5.7 Strings for everything above in `strings.xml`
     - _Requirements: 9.4_
 
-- [ ] 6. Quality
+- [x] 6. Quality
   - [x] 6.1 Layouts: phone portrait and landscape, tablet portrait and landscape, split-screen; red night mode; 200 percent font; TalkBack headings and labels
     - Checked 14 November 2026 on master: A16 emulator and SM-T225, both steps in portrait and landscape at 100 and 200 percent font, red night, and a half-height window on the A16; Back, Skip and Next/Done stay on screen and everything is reachable. This found that step 2 opened at step 1's scroll position (heading cut off in landscape at 200 percent), fixed in PR #42. Headings and labels checked in the code (both titles are headings, the step indicator is text, the banner icon is decorative, every field has a label and every button has text). A live TalkBack listen was not done: TalkBack ignores touches and key presses sent from adb, so it cannot be driven from here, and David decided on 14 November 2026 to leave it as it is
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
