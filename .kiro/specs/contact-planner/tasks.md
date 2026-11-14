@@ -29,12 +29,13 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
     - _Requirements: 1.3, 2.6, 3.1, 3.3_
     - Done 14 November 2026: in `SettingsRepository`, with the defaults, persistence, bad-stored-value and rejected-value cases added to `SettingsRepositoryTest`
 
-- [ ] 3. View model
-  - [ ] 3.1 Add `ContactPlannerViewModel` and `PlannerUiState`, with Robolectric tests
+- [x] 3. View model
+  - [x] 3.1 Add `ContactPlannerViewModel` and `PlannerUiState`, with Robolectric tests
     - Search key and restart; no search while the location is unset; progress; stale warning; one-minute tick dropping ended windows; detail worked out on demand
     - Search on opening when a station is chosen; `refresh()` for Calculate again; the search key includes the selected satellite and the keps generation; the job starts and stops with the planner entry's STARTED state
     - Tests as in the design: restart on each key part, lifecycle cancel and restart, old results never shown as current
     - _Requirements: 1.2, 1.3, 1.5, 4.2, 4.6, 4.7, 4.9, 5.3, 5.5_
+    - Done 14 November 2026: `ui/ContactPlannerViewModel.kt` and `ContactPlannerViewModelTest` (22 tests, plain JVM with the unconfined test dispatcher, as the overview's). The screen calls `onStart()` and `onStop()` from its STARTED lifecycle (task 4.1); the stale warning is data (`StaleElements`), worded by the screen
 
 - [ ] 4. Screens
   - [ ] 4.1 Add `Routes.PLANNER`, the "Contact planner" menu item below All satellites, and the planner screen with the stations, search and results sections, and the Calculate again button
