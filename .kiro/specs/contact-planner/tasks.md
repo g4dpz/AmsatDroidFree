@@ -6,7 +6,7 @@ Order: the pure calculation first (it can be checked against the RS-44 example b
 
 Branch per task group, one PR at a time, wait for CI and Copilot before merging (merge commit).
 
-Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided by David the same day. Two readings are still to confirm: P2 (6- and 8-character locators and latitude and longitude are kept alongside the 4-character square) and P5 (the best-moment rule is as first proposed).
+Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirmed by David the same day. No open questions remain.
 
 - [ ] 1. Calculation
   - [ ] 1.1 Add `PlannerStation`, `LookAngle`, `MutualMoment`, `MutualWindow`, `PlannerItem` and `ContactPlanner.windows` in `domain/ContactPlanner.kt`, with `ContactPlannerTest`

@@ -13,10 +13,10 @@ Related specs: `first-run-setup`, `pass-card-layout` and `multi-satellite-passes
 ## Decisions (David, 14 November 2026)
 
 - **P1. Name and place.** The feature is called **Contact planner**. It opens from an overflow menu item of that name, below All satellites.
-- **P2. The other station.** Entered as an IARU locator, where a 4-character square such as EM29 is accepted (O5), or as a latitude and longitude, with an optional name such as a callsign. The app keeps a short list of saved stations. David's answer was "4 character maidenhead"; 6- and 8-character locators and latitude and longitude are kept as well, since Settings accepts them (to confirm).
+- **P2. The other station.** Entered as an IARU locator, where a 4-character square such as EM29 is accepted (O5), or as a latitude and longitude, with an optional name such as a callsign. The app keeps a short list of saved stations. David's answer was "4 character maidenhead"; he confirmed on 14 November 2026 that 4-character squares are accepted in the planner, in addition to the 6- and 8-character locators and latitude and longitude that Settings accepts.
 - **P3. Which satellites.** The selected satellite by default, with a switch to search all satellites in the current keps source.
 - **P4. Minimum elevation.** One minimum elevation, the same for both stations, chosen in the planner, default 0°.
-- **P5. Best moment.** The time at which the lower of the two elevations is highest; the total path is shown beside it. David's answer was "P4 at same elevation"; this is read as "both stations use the one minimum elevation of P4", and the rule here is the one proposed (to confirm).
+- **P5. Best moment.** The time at which the lower of the two elevations is highest; the total path is shown beside it. David's answer was "P4 at same elevation", read as "both stations use the one minimum elevation of P4"; he confirmed that reading on 14 November 2026, so the rule here stands as proposed.
 - **P6. Detail.** Both stations' azimuth, elevation and range, and each station's own uplink and downlink Doppler, at the best moment and through the window.
 - **P7. Alerts for a mutual window.** None in this spec.
 - **P8. Release.** The version number is chosen when David asks for the release bump; this spec does not name one.
