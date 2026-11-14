@@ -50,14 +50,15 @@ jobs:
       # Dependencies such as the Kotlin compiler jar are also fetched from GitHub-hosted downloads, which time out
       # during GitHub incidents and fail the build before any code is compiled. Retry the build, but only when the log
       # shows a network failure; a compile error, test failure or lint finding fails at once, without a retry.
-      - name: Assemble, unit test and lint (retries only on network errors)
+      - name: Assemble, unit test, lint and cover (retries only on network errors)
         run: |
           set +e  # a failed build must not end the script before the status is checked
           log="$RUNNER_TEMP/gradle-build.log"
           network_error='Could not (download|GET)|Read timed out|Connect timed out|Connection reset|HTTP response code: 5|status code 5'
           attempts=3
           for attempt in $(seq 1 "$attempts"); do
-            ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug 2>&1 | tee "$log"
+            ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug \
+              :app:koverHtmlReportDebug :app:koverXmlReportDebug 2>&1 | tee "$log"
             status="${PIPESTATUS[0]}"
             if [ "$status" -eq 0 ]; then exit 0; fi
             if ! grep -qE "$network_error" "$log"; then
@@ -72,6 +73,9 @@ jobs:
           echo "::error::Build still failing on network errors after $attempts attempts"
           exit "$status"
 
+      # Show the unit-test coverage on the run's summary page; the HTML report is in the artifact below.
+      - name: Coverage summary
+        run: python3 .github/scripts/coverage-summary.py app/build/reports/kover/reportDebug.xml >> "$GITHUB_STEP_SUMMARY"
       # Make the built debug APK downloadable from the run. This is debug-signed, for testing and
       # sideloading only — not a Play Store release (that needs a signed AAB; see the signing config).
       - name: Upload debug APK
@@ -91,6 +95,7 @@ jobs:
           path: |
             app/build/reports/tests/
             app/build/reports/lint-results-*.html
+            app/build/reports/kover/
             app/build/test-results/
           if-no-files-found: ignore
           retention-days: 14

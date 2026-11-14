@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlinx.kover")
 }
 
 // Release signing is read from a gitignored keystore.properties in the project root (see
@@ -16,6 +17,18 @@ val keystoreProperties = Properties().apply {
     }
 }
 val hasReleaseSigning = keystoreProperties.getProperty("storeFile") != null
+
+// Code coverage of the unit tests (Kover). Only generated classes are left out; the Compose screens stay in, and show
+// as mostly uncovered because they are checked on a device, not by unit tests. CI publishes the report.
+kover {
+    reports {
+        filters {
+            excludes {
+                classes("*.BuildConfig", "*.R", "*.R\$*", "*ComposableSingletons*")
+            }
+        }
+    }
+}
 
 android {
     namespace = "uk.me.g4dpz.HamSatDroid"
