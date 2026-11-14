@@ -2,6 +2,8 @@
 package uk.me.g4dpz.HamSatDroid.domain
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import uk.me.g4dpz.HamSatDroid.domain.LocatorSync.Field
@@ -156,5 +158,61 @@ class LocatorSyncTest {
         // and editing latitude to its own value changes nothing
         val same = accepted(LocatorSync.editLatitude(first.latitude, first))
         assertEquals(first, same)
+    }
+
+    // ---- checking a locator while it is being typed ----
+
+    @Test
+    fun everyPrefixOfAValidLocatorIsFineWhileItIsTyped() {
+        for (locator in listOf("IO82xl", "io82xl", "IO82XL", "IO82xl44", "AA00aa", "RR99xx", "JJ00aa")) {
+            for (n in 0..locator.length) {
+                assertNull("'${locator.take(n)}'", LocatorSync.typingProblem(locator.take(n)))
+            }
+        }
+    }
+
+    @Test
+    fun aZeroTypedForTheLetterOIsCaughtAtTheSecondCharacter() {
+        val problem = LocatorSync.typingProblem("I082xl")!!
+        assertEquals(2, problem.position)
+        assertEquals(LocatorSync.Expected.LETTER_A_TO_R, problem.expected)
+        assertEquals('0', problem.found)
+        // and as soon as it is typed, before the rest
+        assertEquals(2, LocatorSync.typingProblem("I0")!!.position)
+    }
+
+    @Test
+    fun eachPositionSaysWhatItNeeds() {
+        fun at(text: String) = LocatorSync.typingProblem(text)!!
+        assertEquals(LocatorSync.TypingProblem(1, LocatorSync.Expected.LETTER_A_TO_R, 'S'), at("S"))
+        assertEquals(LocatorSync.TypingProblem(1, LocatorSync.Expected.LETTER_A_TO_R, '1'), at("1"))
+        assertEquals(LocatorSync.TypingProblem(3, LocatorSync.Expected.DIGIT, 'O'), at("IOO"))
+        assertEquals(LocatorSync.TypingProblem(4, LocatorSync.Expected.DIGIT, 'x'), at("IO8x"))
+        assertEquals(LocatorSync.TypingProblem(5, LocatorSync.Expected.LETTER_A_TO_X, '1'), at("IO821"))
+        assertEquals(LocatorSync.TypingProblem(6, LocatorSync.Expected.LETTER_A_TO_X, 'y'), at("IO82xy"))
+        assertEquals(LocatorSync.TypingProblem(7, LocatorSync.Expected.DIGIT, 'a'), at("IO82xla"))
+        assertEquals(LocatorSync.TypingProblem(8, LocatorSync.Expected.DIGIT, '-'), at("IO82xl4-"))
+        assertEquals(LocatorSync.TypingProblem(9, LocatorSync.Expected.NOTHING, '1'), at("IO82xl441"))
+    }
+
+    @Test
+    fun spacesAroundTheTextAreIgnoredButASpaceInsideIsAProblem() {
+        assertNull(LocatorSync.typingProblem("  IO82xl  "))
+        assertNull(LocatorSync.typingProblem(" "))
+        val inside = LocatorSync.typingProblem("IO 82")!!
+        assertEquals(3, inside.position)
+        assertEquals(' ', inside.found)
+    }
+
+    @Test
+    fun textThatIsAcceptedWhenFinishedHasNoTypingProblemAndTextWithOneIsRejected() {
+        for (text in listOf("IO82xl", "io82xl", " IO82xl44 ", "AA00aa", "RR99xx")) {
+            assertNull(text, LocatorSync.typingProblem(text))
+            assertTrue(text, LocatorSync.editLocator(text, london) is Result.Accepted)
+        }
+        for (text in listOf("I082xl", "IO82xy", "SS00aa", "IO82xl441", "IO 82xl")) {
+            assertNotNull(text, LocatorSync.typingProblem(text))
+            assertTrue(text, LocatorSync.editLocator(text, london) is Result.Rejected)
+        }
     }
 }
