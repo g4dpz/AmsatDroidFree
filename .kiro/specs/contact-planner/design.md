@@ -140,6 +140,7 @@ object SavedStationsJson {
     fun read(text: String?): List<SavedStation>
 }
 ```
+The stored text is `{"schema":1,"stations":[{"id":...,"name":...,"latitude":...,"longitude":...,"locator":...}]}`. Reading also drops an entry with no id or with a latitude or longitude that is missing, not a number or out of range, keeps only the first of two entries with the same id, cuts a name to 20 characters, reads at most 10 stations, and treats a JSON null as a missing field. `SavedStation.displayName` is the name, or the locator when there is no name.
 
 New settings in `SettingsRepository`, all with defaults so upgrades need no migration:
 

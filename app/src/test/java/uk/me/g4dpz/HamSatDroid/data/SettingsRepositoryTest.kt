@@ -45,6 +45,11 @@ class SettingsRepositoryTest {
         assertEquals(12, s.overviewHours.value)
         assertEquals(0, s.overviewMinElevation.value)
         assertFalse(s.setupFinished.value)
+        assertEquals(emptyList<SavedStation>(), s.plannerStations.value)
+        assertEquals("", s.plannerStationId.value)
+        assertEquals(0, s.plannerMinElevation.value)
+        assertEquals(24, s.plannerHours.value)
+        assertFalse(s.plannerAllSatellites.value)
     }
 
     @Test
@@ -78,6 +83,12 @@ class SettingsRepositoryTest {
         a.overviewHours.value = 24
         a.overviewMinElevation.value = 20
         a.setupFinished.value = true
+        val kansas = SavedStation("id-1", "W0KC", "39.5", "-95", "EM29mm")
+        a.plannerStations.value = listOf(kansas)
+        a.plannerStationId.value = "id-1"
+        a.plannerMinElevation.value = 10
+        a.plannerHours.value = 48
+        a.plannerAllSatellites.value = true
 
         val b = settings()
         assertEquals("52.25", b.homeLat.value)
@@ -94,6 +105,11 @@ class SettingsRepositoryTest {
         assertEquals(24, b.overviewHours.value)
         assertEquals(20, b.overviewMinElevation.value)
         assertTrue(b.setupFinished.value)
+        assertEquals(listOf(kansas), b.plannerStations.value)
+        assertEquals("id-1", b.plannerStationId.value)
+        assertEquals(10, b.plannerMinElevation.value)
+        assertEquals(48, b.plannerHours.value)
+        assertTrue(b.plannerAllSatellites.value)
     }
 
     @Test
@@ -115,6 +131,10 @@ class SettingsRepositoryTest {
         store.map["kepsSource"] = "NOT_A_SOURCE"
         store.map["selectedCatnum"] = -5
         store.map["compassEnabled"] = "yes" // wrong type
+        store.map["plannerMinElevation"] = 7
+        store.map["plannerHours"] = 72 // the planner offers at most 48
+        store.map["plannerStations"] = "{damaged"
+        store.map["plannerAllSatellites"] = "yes" // wrong type
         val s = settings()
         assertEquals(5, s.alertLeadMinutes.value)
         assertEquals(12, s.overviewHours.value)
@@ -124,6 +144,10 @@ class SettingsRepositoryTest {
         assertEquals(KepsSource.DEFAULT, s.kepsSource.value)
         assertEquals(0, s.selectedCatnum.value)
         assertTrue(s.compassEnabled.value)
+        assertEquals(0, s.plannerMinElevation.value)
+        assertEquals(24, s.plannerHours.value)
+        assertEquals(emptyList<SavedStation>(), s.plannerStations.value)
+        assertFalse(s.plannerAllSatellites.value)
     }
 
     @Test
@@ -133,6 +157,9 @@ class SettingsRepositoryTest {
             { s.alertLeadMinutes.value = 7 },
             { s.overviewHours.value = 3 },
             { s.overviewMinElevation.value = 5 },
+            { s.plannerMinElevation.value = 25 },
+            { s.plannerHours.value = 72 },
+            { s.plannerStations.value = List(SavedStation.MAX_STATIONS + 1) { SavedStation("id-$it", "", "1", "2", "") } },
         )) {
             try {
                 action()

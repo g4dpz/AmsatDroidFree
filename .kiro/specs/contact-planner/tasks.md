@@ -21,11 +21,13 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
   - [x] 1.3 Add `ContactPlannerCalculator` (all satellites, one coroutine each), with `ContactPlannerCalculatorTest` (parallel equals sequential; cancelling work already started)
     - _Requirements: 4.1, 4.6, 9.3_
 
-- [ ] 2. Saved stations and settings
-  - [ ] 2.1 Add `SavedStation` and `SavedStationsJson`, with `SavedStationsJsonTest`
+- [x] 2. Saved stations and settings
+  - [x] 2.1 Add `SavedStation` and `SavedStationsJson`, with `SavedStationsJsonTest`
     - _Requirements: 2.1, 2.4_
-  - [ ] 2.2 Add the five planner settings and the choice lists to `SettingsRepository`, with tests of the defaults
+    - Done 14 November 2026: `data/SavedStation.kt`, `SavedStationsJsonTest` (13 tests)
+  - [x] 2.2 Add the five planner settings and the choice lists to `SettingsRepository`, with tests of the defaults
     - _Requirements: 1.3, 2.6, 3.1, 3.3_
+    - Done 14 November 2026: in `SettingsRepository`, with the defaults, persistence, bad-stored-value and rejected-value cases added to `SettingsRepositoryTest`
 
 - [ ] 3. View model
   - [ ] 3.1 Add `ContactPlannerViewModel` and `PlannerUiState`, with Robolectric tests
@@ -37,7 +39,7 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
 - [ ] 4. Screens
   - [ ] 4.1 Add `Routes.PLANNER`, the "Contact planner" menu item below All satellites, and the planner screen with the stations, search and results sections, and the Calculate again button
     - _Requirements: 1.1, 1.2, 1.4, 1.5, 2.7, 2.8, 3.1, 4.1, 4.2, 5.1, 5.2, 5.4_
-  - [ ] 4.2 Add the station editor (`Routes.PLANNER_STATION`; name, locator, latitude and longitude, no elevation field): add, edit, delete with confirmation, `LocatorSync` rules and 4-character squares (O5), the 10-station limit
+  - [ ] 4.2 Add the station editor (`Routes.PLANNER_STATION`; name, locator, latitude and longitude, no elevation field): add, edit, delete with confirmation, `LocatorSync` rules and 4-character squares (O5), the 10-station limit; the name is limited with `SavedStation.limitName` (a character is a code point, so an emoji is never split)
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
   - [ ] 4.3 Add the window detail: both stations' look angles and total path, the mode picker and each station's Doppler, the timeline
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
