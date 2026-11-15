@@ -13,7 +13,17 @@ What already supports this (checked in the code, version 2.0.0): `PassSummary` c
 **Update, 15 Nov 2026:** Peter asked again, this time for "what satellites we are interested in rather than the whole list". David (G4DPZ) decided that the one list also narrows the **All satellites** overview and the **Contact planner**, so the list is chosen once and used on all three screens.
 Related specs: `pass-card-layout` (the card needs a place for the satellite name, so do that first) and `first-run-setup`.
 
-## Open decisions (please answer before building)
+## Decisions made on 15 Nov 2026
+David (G4DPZ) accepted the recommendation for every open decision below (O1 to O6). The text of each is kept as written.
+- O1: reuse the overview's minimum elevation setting, shown as a dropdown in My satellites mode.
+- O2: the widget shows the earliest next pass across the list, as a last optional task.
+- O3: a two-choice control above the satellite field, remembered.
+- O4: the list starts empty; the editor opens the first time the mode is chosen.
+- O5: the planner scope has three choices (Selected satellite, My satellites, All satellites); the overview has All / My satellites; each screen remembers its own.
+- O6: `plannerAllSatellites` is replaced by a scope setting and the old key is read once.
+- Build order: `pass-card-layout` (2.1.0), then My satellites (2.2.0), then My satellites on the overview and planner.
+- Known limit: a satellite missing from the current keps source is skipped and counted, even if another downloaded source has it. Combining sources is not part of this work; revisit if testers report satellites vanishing when they change source.
+## Open decisions (answered above; kept for the reasoning)
 
 - O1. **Minimum elevation filter.** With several LEO satellites the list gets long and includes passes that peak at 1 or 2 degrees. Recommendation: reuse the existing overview setting (Minimum elevation 0, 10, 20, 30 degrees) so the two lists agree, and show it as a dropdown in My satellites mode. Alternative: no filter in this version.
 - O2. **Widget.** Should the widget show the earliest next pass across My satellites when that mode is on? Recommendation: yes, but as a final optional task, so the main feature can ship without it.
