@@ -1,3 +1,5 @@
-# Copy to sentry.properties (gitignored) and paste the DSN of your Sentry project.
-# Or set the SENTRY_DSN environment variable. With no DSN, crash reporting never starts.
+# Copy to sentry.properties (gitignored) and fill in. Or set the SENTRY_DSN and SENTRY_ENVIRONMENT environment variables.
+# With no DSN, crash reporting never starts.
 dsn=
+# internal-testing, closed-testing or production. Production builds have the Settings switch off by default.
+environment=internal-testing

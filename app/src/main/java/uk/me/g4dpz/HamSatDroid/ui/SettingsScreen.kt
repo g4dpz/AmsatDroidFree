@@ -179,7 +179,7 @@ fun SettingsScreen(
                 onCheckedChange = { settings.spokenAlerts.value = it },
             )
 
-            // Internal-test builds that carry a Sentry DSN only; nothing is shown (or sent) without one.
+            // Builds that carry a Sentry DSN only; nothing is shown (or sent) without one.
             if (BuildConfig.SENTRY_DSN.isNotBlank()) {
                 HorizontalDivider()
                 SectionTitle(R.string.settings_section_privacy)

@@ -8,7 +8,7 @@ import io.sentry.android.core.SentryAndroid
 import uk.me.g4dpz.HamSatDroid.BuildConfig
 
 /**
- * Anonymous crash reports through Sentry, for the internal test only.
+ * Anonymous crash reports through Sentry.
  *
  * Sentry is started by hand (the manifest turns its automatic start off) and only when the user allows crash reports
  * and the build carries a DSN. Without a DSN, as on CI and in a fresh clone, nothing starts. What is sent is the
@@ -17,8 +17,6 @@ import uk.me.g4dpz.HamSatDroid.BuildConfig
  * could identify a person or their location.
  */
 object CrashReporting {
-    const val ENVIRONMENT = "internal-testing"
-
     /** Starts or stops Sentry to match [enabled]. Safe to call repeatedly. */
     fun apply(app: Application, enabled: Boolean, dsn: String = BuildConfig.SENTRY_DSN) {
         if (enabled && dsn.isNotBlank()) {
@@ -26,7 +24,7 @@ object CrashReporting {
                 SentryAndroid.init(app) { options ->
                     options.dsn = dsn
                     options.release = "${app.packageName}@${BuildConfig.VERSION_NAME}+${BuildConfig.VERSION_CODE}"
-                    options.environment = ENVIRONMENT
+                    options.environment = BuildConfig.SENTRY_ENVIRONMENT
                     options.isSendDefaultPii = false
                     options.isEnableAutoSessionTracking = false
                     options.isSendClientReports = false

@@ -1,7 +1,7 @@
-# Crash reports in the internal test build
+# Crash reports
 
-Applies to builds from the branch `internal/sentry-crash-reports` (2.1.0, versionCode 2101 and up). Not for the closed
-or production tracks: take it out first (see the end).
+Crash reports are in master (2.1.0, versionCode 2101 and up). On by default for internal and closed testing,
+off by default for production (set `environment=production` in `sentry.properties`).
 
 ## What is sent
 
@@ -14,15 +14,15 @@ project settings (switch it on).
 
 ## Privacy policy paragraph (wiki, Beta testers section)
 
-> **Crash reports (internal test builds only).** Internal test builds can send an anonymous crash report to Sentry
+> **Crash reports (test builds).** Internal and closed test builds can send an anonymous crash report to Sentry
 > (sentry.io, hosted in the EU) when the app crashes or stops responding. It contains the error and stack trace, the
 > app version, the Android version and the device model. It does not contain your location, name, callsign, email
 > address or any account or advertising identifier. You can switch it off in Settings, Privacy, "Send anonymous crash
-> reports". Production releases do not send crash reports.
+> reports". In production builds the switch is off until you turn it on.
 
 ## Play Console, Data safety (App content)
 
-Update while a build with crash reporting is live, and revert afterwards:
+Declare this before a build with crash reporting goes to any track, and keep it while crash reports are in the app:
 
 - Data types: App info and performance, Crash logs (and Diagnostics if you want to be conservative).
 - Collected: yes. Shared: yes, with Sentry as a third-party service (read the form's current definitions; a service
@@ -31,7 +31,7 @@ Update while a build with crash reporting is live, and revert afterwards:
   anonymous), unless you add a way.
 - Optional: collection can be switched off in Settings.
 
-## Removing it before closed testing
+## Removing crash reports entirely (only if you decide to drop them)
 
 1. Delete `io.sentry:sentry-android-core` from `app/build.gradle.kts`, the `sentryDsn` block and the `SENTRY_DSN`
    BuildConfig field.
@@ -39,4 +39,4 @@ Update while a build with crash reporting is live, and revert afterwards:
    setting, the Settings "Privacy" section and its three strings, and the call in `HamSatDroidApp`.
 3. Remove `sentry.properties.template` and the `.gitignore` entry (keep your local `sentry.properties` out of the repo).
 4. Revert the Data safety form and remove the wiki paragraph.
-5. Release as a new versionCode from master, not from this branch. Simplest: never merge this branch.
+5. Release as a new versionCode.
