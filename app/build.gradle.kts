@@ -38,7 +38,7 @@ android {
         applicationId = "uk.me.g4dpz.amsatdroid"
         minSdk = 30
         targetSdk = 36
-        versionCode = 29
+        versionCode = 2100
         versionName = "2.1.0"
     }
 
