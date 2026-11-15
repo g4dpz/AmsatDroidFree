@@ -120,7 +120,7 @@ class SettingsRepository(private val store: KeyValueStore) {
     val setupFinished = Setting(store.getBoolean(SETUP_FINISHED, false)) { store.putBoolean(SETUP_FINISHED, it) }
 
     // ---- sky view ----
-    val compassEnabled = Setting(store.getBoolean(COMPASS_ENABLED, true)) { store.putBoolean(COMPASS_ENABLED, it) }
+    val compassEnabled = Setting(store.getBoolean(COMPASS_ENABLED, false)) { store.putBoolean(COMPASS_ENABLED, it) }
     val pointingAxis = Setting(enumOrDefault(store.getString(POINTING_AXIS, PointingAxis.TOP_EDGE.name), PointingAxis.TOP_EDGE)) {
         store.putString(POINTING_AXIS, it.name)
     }
