@@ -75,7 +75,7 @@ class SettingsRepositoryTest {
         a.selectedCatnum.value = 25544
         a.alertLeadMinutes.value = 15
         a.spokenAlerts.value = true
-        a.compassEnabled.value = false
+        a.compassEnabled.value = true
         a.pointingAxis.value = PointingAxis.BACK
         a.keepScreenOn.value = false
         a.themeMode.value = ThemeMode.RED_NIGHT
@@ -97,7 +97,7 @@ class SettingsRepositoryTest {
         assertEquals(25544, b.selectedCatnum.value)
         assertEquals(15, b.alertLeadMinutes.value)
         assertTrue(b.spokenAlerts.value)
-        assertFalse(b.compassEnabled.value)
+        assertTrue(b.compassEnabled.value)
         assertEquals(PointingAxis.BACK, b.pointingAxis.value)
         assertFalse(b.keepScreenOn.value)
         assertEquals(ThemeMode.RED_NIGHT, b.themeMode.value)
