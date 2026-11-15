@@ -99,6 +99,7 @@ fun HomeScreen(
     onOpenMap: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenOverview: () -> Unit,
+    onOpenPlanner: () -> Unit,
     /** Whether the home location is set; while it is not, the controls show the "set up" banner. */
     locationSet: Boolean,
     /** Opens the setup guide (menu item and banner). */
@@ -164,6 +165,11 @@ fun HomeScreen(
                                 text = { Text(stringResource(R.string.menu_overview)) },
                                 enabled = state.satellites.isNotEmpty(),
                                 onClick = { menuOpen = false; onOpenOverview() },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_contact_planner)) },
+                                enabled = state.satellites.isNotEmpty(),
+                                onClick = { menuOpen = false; onOpenPlanner() },
                             )
                             if (layout != WindowLayout.DASHBOARD) {
                                 DropdownMenuItem(

@@ -38,13 +38,16 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
     - Done 14 November 2026: `ui/ContactPlannerViewModel.kt` and `ContactPlannerViewModelTest` (22 tests, plain JVM with the unconfined test dispatcher, as the overview's). The screen calls `onStart()` and `onStop()` from its STARTED lifecycle (task 4.1); the stale warning is data (`StaleElements`), worded by the screen
 
 - [ ] 4. Screens
-  - [ ] 4.1 Add `Routes.PLANNER`, the "Contact planner" menu item below All satellites, and the planner screen with the stations, search and results sections, and the Calculate again button
+  - [x] 4.1 Add `Routes.PLANNER`, the "Contact planner" menu item below All satellites, and the planner screen with the stations, search and results sections, and the Calculate again button
     - _Requirements: 1.1, 1.2, 1.4, 1.5, 2.7, 2.8, 3.1, 4.1, 4.2, 5.1, 5.2, 5.4_
-  - [ ] 4.2 Add the station editor (`Routes.PLANNER_STATION`; name, locator, latitude and longitude, no elevation field): add, edit, delete with confirmation, `LocatorSync` rules and 4-character squares (O5), the 10-station limit; the name is limited with `SavedStation.limitName` (a character is a code point, so an emoji is never split)
+    - Done 14 November 2026: `ui/ContactPlannerScreen.kt`, the menu item and `Routes.PLANNER`. Checked on the A16 emulator and the SM-T225: 42 behaviour checks and 35 layout checks each (portrait and landscape, 100 and 200 percent font, red night)
+  - [x] 4.2 Add the station editor (`Routes.PLANNER_STATION`; name, locator, latitude and longitude, no elevation field): add, edit, delete with confirmation, `LocatorSync` rules and 4-character squares (O5), the 10-station limit; the name is limited with `SavedStation.limitName` (a character is a code point, so an emoji is never split)
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+    - Done 14 November 2026: `ui/PlannerStationScreen.kt` and the pure rules in `domain/StationEditing.kt` (`StationEditingTest`, 9 tests); a station just added becomes the chosen one
   - [ ] 4.3 Add the window detail: both stations' look angles and total path, the mode picker and each station's Doppler, the timeline
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
   - [ ] 4.4 Strings for all of the above
+    - Strings for the planner screen and the editor are in with 4.1 and 4.2; those for the detail (4.3) are still to come
     - _Requirements: D4_
 
 - [ ] 5. Quality

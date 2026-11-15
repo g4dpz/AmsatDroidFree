@@ -38,6 +38,8 @@ data class StaleElements(val satelliteName: String, val days: Int)
 data class PlannerUiState(
     /** False when the home location is not set; nothing is searched then. */
     val locationSet: Boolean,
+    /** The home locator, such as IO82xk, shown as "your station". */
+    val homeLocator: String,
     val stations: List<SavedStation>,
     /** The station chosen as the other end, or null when none is chosen (or the chosen one was deleted). */
     val chosen: SavedStation?,
@@ -51,6 +53,11 @@ data class PlannerUiState(
     val allSatellites: Boolean,
     val distanceKm: Double?,
     val searching: Boolean,
+    /**
+     * True when the results shown are complete for the current inputs: a search finished, or there was nothing to search.
+     * False before the first search and after any change, so "no windows" is never shown for a search not yet run.
+     */
+    val done: Boolean,
     /** Satellites done and in all, while searching all satellites; null otherwise. */
     val progress: Pair<Int, Int>?,
     /** Sorted by start. Always for the current inputs: results for older inputs are cleared at once. */
@@ -118,7 +125,8 @@ class ContactPlannerViewModel(
     init {
         viewModelScope.launch {
             merge<Any?>(
-                tles, selectedCatnum, settings.homeLat.state, settings.homeLon.state, settings.plannerStations.state,
+                tles, selectedCatnum, settings.homeLat.state, settings.homeLon.state, settings.homeLocator.state,
+                settings.plannerStations.state,
                 settings.plannerStationId.state, settings.plannerMinElevation.state, settings.plannerHours.state,
                 settings.plannerAllSatellites.state,
             ).collect { onInputsChanged() }
@@ -225,6 +233,7 @@ class ContactPlannerViewModel(
             // are searched, are still shown, and neither has results of its own to leave behind.
             _state.update {
                 it.copy(
+                    homeLocator = settings.homeLocator.value,
                     stations = settings.plannerStations.value,
                     selectedCatnum = selectedCatnum.value ?: 0,
                     selectedName = tles.value.firstOrNull { t -> t.catnum == selectedCatnum.value }?.name,
@@ -250,6 +259,7 @@ class ContactPlannerViewModel(
         val locationSet = HomeLocation.isSet(key.lat, key.lon)
         return PlannerUiState(
             locationSet = locationSet,
+            homeLocator = settings.homeLocator.value,
             stations = settings.plannerStations.value,
             chosen = key.chosen,
             minElevation = key.minElevation,
@@ -259,6 +269,7 @@ class ContactPlannerViewModel(
             allSatellites = key.all,
             distanceKm = if (locationSet && home != null && other != null) ContactPlanner.greatCircleKm(home, other) else null,
             searching = false,
+            done = false,
             progress = null,
             windows = emptyList(),
             usableNow = emptyList(),
@@ -295,12 +306,12 @@ class ContactPlannerViewModel(
         if (home == null || other == null || !canSearch(key)) {
             // nothing to search: not set, no station chosen, or no satellite to search
             finished = true
-            _state.update { it.copy(searching = false, progress = null, windows = emptyList(), usableNow = emptyList(), staleElements = null) }
+            _state.update { it.copy(searching = false, done = true, progress = null, windows = emptyList(), usableNow = emptyList(), staleElements = null) }
             return
         }
         _state.update {
             it.copy(
-                searching = true, progress = if (key.all) 0 to satellites.size else null, windows = emptyList(),
+                searching = true, done = false, progress = if (key.all) 0 to satellites.size else null, windows = emptyList(),
                 usableNow = emptyList(), staleElements = staleFor(key, startedAt),
             )
         }
@@ -319,7 +330,7 @@ class ContactPlannerViewModel(
                     }
                 }
             finished = true
-            _state.update { it.copy(searching = false, progress = null) }
+            _state.update { it.copy(searching = false, done = true, progress = null) }
             dropEnded()
             log("Contact planner: ${satellites.size} satellite(s) over ${key.hours} h took ${clock() - startedAt} ms")
         }

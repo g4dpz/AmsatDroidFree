@@ -22,6 +22,7 @@ import java.util.Locale
 class DisplayFormats(val locale: Locale, val zone: ZoneId = ZoneId.systemDefault()) {
     private val date = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale).withZone(zone)
     private val time = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale).withZone(zone)
+    private val utcTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale).withZone(java.time.ZoneOffset.UTC)
     private val dateTime = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
         .withLocale(locale).withZone(zone)
     private val coordinate = NumberFormat.getNumberInstance(locale).apply { maximumFractionDigits = 4 }
@@ -44,6 +45,9 @@ class DisplayFormats(val locale: Locale, val zone: ZoneId = ZoneId.systemDefault
     fun twoDecimals(value: Double): String = twoDecimals.format(value)
 
     fun date(instant: Instant): String = date.format(instant)
+
+    /** The time of day in UTC, for times two stations in different time zones both need (the contact planner). */
+    fun utcTime(instant: Instant): String = utcTime.format(instant)
     fun time(instant: Instant): String = time.format(instant)
     fun dateTime(instant: Instant): String = dateTime.format(instant)
     fun dateTime(millis: Long): String = dateTime(Instant.ofEpochMilli(millis))
