@@ -383,6 +383,34 @@ class ContactPlannerTest {
     }
 
     @Test
+    fun `the timeline of a very long window is thinned so it stays a few rows`() {
+        // The Molniya-type orbit of the recovery test: the UK and Moscow see it for about eight hours, 480 minutes
+        val long = windows(molniya, uk, moscow, 0.0, "2026-11-14T22:27:00Z", 12).first()
+        assertTrue("fixture: a window of hours", Duration.between(long.start, long.end).toMinutes() > 300)
+        val rows = ContactPlanner.timeline(molniya, uk, moscow, long)
+        assertTrue("${rows.size} rows", rows.size in 60..ContactPlanner.MAX_TIMELINE_ROWS)
+        assertEquals(long.start, rows.first().time)
+        assertEquals(long.end, rows.last().time)
+        assertTrue("the best moment is listed", rows.any { it.time == long.best.time })
+        assertEquals("sorted and without repeats", rows.map { it.time }.distinct().sorted(), rows.map { it.time })
+        // the rows between are on whole minutes, an even number of minutes apart
+        val minutes = rows.map { it.time }.filter { it != long.start && it != long.end && it != long.best.time }
+        val gaps = minutes.zipWithNext().map { (a, b) -> Duration.between(a, b).seconds }.toSet()
+        assertEquals("one even spacing: $gaps", 1, gaps.size)
+        assertTrue("whole minutes", minutes.all { it.epochSecond % 60 == 0L })
+        assertTrue("more than a minute apart for such a window: $gaps", gaps.single() > 60)
+    }
+
+    @Test
+    fun `a window of ordinary length keeps one row a minute`() {
+        val w = windows(rs44, uk, kansasCity, 0.0, "2026-11-15T15:00:00Z", 2).single()
+        val rows = ContactPlanner.timeline(rs44, uk, kansasCity, w)
+        val wholeMinutes = rows.map { it.time }.filter { it.epochSecond % 60 == 0L && it != w.start && it != w.end }
+        assertTrue(wholeMinutes.zipWithNext().all { (a, b) -> Duration.between(a, b).seconds == 60L })
+        assertTrue(rows.size < ContactPlanner.MAX_TIMELINE_ROWS)
+    }
+
+    @Test
     fun `the great-circle distance between stations`() {
         assertEquals(6818.0, ContactPlanner.greatCircleKm(uk, kansasCity), 5.0) // the figure in the requirements
         assertEquals(343.0, ContactPlanner.greatCircleKm(PlannerStation(51.5, -0.12), PlannerStation(48.86, 2.35)), 5.0) // London to Paris

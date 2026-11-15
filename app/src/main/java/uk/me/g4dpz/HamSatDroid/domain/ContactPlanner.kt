@@ -79,6 +79,9 @@ sealed interface PlannerItem {
 object ContactPlanner {
     const val STEP_SECONDS = 5
 
+    /** The most rows a window's timeline has; longer windows are thinned (see [timeline]). */
+    const val MAX_TIMELINE_ROWS = 120
+
     private const val STEP_MS = STEP_SECONDS * 1000L
     private const val MINUTE_MS = 60_000L
     private const val EARTH_RADIUS_KM = 6371.0
@@ -147,6 +150,10 @@ object ContactPlanner {
     /**
      * The moments to list for [window], earliest first: its start, every whole UTC minute inside it, its best moment
      * and its end (requirement 6.3). [tle] must be the satellite the window was found for.
+     *
+     * A window of a couple of hours or more (a slow elliptical orbit) would give hundreds of rows, so then the rows between
+     * are every 2nd, 3rd, 4th ... whole minute, as few as keep the list to [MAX_TIMELINE_ROWS]. The start, the best moment
+     * and the end are always listed.
      */
     fun timeline(tle: TLE, home: PlannerStation, other: PlannerStation, window: MutualWindow): List<MutualMoment> {
         val observer = Observer(tle)
@@ -155,10 +162,15 @@ object ContactPlanner {
         val startMs = window.start.toEpochMilli()
         val endMs = window.end.toEpochMilli()
         val times = sortedSetOf(startMs, endMs, window.best.time.toEpochMilli())
-        var minute = (startMs / MINUTE_MS + 1) * MINUTE_MS
+        val firstMinute = (startMs / MINUTE_MS + 1) * MINUTE_MS
+        val minutesInside = if (endMs > firstMinute) ((endMs - 1 - firstMinute) / MINUTE_MS + 1).toInt() else 0
+        // the three fixed rows leave this many for the minutes between
+        val room = MAX_TIMELINE_ROWS - 3
+        val every = ((minutesInside + room - 1) / room).coerceAtLeast(1)
+        var minute = firstMinute
         while (minute < endMs) {
             times += minute
-            minute += MINUTE_MS
+            minute += every * MINUTE_MS
         }
         return times.filter { it in startMs..endMs }.map {
             MutualMoment(Instant.ofEpochMilli(it), observer.look(homeStation, it), observer.look(otherStation, it))

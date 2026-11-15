@@ -118,7 +118,7 @@ Related specs: `first-run-setup`, `pass-card-layout` and `multi-satellite-passes
 
 1. Tapping a window SHALL show its detail.
 2. The detail SHALL show, for each station at the best moment: azimuth, elevation and range, and the total path.
-3. The detail SHALL show a timeline through the window, one row a minute and at the start, best moment and end, with both stations' azimuth and elevation.
+3. The detail SHALL show a timeline through the window, one row a minute and at the start, best moment and end, with both stations' azimuth and elevation. WHEN a window is so long that this would be more than 120 rows (a slow elliptical orbit) THEN the rows between SHALL be an even number of whole minutes apart, as few as keep the timeline to 120 rows, and the start, best moment and end SHALL always be shown.
 4. WHEN the satellite has modes in the transponder database THEN the detail SHALL offer the same mode choice as the sky screen, and show for each station at the best moment its own downlink (receive) and uplink (transmit) frequencies corrected for Doppler, with `DopplerMath`, and the CTCSS tone when the mode has one.
 5. WHEN the satellite has no transponder data THEN the detail SHALL say so, as the sky screen does.
 6. The detail SHALL be readable aloud by a screen reader in a sensible order: station, then azimuth, elevation, range, then frequencies.
