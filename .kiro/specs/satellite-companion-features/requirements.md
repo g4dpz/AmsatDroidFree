@@ -40,7 +40,7 @@ Secondary target (phone sizes): **Samsung Galaxy A16**, checked on an emulator o
 - D1. Alert lead time defaults to **5 minutes**, user-selectable (5, 10, 15, 30).
 - D2. Automatic keps refresh is **on by default, every 24 hours**, on any connected network, using the user's selected keps source.
 - D5. The default keps source is **Celestrak amateur (JSON)**; see A14.
-- D3. The compass is **on by default** when the device has a rotation-vector sensor.
+- D3. The compass is **off by default** (changed from on, 15 Nov 2026) and the user switches it on; the choice persists.
 - D4. All of the following are in scope: Compose, replacing the serialized `elems.bin` / `prefs.bin` files, replacing `android.preference`, the widget, adaptive two-pane layouts, translation support.
 
 ### Assumptions (please confirm or change)
@@ -131,7 +131,7 @@ Secondary target (phone sizes): **Samsung Galaxy A16**, checked on an emulator o
 6. The heading source SHALL be chosen in this order: rotation-vector sensor, geomagnetic rotation-vector sensor, then accelerometer plus magnetometer combined with `SensorManager.getRotationMatrix`. The app SHALL work on a device without a gyroscope.
 7. IF none of these is available THEN the chart SHALL stay north-up and the compass control SHALL be hidden.
 8. WHEN sensor accuracy is low THEN the screen SHALL show a short hint to calibrate the compass.
-9. The compass SHALL be enabled by default; the user SHALL be able to switch it off and on, and the choice SHALL persist.
+9. The compass SHALL be off by default; the user SHALL be able to switch it on and off, and the choice SHALL persist.
 10. The chart orientation SHALL be correct when the device lies flat and when it is held upright, in portrait or landscape.
 11. Pass track, AOS/LOS labels and current satellite marker SHALL remain correct relative to the compass (only the chart rotation changes, not the satellite maths).
 

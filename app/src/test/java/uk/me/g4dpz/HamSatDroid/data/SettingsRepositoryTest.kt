@@ -37,7 +37,7 @@ class SettingsRepositoryTest {
         assertEquals(0, s.selectedCatnum.value)
         assertEquals(5, s.alertLeadMinutes.value)
         assertFalse(s.spokenAlerts.value)
-        assertTrue(s.compassEnabled.value)
+        assertFalse(s.compassEnabled.value)
         assertEquals(PointingAxis.TOP_EDGE, s.pointingAxis.value)
         assertTrue(s.keepScreenOn.value)
         assertEquals(ThemeMode.SYSTEM, s.themeMode.value)
@@ -75,7 +75,7 @@ class SettingsRepositoryTest {
         a.selectedCatnum.value = 25544
         a.alertLeadMinutes.value = 15
         a.spokenAlerts.value = true
-        a.compassEnabled.value = false
+        a.compassEnabled.value = true
         a.pointingAxis.value = PointingAxis.BACK
         a.keepScreenOn.value = false
         a.themeMode.value = ThemeMode.RED_NIGHT
@@ -97,7 +97,7 @@ class SettingsRepositoryTest {
         assertEquals(25544, b.selectedCatnum.value)
         assertEquals(15, b.alertLeadMinutes.value)
         assertTrue(b.spokenAlerts.value)
-        assertFalse(b.compassEnabled.value)
+        assertTrue(b.compassEnabled.value)
         assertEquals(PointingAxis.BACK, b.pointingAxis.value)
         assertFalse(b.keepScreenOn.value)
         assertEquals(ThemeMode.RED_NIGHT, b.themeMode.value)
@@ -143,7 +143,7 @@ class SettingsRepositoryTest {
         assertEquals(PointingAxis.TOP_EDGE, s.pointingAxis.value)
         assertEquals(KepsSource.DEFAULT, s.kepsSource.value)
         assertEquals(0, s.selectedCatnum.value)
-        assertTrue(s.compassEnabled.value)
+        assertFalse(s.compassEnabled.value)
         assertEquals(0, s.plannerMinElevation.value)
         assertEquals(24, s.plannerHours.value)
         assertEquals(emptyList<SavedStation>(), s.plannerStations.value)
