@@ -46,11 +46,13 @@ open class HamSatDroidApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        AlertNotifier(this).ensureChannel()
-        // Internal-test crash reports: starts or stops with the setting (and does nothing without a DSN).
+        // Crash reports: start Sentry here, before anything else, so a failure during start-up is caught; later changes
+        // of the setting start or stop it (no DSN means nothing starts).
+        CrashReporting.apply(this, settings.crashReports.value)
         scope.launch {
             settings.crashReports.state.collect { enabled -> CrashReporting.apply(this@HamSatDroidApp, enabled) }
         }
+        AlertNotifier(this).ensureChannel()
         val scheduler = KepsScheduler(this)
         // A StateFlow delivers the current value first (applied at start-up) and then every change.
         scope.launch {

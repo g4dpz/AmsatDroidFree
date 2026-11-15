@@ -27,9 +27,9 @@ val sentryPropertiesFile = rootProject.file("sentry.properties")
 val sentryProperties = Properties().apply {
     if (sentryPropertiesFile.exists()) sentryPropertiesFile.inputStream().use { load(it) }
 }
-val sentryDsn: String = System.getenv("SENTRY_DSN")?.takeIf { it.isNotBlank() }
+val sentryDsn: String = System.getenv("SENTRY_DSN")?.trim()?.takeIf { it.isNotEmpty() }
     ?: sentryProperties.getProperty("dsn", "").trim()
-val sentryEnvironment: String = System.getenv("SENTRY_ENVIRONMENT")?.takeIf { it.isNotBlank() }
+val sentryEnvironment: String = System.getenv("SENTRY_ENVIRONMENT")?.trim()?.takeIf { it.isNotEmpty() }
     ?: sentryProperties.getProperty("environment", "internal-testing").trim()
 
 // Code coverage of the unit tests (Kover). Only generated classes are left out; the Compose screens stay in, and show
