@@ -58,7 +58,8 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
   - [x] 5.2 Speed on the SM-T225: one satellite over 48 hours; all Amateur satellites over 24 hours (first results, finish); the longest single `getPasses` call (how long cancellation can lag). Record the numbers here
     - Done 15 Nov 2026, SM-T225, from the app's log line: one satellite over 48 h 1642 ms; 99 satellites over 24 h 5690 and 5611 ms; 99 satellites over 48 h 10041 ms (about 100 ms per satellite). The longest single `getPasses` call was not instrumented; it is bounded by the 48 h case for one satellite, 1642 ms at most, so cancellation lags by no more than that
     - _Requirements: 9.1, 9.2_
-  - [ ] 5.3 Compare a few windows with an independent tool and record the result
+  - [x] 5.3 Compare a few windows with an independent tool and record the result
+    - Done 15 Nov 2026: the independent tool was the reference `sgp4` Python package (2.27, Vallado), with its own sidereal-time and look-angle code, stepping every second over the same fixed RS-44 elements, UK (IO82xk) to Kansas City (EM29mm), 72 h from 2026-11-14 14:55:24Z, minimum 0 degrees. It found three windows, 18:01:24 to 18:02:33, 16:25:31 to 16:30:19 and 16:51:36 to 16:55:27, with best moments 18:02:13, 16:27:33 and 16:53:56 and lower elevations 1.0, 3.7 and 3.5 degrees. The planner's expected values agree within 5 s and 0.1 degree. Not compared with Gpredict or N2YO
     - _Requirements: 10.1_
 
 - [ ] 6. Documentation
