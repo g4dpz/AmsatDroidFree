@@ -44,9 +44,9 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
   - [x] 4.2 Add the station editor (`Routes.PLANNER_STATION`; name, locator, latitude and longitude, no elevation field): add, edit, delete with confirmation, `LocatorSync` rules and 4-character squares (O5), the 10-station limit; the name is limited with `SavedStation.limitName` (a character is a code point, so an emoji is never split)
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
     - Done 14 November 2026: `ui/PlannerStationScreen.kt` and the pure rules in `domain/StationEditing.kt` (`StationEditingTest`, 9 tests); a station just added becomes the chosen one
-  - [x] 4.3 Add the window detail: both stations' look angles and total path, the mode picker and each station's Doppler, the timeline
-    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
-    - Done 14 November 2026: `ui/ContactPlannerDetail.kt`; tapping a window's summary shows or hides it in place. `ContactPlannerTest` checks that each station gets its own Doppler-corrected frequencies (the RS-44 figures of the requirements). Checked on the A16 emulator and the SM-T225, in every layout
+  - [x] 4.3 Add the window detail: both stations' look angles and total path, the timeline (no Doppler, D5)
+    - _Requirements: 6.1, 6.2, 6.3, 6.6_
+    - Done 14 November 2026: `ui/ContactPlannerDetail.kt`; tapping a window's summary shows or hides it in place. The first version also showed each station's Doppler-corrected frequencies and a mode picker; David took them out the same day (D5). Checked on the A16 emulator and the SM-T225, in every layout
   - [x] 4.4 Strings for all of the above
     - Done: the strings came in with 4.1, 4.2 and 4.3, with plurals where a count is followed by a word (lint is clean)
     - _Requirements: D4_

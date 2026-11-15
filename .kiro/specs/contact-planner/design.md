@@ -14,8 +14,6 @@ New code: one domain calculator with its data types, a saved-station type with i
 | `Satellite.getPosition(station, date)` | writes into the `GroundStationPosition` it is given, so each thread needs its own (see `OverviewCalculator`) |
 | `OverviewCalculator` | runs every satellite in its own coroutine on a limited dispatcher and emits results as each finishes; skips `SatelliteMotion.isStationary` satellites |
 | `SatelliteMotion.fixedPosition` | look angles of a stationary satellite |
-| `DopplerMath.downlinkHz` / `uplinkHz` | Doppler from a range rate in km/s |
-| `TransponderDatabase.modesForNoradId` | the satellite's modes from the OscarWatch database |
 | `LocatorSync` | the locator and latitude/longitude rules of Settings, pure and tested |
 | `LocationEditor` | bound to the home location in `SettingsRepository`, with GPS and network buttons; not reusable for another station as it stands |
 | `Settings.OVERVIEW_MIN_ELEVATION_CHOICES` | 0, 10, 20, 30; the planner needs finer steps at the low end (requirement 3.3) |
@@ -187,7 +185,7 @@ data class PlannerUiState(
 - `refresh()` searches again from now with the same choices (the "Calculate again" button, as on the overview).
 - The home position comes from the live `homeLat` and `homeLon` settings flows, checked with `HomeLocation.isSet`.
 - A one-minute tick drops windows whose end has passed (requirement 5.5).
-- The timeline and Doppler for an open window are worked out on demand, off the main thread, and kept while it is open.
+- The timeline for an open window is worked out on demand, off the main thread, and kept while it is open.
 
 ## Screens
 
@@ -198,9 +196,9 @@ From the top, in a scrolling column with the 600 dp maximum width the setup guid
 1. **Stations.** "Your station: IO82xk", then one "Minimum elevation (both stations)" picker. Then "Other station" as a dropdown of saved stations, with Edit and Add station buttons, and the distance between them.
 2. **Search.** Selected satellite or All satellites (a segmented button), the time window picker, and a "Calculate again" button (the overview's `overview_refresh` string) that searches again from now.
 3. **Results.** Progress while searching. Each window is a card in the passes-list style: satellite name (when searching all), date, start to end, duration, "Best 16:27:34 (16:27:34 UTC), both above 3.7°". "Usable from both stations now" cards for stationary satellites come first.
-4. **Detail.** Tapping a card's summary expands it in place (no new route, so the list keeps its scroll position): a two-column block, home and other, with azimuth, elevation and range at the best moment, the total path, the mode picker and each station's Tune and Transmit frequencies, then the timeline as rows of "16:26 · home az 292° el 2.1° · other az 49° el 3.0°".
+4. **Detail.** Tapping a card's summary expands it in place (no new route, so the list keeps its scroll position): for each station (home, then other) its azimuth, elevation and range at the best moment, the total path, then the timeline as rows of "16:26 · home az 292° el 2.1° · other az 49° el 3.0°".
 
-Only the summary of a card is the button (a tappable `Card` would merge everything inside it into one item for a screen reader, and the mode picker in the detail could not be reached on its own). The detail reads, in order: the total path, the mode picker, then for each station its name, azimuth, elevation, range and its own Tune and Transmit frequencies, then the notes for the mode (inverting, CTCSS, beacon only), then the timeline. The timeline is at most 120 rows: a very long window (hours, on a slow elliptical orbit) is thinned in `ContactPlanner.timeline` to every 2nd, 3rd, 4th ... minute, so the detail never builds hundreds of rows at once.
+Only the summary of a card is the button (a tappable `Card` would merge everything inside it into one item for a screen reader, and each part of the detail could not be reached on its own). The detail reads, in order: the total path, then for each station its name, azimuth, elevation and range, then the timeline. There are no frequencies (requirements D5). The timeline is at most 120 rows: a very long window (hours, on a slow elliptical orbit) is thinned in `ContactPlanner.timeline` to every 2nd, 3rd, 4th ... minute, so the detail never builds hundreds of rows at once.
 
 The unset-location message and Set up button from the overview are reused (requirement 1.2).
 
@@ -212,7 +210,7 @@ The location fields use `LocatorSync` directly, with the same field order, label
 
 ## Strings
 
-All new text in `strings.xml`: the menu item, screen titles, section headings, labels, the empty and no-station messages, the progress line, the card and detail formats, and the editor's labels and messages. Existing strings reused: `overview_no_location`, the Set up button, the Doppler labels (`doppler_*`), the stale-elements warning.
+All new text in `strings.xml`: the menu item, screen titles, section headings, labels, the empty and no-station messages, the progress line, the card and detail formats, and the editor's labels and messages. Existing strings reused: `overview_no_location`, the Set up button, the azimuth, elevation and range labels of the sky screen, the stale-elements warning.
 
 ## Testing
 

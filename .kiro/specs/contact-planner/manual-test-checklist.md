@@ -38,8 +38,7 @@ Mark each box when it passes. Devices: Galaxy A16 emulator (411 x 891 dp), Galax
 
 - [ ] Tapping a window expands it; tapping again closes it; the list keeps its place
 - [ ] Both stations' azimuth, elevation and range at the best moment, and the total path, are shown
-- [ ] The mode picker appears for a satellite with transponder data, and each station shows its own Tune and Transmit frequencies
-- [ ] A satellite without transponder data says so
+- [ ] No frequencies, mode picker or Doppler appear in the detail
 - [ ] The timeline has a row a minute, plus start, best moment and end
 - [ ] Your station's look angles match the sky screen for the same pass at the same time
 
