@@ -2,7 +2,7 @@
 
 Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after each task. The golden regression test must stay green. Every task must leave the app building and runnable, and One satellite mode must keep working at every step.
 
-Before starting: answer the open decisions O1 to O4 in `requirements.md`, check open pull requests that touch `PassesScreen.kt` or `AppViewModel.kt`, and land `pass-card-layout` (the card needs the satellite name).
+Before starting: answer the open decisions O1 to O6 in `requirements.md`, check open pull requests that touch `PassesScreen.kt` or `AppViewModel.kt`, and land `pass-card-layout` (the card needs the satellite name). Task 9 needs the Contact planner merged to master.
 
 One PR at a time; wait for CI and Copilot before merging (merge commit).
 
@@ -53,10 +53,13 @@ One PR at a time; wait for CI and Copilot before merging (merge commit).
   - [ ] 8.1 `WidgetUpdater` picks the earliest next pass across the list in My satellites mode; `earliest` helper and tests
     - _Requirements: 7.1, 7.2, 7.3_
 
-- [ ] 9. Overview filter (optional)
-  - [ ] 9.1 "My satellites" chip on the overview screen
-    - _Requirements: 6.2_
-
+- [ ] 9. Overview and Contact planner use the list
+  - [ ] 9.1 Overview: All / My satellites control, `overviewScope` setting, view model filter, fallback when the list is empty; tests
+    - _Requirements: 6.2, 6.3_
+  - [ ] 9.2 Planner: `plannerScope` (SELECTED, MY, ALL) replacing `plannerAllSatellites` with the one-time read of the old key; search over the list; skipped note; restart on list change; fallback when empty; tests including the migration
+    - _Requirements: 10.2, 10.3, 10.4, 10.5, 10.6_
+  - [ ] 9.3 Planner screen: three-way scope, My satellites only when the list is not empty, Edit button; layouts and TalkBack; timing on the SM-T225 with 10 and 99 listed satellites
+    - _Requirements: 10.1, 10.7, 9.1, 9.2, 9.3_
 - [ ] 10. Documentation and release
   - [ ] 10.1 Update the README, the wiki Home page and the Play listing description; recapture screenshots
   - [ ] 10.2 Run `manual-test-checklist.md` and record results

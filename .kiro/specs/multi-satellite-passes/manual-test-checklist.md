@@ -53,3 +53,12 @@ Mark each box when it passes. Devices: Galaxy A16 emulator (411 x 891 dp), Galax
 - [ ] 200 percent font size: nothing clipped
 - [ ] TalkBack announces the selected mode and each checkbox as "name, checked" or "not checked"
 - [ ] Red night mode covers the mode control, the editor and the cards
+## Overview and Contact planner
+- [ ] Overview: the All / My satellites control is not shown with an empty list, and shows with a list; My satellites shows only listed satellites, up now and coming
+- [ ] Overview: the choice is kept after leaving and reopening the app; emptying the list returns to All and says why
+- [ ] Planner: Selected satellite, My satellites and All satellites are offered; My satellites only with a list; Edit opens the editor
+- [ ] Planner: My satellites searches only the listed satellites; changing the list restarts the search
+- [ ] Planner: a listed satellite not in the keps is counted as left out
+- [ ] Planner: upgrading from a build with All satellites chosen keeps All satellites; with it off keeps Selected satellite
+- [ ] Planner: emptying the list while My satellites is chosen falls back to Selected satellite and says why
+- [ ] Planner: a list of 10 and a list of 99 finish within the limits on the SM-T225

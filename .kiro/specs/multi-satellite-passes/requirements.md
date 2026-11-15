@@ -10,6 +10,7 @@ This spec adds **My satellites**: a personal list of satellites (for example AO-
 
 What already supports this (checked in the code, version 2.0.0): `PassSummary` carries `catnum` and `satName`; `PassAlert` is stored per pass with its satellite; the sky and map screens take the satellite from the selected pass; the overview calculates many satellites in parallel with `OverviewCalculator`. What does not: the passes list state and its stored copy (`PassStore`) hold one satellite, and the picker is single-choice.
 
+**Update, 15 Nov 2026:** Peter asked again, this time for "what satellites we are interested in rather than the whole list". David (G4DPZ) decided that the one list also narrows the **All satellites** overview and the **Contact planner**, so the list is chosen once and used on all three screens.
 Related specs: `pass-card-layout` (the card needs a place for the satellite name, so do that first) and `first-run-setup`.
 
 ## Open decisions (please answer before building)
@@ -27,6 +28,11 @@ Related specs: `pass-card-layout` (the card needs a place for the satellite name
 - D4. Alerts, the sky view, Aim mode, the map, Doppler and the pass card all work for a pass from any satellite in the merged list, because they already follow the selected pass.
 - D5. All new text is in `strings.xml`; English only.
 
+- D6. One list serves three screens: the passes screen (merged list), the All satellites overview and the Contact planner's "all satellites" search. The editor is the same; there is one saved list (`mySatellites`).
+- D7. The overview and planner changes are required, not optional (they replace the optional overview filter, requirement 6.2 and task 9).
+## Open decisions (added 15 Nov 2026)
+- O5. **How the other two screens offer the list.** Recommendation: the planner's scope choice becomes three: Selected satellite, My satellites, All satellites; the overview gets a two-choice filter, All / My satellites. Each screen remembers its own choice. Both show My satellites only when the list is not empty, and offer Edit.
+- O6. **Planner setting.** The planner stores `plannerAllSatellites` (true or false). Recommendation: replace it with a scope setting and read the old key once, so that true means All satellites and false means Selected satellite. No tester loses a choice.
 ## Assumptions (please confirm or change)
 
 - A1. A list of up to about 100 satellites is supported (the full catalogue is 99 today); no hard cap is enforced, but the editor and calculation are tested at 99.
@@ -115,8 +121,9 @@ Related specs: `pass-card-layout` (the card needs a place for the satellite name
 #### Acceptance criteria
 
 1. WHEN the user opens a pass from the All satellites overview THEN the app SHALL switch to One satellite mode for that satellite, as the overview does today, and SHALL leave the saved list untouched.
-2. The overview SHALL offer an option to show only My satellites (when the list is not empty). (Optional; see task 9.)
-3. The overflow menu actions that need a single satellite (Map view) SHALL use the selected pass's satellite in My satellites mode, and SHALL be disabled when nothing is selected.
+2. The overview SHALL offer a choice between All satellites and My satellites (when the list is not empty). The choice SHALL be remembered. In My satellites the "Up now" section and the upcoming passes SHALL use only the listed satellites, and the heading SHALL say so.
+3. WHEN the saved list becomes empty while the overview is set to My satellites THEN the overview SHALL show all satellites and say why.
+4. The overflow menu actions that need a single satellite (Map view) SHALL use the selected pass's satellite in My satellites mode, and SHALL be disabled when nothing is selected.
 
 ### Requirement 7: Widget (subject to O2)
 
@@ -149,3 +156,14 @@ Related specs: `pass-card-layout` (the card needs a place for the satellite name
 2. Text SHALL not clip at 200 percent font size; the layouts SHALL work in portrait, landscape and split-screen on phones and tablets.
 3. The red night theme SHALL cover every new control.
 4. The feature SHALL add no permissions, no network requests and no data leaving the device.
+### Requirement 10: Contact planner
+**User story:** As an operator, I want the contact planner to search only the satellites I use, so that I am not shown windows through satellites I do not care about.
+#### Acceptance criteria
+1. The planner's scope choice SHALL offer Selected satellite, My satellites and All satellites. My satellites SHALL be shown only when the list is not empty; an Edit button SHALL open the same editor as the passes screen.
+2. WHEN My satellites is chosen THEN the search SHALL cover exactly the listed satellites that are in the current keps, with the same progress, cancellation, results order and limits as an all-satellites search.
+3. Listed satellites that are not in the current keps SHALL be skipped, and the screen SHALL say how many were left out.
+4. The choice SHALL be remembered. A tester who had All satellites or Selected satellite chosen before the change SHALL see the same choice afterwards (O6).
+5. WHEN the list changes THEN a running search SHALL restart, and results for the old list SHALL not be shown.
+6. WHEN the saved list becomes empty while the planner is set to My satellites THEN the planner SHALL fall back to Selected satellite and say why.
+7. The planner's timing limits (planner requirement 9) SHALL hold: a list is never slower than All satellites.
+8. The Contact planner spec and screens SHALL otherwise be unchanged, and no new network use or permission is added.

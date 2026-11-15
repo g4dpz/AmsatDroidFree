@@ -110,9 +110,11 @@ No structural change. `onPassClick` calls `selectPass`, which now also sets `sel
 
 `WidgetUpdater.compute` reads `passMode` and `mySatellites`. In MINE mode it calls `PassPredictor.nextSatPass` per satellite (as it does for one today), picks the earliest, and returns `WidgetState.Ready(satName, pass)`. `decide` stays pure; a small `earliest(passes)` helper is added and tested. WorkManager refresh and the Glance layout are unchanged.
 
-## Overview option (optional task)
+## Overview filter
+The overview screen gets a two-choice control, All / My satellites (shown when the list is not empty). `OverviewViewModel` limits its TLEs to the saved catnums in My satellites mode, with the same calculator. The choice is a setting (`overviewScope`). If the list becomes empty the view model falls back to All and publishes a one-line reason.
 
-A filter chip "My satellites" on the overview screen (when the list is not empty) limits `OverviewViewModel`'s TLEs to the saved catnums. No other change.
+## Contact planner scope
+`ContactPlannerViewModel` today reads `plannerAllSatellites` (boolean). It moves to `plannerScope` (SELECTED, MY, ALL). On first read, a missing `plannerScope` is taken from the old key (true is ALL, false is SELECTED); the old key is left alone. In MY the search runs over the TLEs whose catnums are in `mySatellites` and in the current keps, by the same path as ALL (progress, cancellation, ordering, the 120-row timeline limit); `skipped` counts the rest. A list or scope change restarts the search through the existing key (the search key gains the list). The planner screen shows the scope as three choices and an Edit button that opens `MySatellitesEditor` (the dialog or full screen of the passes screen).
 
 ## Risks
 
