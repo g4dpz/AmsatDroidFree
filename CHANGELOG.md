@@ -4,6 +4,15 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
+## [2.1.0] - 2026-11-15 (versionCode 29)
+### Added
+- Contact planner (menu): pick another station by name and locator and see when a satellite is above the horizon at both stations, with the best moment and the look angles at both ends. Informational only, no alerts or Doppler.
+### Changed
+- Red night mode is 20 percent brighter and easier to read in a dark room.
+- The compass is off until you switch it on.
+### Fixed
+- The locator is checked as you type it.
+- Each setup guide step opens at the top.
 ## [2.0.8] - 2026-11-13 (versionCode 28)
 
 ### Fixed
