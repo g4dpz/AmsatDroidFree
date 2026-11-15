@@ -16,8 +16,14 @@ import androidx.compose.ui.graphics.ColorMatrix
  */
 object NightPalette {
 
-    /** A shade of pure red, from 0 (black) to 255 (brightest red). */
-    fun red(level: Int): Color = Color(red = level / 255f, green = 0f, blue = 0f)
+    /**
+     * How much brighter every red is than the levels written below: 20 percent (15 Nov 2026), clamped at full red.
+     * Levels of 0xD5 and above all reach full red, so the very brightest roles are no longer told apart by brightness.
+     */
+    const val BRIGHTNESS = 1.2f
+
+    /** A shade of pure red, from 0 (black) to 255 (brightest red), before [BRIGHTNESS] is applied. */
+    fun red(level: Int): Color = Color(red = (level * BRIGHTNESS).coerceAtMost(255f) / 255f, green = 0f, blue = 0f)
 
     private val black = red(0)
 
@@ -73,13 +79,13 @@ object NightPalette {
     )
 
     /** How bright the map photograph is kept, so the track and footprint drawn over it stand out. */
-    const val MAP_BRIGHTNESS = 0.55f
+    const val MAP_BRIGHTNESS = 0.55f * BRIGHTNESS
 
     /**
      * The scale for the map icons. Above 1 because the icons are dark-ish pictures: the luminance is boosted (and
      * clamped at full red) so they stand out against the dimmed photograph.
      */
-    const val ICON_BRIGHTNESS = 1.6f
+    const val ICON_BRIGHTNESS = 1.6f * BRIGHTNESS
 
     /**
      * Turns a picture (the world map, the icons) into shades of red by its brightness: red = scale x luminance,
