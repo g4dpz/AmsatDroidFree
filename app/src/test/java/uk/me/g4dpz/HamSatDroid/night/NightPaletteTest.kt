@@ -35,6 +35,7 @@ class NightPaletteTest {
         assertEquals(1f, NightPalette.red(0xFF).red, 0f)
         assertEquals(0f, NightPalette.red(0).red, 0f)
         assertEquals(0.55f * 1.2f, NightPalette.MAP_BRIGHTNESS, 1e-6f)
+        assertEquals(1.6f * 1.2f, NightPalette.ICON_BRIGHTNESS, 1e-6f)
     }
 
     @Test

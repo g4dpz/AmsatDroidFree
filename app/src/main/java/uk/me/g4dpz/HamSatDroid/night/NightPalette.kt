@@ -85,7 +85,7 @@ object NightPalette {
      * The scale for the map icons. Above 1 because the icons are dark-ish pictures: the luminance is boosted (and
      * clamped at full red) so they stand out against the dimmed photograph.
      */
-    const val ICON_BRIGHTNESS = 1.6f
+    const val ICON_BRIGHTNESS = 1.6f * BRIGHTNESS
 
     /**
      * Turns a picture (the world map, the icons) into shades of red by its brightness: red = scale x luminance,
