@@ -4,7 +4,7 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
-## [2.1.0] - 2026-11-15 (versionCode 29)
+## [2.1.0] - 2026-11-15 (versionCode 2100)
 ### Added
 - Contact planner (menu): pick another station by name and locator and see when a satellite is above the horizon at both stations, with the best moment and the look angles at both ends. Informational only, no alerts or Doppler.
 ### Changed
