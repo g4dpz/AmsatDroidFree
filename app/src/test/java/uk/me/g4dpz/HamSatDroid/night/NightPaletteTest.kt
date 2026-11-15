@@ -30,6 +30,14 @@ class NightPaletteTest {
     }
 
     @Test
+    fun `the reds are 20 percent brighter and never pass full red`() {
+        assertEquals(0x80 * 1.2f / 255f, NightPalette.red(0x80).red, 0.005f) // colours are stored at 8 bits
+        assertEquals(1f, NightPalette.red(0xFF).red, 0f)
+        assertEquals(0f, NightPalette.red(0).red, 0f)
+        assertEquals(0.55f * 1.2f, NightPalette.MAP_BRIGHTNESS, 1e-6f)
+    }
+
+    @Test
     fun `text is bright enough against the background`() {
         val s = NightPalette.colorScheme
         assertTrue(s.onBackground.red - s.background.red > 0.7f)
