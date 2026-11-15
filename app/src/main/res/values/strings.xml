@@ -361,4 +361,16 @@
     <string name="station_delete">Delete</string>
     <string name="station_delete_title">Delete this station?</string>
     <string name="station_delete_message">%1$s will be removed from your saved stations.</string>
+    <!-- Contact planner: the detail of a window -->
+    <string name="planner_detail_shown">Details shown. Tap to hide.</string>
+    <string name="planner_detail_hidden">Details hidden. Tap to show.</string>
+    <string name="planner_detail_show">Show details</string>
+    <string name="planner_detail_hide">Hide details</string>
+    <string name="planner_detail_other">Other station: %1$s</string>
+    <string name="planner_total_path">Total path at the best moment: %1$s km</string>
+    <string name="planner_timeline_title">Through the window</string>
+    <string name="planner_timeline_row">%1$s%2$s: you azimuth %3$s°, elevation %4$s°. Them azimuth %5$s°, elevation %6$s°.</string>
+    <string name="planner_marker_start">" (start)"</string>
+    <string name="planner_marker_best">" (best)"</string>
+    <string name="planner_marker_end">" (end)"</string>
 </resources>

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package uk.me.g4dpz.HamSatDroid.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,8 +34,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -118,7 +121,7 @@ fun ContactPlannerScreen(
                         )
                     }
                 }
-                if (state.chosen != null) resultItems(state, formats)
+                if (state.chosen != null) resultItems(state, viewModel, formats)
             }
         }
     }
@@ -236,7 +239,11 @@ private fun StatusLine(state: PlannerUiState) {
 }
 
 /** The results: stationary satellites usable now first, then the windows, or a message when there are none. */
-private fun androidx.compose.foundation.lazy.LazyListScope.resultItems(state: PlannerUiState, formats: DisplayFormats) {
+private fun androidx.compose.foundation.lazy.LazyListScope.resultItems(
+    state: PlannerUiState,
+    viewModel: ContactPlannerViewModel,
+    formats: DisplayFormats,
+) {
     item(key = "results-title") { SectionHeading(stringResource(R.string.planner_section_results)) }
     if (state.usableNow.isNotEmpty()) {
         item(key = "usable-title") {
@@ -249,7 +256,12 @@ private fun androidx.compose.foundation.lazy.LazyListScope.resultItems(state: Pl
         items(state.usableNow, key = { "usable-${it.catnum}" }) { UsableNowCard(it, formats) }
     }
     items(state.windows, key = { "${it.catnum}-${it.start.toEpochMilli()}" }) { window ->
-        WindowCard(window, showName = state.allSatellites, formats)
+        val open = state.expanded == (window.catnum to window.start)
+        WindowCard(window, showName = state.allSatellites, formats, expanded = open, onClick = { viewModel.toggleDetail(window) }) {
+            WindowDetail(
+                window, state.timeline, state.homeLocator, state.chosen?.displayName.orEmpty(), formats,
+            )
+        }
     }
     if (state.done && state.windows.isEmpty() && state.usableNow.isEmpty()) {
         item(key = "none") {
@@ -283,28 +295,52 @@ private fun UsableNowCard(item: PlannerItem.UsableNow, formats: DisplayFormats) 
     }
 }
 
-/** One window: its date and times in the device's time zone, and its best moment in local time and in UTC. */
+/**
+ * One window: its date and times in the device's time zone, and its best moment in local time and in UTC. Tapping it shows
+ * or hides its detail ([detail]) under it, so the list keeps its place.
+ */
 @Composable
-private fun WindowCard(window: MutualWindow, showName: Boolean, formats: DisplayFormats) {
+private fun WindowCard(
+    window: MutualWindow,
+    showName: Boolean,
+    formats: DisplayFormats,
+    expanded: Boolean,
+    onClick: () -> Unit,
+    detail: @Composable () -> Unit,
+) {
     val minutes = Duration.between(window.start, window.end).seconds / 60.0
-    Card(modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}) {
-        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            if (showName) Text(window.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
-            Text(
-                stringResource(
-                    R.string.planner_window_when,
-                    formats.date(window.start), formats.time(window.start), formats.time(window.end), formats.oneDecimal(minutes),
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Text(
-                stringResource(
-                    R.string.planner_window_best,
-                    formats.time(window.best.time), formats.utcTime(window.best.time),
-                    formats.oneDecimal(window.best.lowerElevationDeg),
-                ),
-                style = MaterialTheme.typography.bodySmall,
-            )
+    val stateText = stringResource(if (expanded) R.string.planner_detail_shown else R.string.planner_detail_hidden)
+    val toggleLabel = stringResource(if (expanded) R.string.planner_detail_hide else R.string.planner_detail_show)
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Only the summary is the button, and a screen reader reads it as one thing. The detail under it stays
+            // separate, so its pieces (and the mode picker in it) are reached one by one; a clickable Card would merge
+            // everything inside it into a single item.
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClickLabel = toggleLabel, role = Role.Button, onClick = onClick)
+                    .semantics(mergeDescendants = true) { stateDescription = stateText },
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                if (showName) Text(window.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                Text(
+                    stringResource(
+                        R.string.planner_window_when,
+                        formats.date(window.start), formats.time(window.start), formats.time(window.end), formats.oneDecimal(minutes),
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Text(
+                    stringResource(
+                        R.string.planner_window_best,
+                        formats.time(window.best.time), formats.utcTime(window.best.time),
+                        formats.oneDecimal(window.best.lowerElevationDeg),
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            if (expanded) detail()
         }
     }
 }

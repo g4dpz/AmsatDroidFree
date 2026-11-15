@@ -392,6 +392,29 @@ class ContactPlannerTest {
         assertEquals(ContactPlanner.greatCircleKm(PlannerStation(0.0, 179.0), PlannerStation(0.0, -179.0)), 222.4, 0.5) // across the date line
     }
 
+    @Test
+    fun `each station tunes and transmits on its own Doppler-corrected frequency at the best moment`() {
+        // Sunday's window between the UK and Kansas City, for a transponder centred on 435.640 down and 145.965 up
+        val best = windows(rs44, uk, kansasCity, 0.0, "2026-11-14T14:55:24Z", 48)[1].best
+        val nominalDown = 435_640_000L
+        val nominalUp = 145_965_000L
+        val ukDown = DopplerMath.downlinkHz(nominalDown, best.home.rangeRateKmS)
+        val kcDown = DopplerMath.downlinkHz(nominalDown, best.other.rangeRateKmS)
+        val ukUp = DopplerMath.uplinkHz(nominalUp, best.home.rangeRateKmS)
+        val kcUp = DopplerMath.uplinkHz(nominalUp, best.other.rangeRateKmS)
+        // the figures of the requirements: UK 145.9635 / 435.6446 MHz, Kansas City 145.9657 / 435.6380 MHz
+        assertEquals(435_644_600.0, ukDown.toDouble(), 600.0)
+        assertEquals(435_638_000.0, kcDown.toDouble(), 600.0)
+        assertEquals(145_963_500.0, ukUp.toDouble(), 250.0)
+        assertEquals(145_965_700.0, kcUp.toDouble(), 250.0)
+        // the two ends differ, so each must use its own: a single correction would put one of them off the signal
+        assertTrue("downlinks differ by more than 5 kHz: ${ukDown - kcDown}", ukDown - kcDown > 5_000)
+        assertTrue("uplinks differ by more than 1 kHz: ${kcUp - ukUp}", kcUp - ukUp > 1_000)
+        // the station the satellite is moving away from hears it lower, and must transmit higher to be heard
+        assertTrue(best.home.rangeRateKmS < best.other.rangeRateKmS)
+        assertTrue(ukUp < kcUp && ukDown > kcDown)
+    }
+
     // ---- stopping the work -------------------------------------------------------------------------------
 
     @Test
