@@ -83,6 +83,10 @@ warning. (The exact coordinates are redacted.)*
   (works without a gyroscope).
 - **All-satellite overview**: what is up now and what is coming across every
   satellite in the current elements.
+- **Contact planner**: find when a satellite is above the horizon at both your
+  station and another one (saved by name and locator, up to 10), with the best
+  moment, the total path and the look angles at both ends through each window.
+  It is informational and has no alerts or Doppler figures.
 - **Scheduled keps refresh** that keeps orbital elements current in the
   background, from Celestrak (JSON) or AMSAT (TLE).
 - **Home-screen widget** showing the next pass for the last selected satellite.
