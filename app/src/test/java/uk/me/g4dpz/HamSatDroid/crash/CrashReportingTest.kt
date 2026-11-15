@@ -16,13 +16,14 @@ class CrashReportingTest {
             user = User().apply { id = "x"; username = "g4dpz"; ipAddress = "203.0.113.9" }
             serverName = "Davids-Tab"
             addBreadcrumb(Breadcrumb("tapped"))
-            contexts.setDevice(Device().apply { name = "David's tablet"; model = "SM-T225" })
+            contexts.setDevice(Device().apply { name = "David's tablet"; id = "fa3db885"; model = "SM-T225" })
         }
         val out = CrashReporting.scrub(event)
         assertNull(out.user)
         assertNull(out.serverName)
         assertNull(out.breadcrumbs)
         assertNull(out.contexts.device?.name)
+        assertNull(out.contexts.device?.id)
         assertEquals("SM-T225", out.contexts.device?.model)
     }
 

@@ -42,12 +42,13 @@ object CrashReporting {
         }
     }
 
-    /** Removes the user, the server name, breadcrumbs and the device's own name from [event]. */
+    /** Removes the user, the server name, breadcrumbs and the device's own name and install id from [event]. */
     fun scrub(event: SentryEvent): SentryEvent {
         event.user = null
         event.serverName = null
         event.breadcrumbs = null
         event.contexts.device?.name = null
+        event.contexts.device?.id = null
         return event
     }
 }
