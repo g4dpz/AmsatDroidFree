@@ -18,6 +18,15 @@ val keystoreProperties = Properties().apply {
 }
 val hasReleaseSigning = keystoreProperties.getProperty("storeFile") != null
 
+// Crash reports (Sentry, internal-testing builds only). The DSN comes from the SENTRY_DSN environment variable or from
+// a gitignored sentry.properties (key: dsn; see sentry.properties.template). When neither is set, as on CI and in a
+// fresh clone, the DSN is empty and crash reporting never starts.
+val sentryPropertiesFile = rootProject.file("sentry.properties")
+val sentryDsn: String = System.getenv("SENTRY_DSN")?.takeIf { it.isNotBlank() }
+    ?: Properties().apply {
+        if (sentryPropertiesFile.exists()) sentryPropertiesFile.inputStream().use { load(it) }
+    }.getProperty("dsn", "").trim()
+
 // Code coverage of the unit tests (Kover). Only generated classes are left out; the Compose screens stay in, and show
 // as mostly uncovered because they are checked on a device, not by unit tests. CI publishes the report.
 kover {
@@ -38,8 +47,9 @@ android {
         applicationId = "uk.me.g4dpz.amsatdroid"
         minSdk = 30
         targetSdk = 36
-        versionCode = 2100
+        versionCode = 2101
         versionName = "2.1.0"
+        buildConfigField("String", "SENTRY_DSN", "\"$sentryDsn\"")
     }
 
     signingConfigs {
@@ -79,6 +89,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     lint {
@@ -118,6 +129,9 @@ dependencies {
     implementation("androidx.glance:glance-appwidget:1.2.0")
     implementation("androidx.glance:glance-material3:1.2.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    // Crash reports for the internal test only. The core artifact, not io.sentry:sentry-android, which would add the
+    // NDK integration and native libraries this app does not need.
+    implementation("io.sentry:sentry-android-core:8.64.0")
 
     testImplementation("junit:junit:4.13.2")
     // Android's org.json is only a stub on the JVM, so unit tests need the real implementation.

@@ -1,0 +1,3 @@
+# Copy to sentry.properties (gitignored) and paste the DSN of your Sentry project.
+# Or set the SENTRY_DSN environment variable. With no DSN, crash reporting never starts.
+dsn=

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import uk.me.g4dpz.HamSatDroid.alert.AlertNotifier
 import uk.me.g4dpz.HamSatDroid.alert.PassAlertStore
+import uk.me.g4dpz.HamSatDroid.crash.CrashReporting
 import uk.me.g4dpz.HamSatDroid.data.FileStore
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.data.SharedPreferencesStore
@@ -46,6 +47,10 @@ open class HamSatDroidApp : Application() {
     override fun onCreate() {
         super.onCreate()
         AlertNotifier(this).ensureChannel()
+        // Internal-test crash reports: starts or stops with the setting (and does nothing without a DSN).
+        scope.launch {
+            settings.crashReports.state.collect { enabled -> CrashReporting.apply(this@HamSatDroidApp, enabled) }
+        }
         val scheduler = KepsScheduler(this)
         // A StateFlow delivers the current value first (applied at start-up) and then every change.
         scope.launch {

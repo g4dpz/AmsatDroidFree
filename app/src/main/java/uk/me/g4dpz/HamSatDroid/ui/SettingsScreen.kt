@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import uk.me.g4dpz.HamSatDroid.BuildConfig
 import uk.me.g4dpz.HamSatDroid.R
 import uk.me.g4dpz.HamSatDroid.data.KepsSource
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
@@ -74,6 +75,7 @@ fun SettingsScreen(
     val pointingAxis by settings.pointingAxis.state.collectAsStateWithLifecycle()
     val themeMode by settings.themeMode.state.collectAsStateWithLifecycle()
     val autoRedNight by settings.autoRedNight.state.collectAsStateWithLifecycle()
+    val crashReports by settings.crashReports.state.collectAsStateWithLifecycle()
 
     var message by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(message) {
@@ -176,6 +178,18 @@ fun SettingsScreen(
                 checked = spokenAlerts,
                 onCheckedChange = { settings.spokenAlerts.value = it },
             )
+
+            // Internal-test builds that carry a Sentry DSN only; nothing is shown (or sent) without one.
+            if (BuildConfig.SENTRY_DSN.isNotBlank()) {
+                HorizontalDivider()
+                SectionTitle(R.string.settings_section_privacy)
+                SwitchRow(
+                    label = stringResource(R.string.settings_crash_reports),
+                    checked = crashReports,
+                    onCheckedChange = { settings.crashReports.value = it },
+                )
+                Text(stringResource(R.string.settings_crash_reports_help), style = MaterialTheme.typography.bodyMedium)
+            }
 
             HorizontalDivider()
             SectionTitle(R.string.settings_section_background)

@@ -132,6 +132,9 @@ class SettingsRepository(private val store: KeyValueStore) {
     }
     val autoRedNight = Setting(store.getBoolean(AUTO_RED_NIGHT, false)) { store.putBoolean(AUTO_RED_NIGHT, it) }
 
+    /** Whether anonymous crash reports may be sent (internal test builds that carry a Sentry DSN only). */
+    val crashReports = Setting(store.getBoolean(CRASH_REPORTS, true)) { store.putBoolean(CRASH_REPORTS, it) }
+
     // ---- overview ----
     val overviewHours = Setting(
         store.getInt(OVERVIEW_HOURS, DEFAULT_OVERVIEW_HOURS).takeIf { it in OVERVIEW_HOUR_CHOICES } ?: DEFAULT_OVERVIEW_HOURS
@@ -203,6 +206,7 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val KEEP_SCREEN_ON = "keepScreenOn"
         const val THEME_MODE = "themeMode"
         const val AUTO_RED_NIGHT = "autoRedNight"
+        const val CRASH_REPORTS = "crashReports"
         const val OVERVIEW_HOURS = "overviewHours"
         const val OVERVIEW_MIN_ELEVATION = "overviewMinElevation"
         const val PLANNER_STATIONS = "plannerStations"
