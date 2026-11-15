@@ -38,8 +38,8 @@ android {
         applicationId = "uk.me.g4dpz.amsatdroid"
         minSdk = 30
         targetSdk = 36
-        versionCode = 28
-        versionName = "2.0.8"
+        versionCode = 29
+        versionName = "2.1.0"
     }
 
     signingConfigs {
