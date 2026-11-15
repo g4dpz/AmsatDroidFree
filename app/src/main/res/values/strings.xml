@@ -68,6 +68,9 @@
     <string name="settings_keps_source">Keps source</string>
     <string name="settings_section_display">Display</string>
     <string name="settings_theme">Theme</string>
+    <string name="settings_section_privacy">Privacy</string>
+    <string name="settings_crash_reports">Send anonymous crash reports</string>
+    <string name="settings_crash_reports_help">If the app crashes, the error, the app version and the device model are sent to the developer to fix it. No location, name or account is included.</string>
     <string name="settings_auto_red_night">Switch to red night mode automatically in the dark</string>
     <string name="theme_system">System default</string>
     <string name="theme_light">Light</string>

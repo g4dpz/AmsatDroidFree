@@ -18,6 +18,20 @@ val keystoreProperties = Properties().apply {
 }
 val hasReleaseSigning = keystoreProperties.getProperty("storeFile") != null
 
+// Crash reports (Sentry). The DSN and the environment come from the SENTRY_DSN and SENTRY_ENVIRONMENT environment
+// variables or from a gitignored sentry.properties (keys: dsn, environment; see sentry.properties.template). When no
+// DSN is set, as on CI and in a fresh clone, crash reporting never starts. The environment names the build in Sentry
+// (internal-testing, closed-testing, production). The Settings switch defaults to on for the testing environments
+// and off for production, so a production build only reports for users who switch it on.
+val sentryPropertiesFile = rootProject.file("sentry.properties")
+val sentryProperties = Properties().apply {
+    if (sentryPropertiesFile.exists()) sentryPropertiesFile.inputStream().use { load(it) }
+}
+val sentryDsn: String = System.getenv("SENTRY_DSN")?.trim()?.takeIf { it.isNotEmpty() }
+    ?: sentryProperties.getProperty("dsn", "").trim()
+val sentryEnvironment: String = System.getenv("SENTRY_ENVIRONMENT")?.trim()?.takeIf { it.isNotEmpty() }
+    ?: sentryProperties.getProperty("environment", "internal-testing").trim()
+
 // Code coverage of the unit tests (Kover). Only generated classes are left out; the Compose screens stay in, and show
 // as mostly uncovered because they are checked on a device, not by unit tests. CI publishes the report.
 kover {
@@ -38,8 +52,11 @@ android {
         applicationId = "uk.me.g4dpz.amsatdroid"
         minSdk = 30
         targetSdk = 36
-        versionCode = 2100
+        versionCode = 2101
         versionName = "2.1.0"
+        buildConfigField("String", "SENTRY_DSN", "\"$sentryDsn\"")
+        buildConfigField("String", "SENTRY_ENVIRONMENT", "\"$sentryEnvironment\"")
+        buildConfigField("boolean", "CRASH_REPORTS_DEFAULT", (sentryEnvironment != "production").toString())
     }
 
     signingConfigs {
@@ -79,6 +96,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     lint {
@@ -118,6 +136,9 @@ dependencies {
     implementation("androidx.glance:glance-appwidget:1.2.0")
     implementation("androidx.glance:glance-material3:1.2.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    // Crash reports. The core artifact, not io.sentry:sentry-android, which would add the NDK integration and native
+    // libraries this app does not need.
+    implementation("io.sentry:sentry-android-core:8.64.0")
 
     testImplementation("junit:junit:4.13.2")
     // Android's org.json is only a stub on the JVM, so unit tests need the real implementation.
