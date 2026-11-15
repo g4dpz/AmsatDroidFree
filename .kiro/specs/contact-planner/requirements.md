@@ -4,9 +4,9 @@
 
 Idea from David (G4DPZ), 14 November 2026: work out when two ground stations can both use a satellite, and the best azimuth, elevation and time for the contact.
 
-A trial calculation with the app's own orbit code showed it is useful. For RS-44 between IO82xk (UK) and EM29mm (Kansas City, 39.5° N 95.0° W; 6,818 km apart), the next 72 hours from 14 November 2026 held three mutual windows of 1.2, 4.8 and 3.8 minutes. The best one, Sunday 15 November 16:25:34 to 16:30:24 UTC, has both stations at about 3.7° elevation at 16:27:34, the UK pointing at 289° and Kansas at 54°, each about 4,000 km from the satellite. Each end needs its own Doppler correction: at that moment the transponder centre is 145.9635 / 435.6446 MHz for the UK and 145.9657 / 435.6380 MHz for Kansas.
+A trial calculation with the app's own orbit code showed it is useful. For RS-44 between IO82xk (UK) and EM29mm (Kansas City, 39.5° N 95.0° W; 6,818 km apart), the next 72 hours from 14 November 2026 held three mutual windows of 1.2, 4.8 and 3.8 minutes. The best one, Sunday 15 November 16:25:34 to 16:30:24 UTC, has both stations at about 3.7° elevation at 16:27:34, the UK pointing at 289° and Kansas at 54°, each about 4,000 km from the satellite.
 
-This spec adds a **Contact planner** screen that finds those windows, for the selected satellite or for all of them, and shows both stations' look angles and Doppler.
+This spec adds a **Contact planner** screen that finds those windows, for the selected satellite or for all of them, and shows both stations' look angles. It does not show frequencies: see D5.
 
 Related specs: `first-run-setup`, `pass-card-layout` and `multi-satellite-passes`. This spec is independent of them. The release number is chosen when David asks for the bump (P8).
 
@@ -17,7 +17,7 @@ Related specs: `first-run-setup`, `pass-card-layout` and `multi-satellite-passes
 - **P3. Which satellites.** The selected satellite by default, with a switch to search all satellites in the current keps source.
 - **P4. Minimum elevation.** One minimum elevation, the same for both stations, chosen in the planner, default 0°.
 - **P5. Best moment.** The time at which the lower of the two elevations is highest; the total path is shown beside it. David's answer was "P4 at same elevation", read as "both stations use the one minimum elevation of P4"; he confirmed that reading on 14 November 2026, so the rule here stands as proposed.
-- **P6. Detail.** Both stations' azimuth, elevation and range, and each station's own uplink and downlink Doppler, at the best moment and through the window.
+- **P6. Detail.** Both stations' azimuth, elevation and range at the best moment and through the window. Changed 14 November 2026: the first version of this decision also showed each station's own Doppler-corrected frequencies; see D5.
 - **P7. Alerts for a mutual window.** None in this spec.
 - **P8. Release.** The version number is chosen when David asks for the release bump; this spec does not name one.
 - **O1. Start time.** The search always starts now.
@@ -28,9 +28,10 @@ Related specs: `first-run-setup`, `pass-card-layout` and `multi-satellite-passes
 
 ## Decisions already made
 
-- D1. **No network use and no new permissions.** The calculation uses the keps and transponder database already on the device. The other station is typed in, never fetched.
+- D1. **No network use and no new permissions.** The calculation uses the keps already on the device. The other station is typed in, never fetched.
 - D2. **Saved stations stay on the device.** They are stored in the app's preferences, which are not backed up (`allowBackup="false"`). The privacy policy and Play data safety answers stay true.
 - D3. **The home station is the home location.** The planner does not have its own copy; changing the home location in Settings changes the planner.
+- D5. **No Doppler or frequencies.** The planner is informational: it says when a contact is possible and where to point. Doppler-corrected frequencies come from the tracking software, or from this app's sky screen, at the time of the contact. Decided by David on 14 November 2026; requirements 6.4 and 6.5 are withdrawn.
 - D4. **English only**, like the rest of the app, with all text in `strings.xml`.
 
 ## Glossary
@@ -112,16 +113,16 @@ Related specs: `first-run-setup`, `pass-card-layout` and `multi-satellite-passes
 
 ### Requirement 6: Detail of a window
 
-**User story:** As an operator, I want to know exactly where to point and what to tune at both ends, so that I can tell my contact and set up my own station.
+**User story:** As an operator, I want to know exactly where to point at both ends, so that I can tell my contact and set up my own station.
 
 #### Acceptance criteria
 
 1. Tapping a window SHALL show its detail.
 2. The detail SHALL show, for each station at the best moment: azimuth, elevation and range, and the total path.
-3. The detail SHALL show a timeline through the window, one row a minute and at the start, best moment and end, with both stations' azimuth and elevation.
-4. WHEN the satellite has modes in the transponder database THEN the detail SHALL offer the same mode choice as the sky screen, and show for each station at the best moment its own downlink (receive) and uplink (transmit) frequencies corrected for Doppler, with `DopplerMath`, and the CTCSS tone when the mode has one.
-5. WHEN the satellite has no transponder data THEN the detail SHALL say so, as the sky screen does.
-6. The detail SHALL be readable aloud by a screen reader in a sensible order: station, then azimuth, elevation, range, then frequencies.
+3. The detail SHALL show a timeline through the window, one row a minute and at the start, best moment and end, with both stations' azimuth and elevation. WHEN a window is so long that this would be more than 120 rows (a slow elliptical orbit) THEN the rows between SHALL be an even number of whole minutes apart, as few as keep the timeline to 120 rows, and the start, best moment and end SHALL always be shown.
+4. (Withdrawn, D5.) Doppler-corrected frequencies and the transponder mode picker are not in the planner.
+5. (Withdrawn, D5.)
+6. The detail SHALL be readable aloud by a screen reader in a sensible order: the total path, then for each station its name, azimuth, elevation and range, then the timeline.
 
 ### Requirement 7: The best moment
 

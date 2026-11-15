@@ -36,20 +36,21 @@ Mark each box when it passes. Devices: Galaxy A16 emulator (411 x 891 dp), Galax
 
 ## Detail
 
-- [ ] Tapping a window expands it; tapping again closes it; the list keeps its place
-- [ ] Both stations' azimuth, elevation and range at the best moment, and the total path, are shown
-- [ ] The mode picker appears for a satellite with transponder data, and each station shows its own Tune and Transmit frequencies
-- [ ] A satellite without transponder data says so
-- [ ] The timeline has a row a minute, plus start, best moment and end
+- [x] Tapping a window expands it; tapping again closes it; the list keeps its place
+- [x] Both stations' azimuth, elevation and range at the best moment, and the total path, are shown
+- [x] No frequencies, mode picker or Doppler appear in the detail
+- [x] The timeline has a row a minute, plus start, best moment and end
 - [ ] Your station's look angles match the sky screen for the same pass at the same time
 
 ## Quality
 
-- [ ] Phone portrait and landscape
-- [ ] Tablet portrait and landscape
+- [x] Phone portrait and landscape
+- [x] Tablet portrait and landscape
 - [ ] Split-screen
 - [ ] Red night mode: everything readable in red
-- [ ] 200 percent font: nothing clipped, everything reachable by scrolling
+- [x] 200 percent font: nothing clipped, everything reachable by scrolling
 - [ ] TalkBack: headings, labels, and the detail read station by station
 - [ ] Speed on the SM-T225: one satellite over 48 hours, and all satellites over 24 hours, within the limits in requirement 9
 - [ ] No network use: the planner works in aeroplane mode
+
+Ticked by the device scripts on 15 Nov 2026 (emulator and SM-T225; `build/planner/layouts.sh` 45/45 on each, `check-j.sh` 13/13 on the emulator), not by hand. Left for a person: everything else, including the sky-screen comparison, split-screen, red night mode, TalkBack, aeroplane mode, and speed (finish times are in tasks.md 5.2, but first results within 2 seconds were not measured).

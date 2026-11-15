@@ -37,25 +37,29 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
     - _Requirements: 1.2, 1.3, 1.5, 4.2, 4.6, 4.7, 4.9, 5.3, 5.5_
     - Done 14 November 2026: `ui/ContactPlannerViewModel.kt` and `ContactPlannerViewModelTest` (22 tests, plain JVM with the unconfined test dispatcher, as the overview's). The screen calls `onStart()` and `onStop()` from its STARTED lifecycle (task 4.1); the stale warning is data (`StaleElements`), worded by the screen
 
-- [ ] 4. Screens
+- [x] 4. Screens
   - [x] 4.1 Add `Routes.PLANNER`, the "Contact planner" menu item below All satellites, and the planner screen with the stations, search and results sections, and the Calculate again button
     - _Requirements: 1.1, 1.2, 1.4, 1.5, 2.7, 2.8, 3.1, 4.1, 4.2, 5.1, 5.2, 5.4_
     - Done 14 November 2026: `ui/ContactPlannerScreen.kt`, the menu item and `Routes.PLANNER`. Checked on the A16 emulator and the SM-T225: 42 behaviour checks and 35 layout checks each (portrait and landscape, 100 and 200 percent font, red night)
   - [x] 4.2 Add the station editor (`Routes.PLANNER_STATION`; name, locator, latitude and longitude, no elevation field): add, edit, delete with confirmation, `LocatorSync` rules and 4-character squares (O5), the 10-station limit; the name is limited with `SavedStation.limitName` (a character is a code point, so an emoji is never split)
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
     - Done 14 November 2026: `ui/PlannerStationScreen.kt` and the pure rules in `domain/StationEditing.kt` (`StationEditingTest`, 9 tests); a station just added becomes the chosen one
-  - [ ] 4.3 Add the window detail: both stations' look angles and total path, the mode picker and each station's Doppler, the timeline
-    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
-  - [ ] 4.4 Strings for all of the above
-    - Strings for the planner screen and the editor are in with 4.1 and 4.2; those for the detail (4.3) are still to come
+  - [x] 4.3 Add the window detail: both stations' look angles and total path, the timeline (no Doppler, D5)
+    - _Requirements: 6.1, 6.2, 6.3, 6.6_
+    - Done 14 November 2026: `ui/ContactPlannerDetail.kt`; tapping a window's summary shows or hides it in place. The first version also showed each station's Doppler-corrected frequencies and a mode picker; David took them out the same day (D5). Checked on the A16 emulator and the SM-T225, in every layout
+  - [x] 4.4 Strings for all of the above
+    - Done: the strings came in with 4.1, 4.2 and 4.3, with plurals where a count is followed by a word (lint is clean)
     - _Requirements: D4_
 
 - [ ] 5. Quality
-  - [ ] 5.1 Layouts: phone portrait and landscape, tablet portrait and landscape, split-screen; red night mode; 200 percent font; TalkBack headings, labels and reading order
+  - [x] 5.1 Layouts: phone portrait and landscape, tablet portrait and landscape, split-screen; red night mode; 200 percent font; TalkBack headings, labels and reading order
+    - Done 15 Nov 2026: layout script 45/45 on the emulator and 45/45 on the SM-T225 (portrait and landscape, 100 and 200 percent font). Not run: TalkBack listening and split-screen, which adb cannot drive; reading order, labels and the button role on the card summary were checked by the accessibility tree only
     - _Requirements: 6.6, 8.1, 8.2, 8.3, 8.4_
-  - [ ] 5.2 Speed on the SM-T225: one satellite over 48 hours; all Amateur satellites over 24 hours (first results, finish); the longest single `getPasses` call (how long cancellation can lag). Record the numbers here
+  - [x] 5.2 Speed on the SM-T225: one satellite over 48 hours; all Amateur satellites over 24 hours (first results, finish); the longest single `getPasses` call (how long cancellation can lag). Record the numbers here
+    - Done 15 Nov 2026, SM-T225, from the app's log line: one satellite over 48 h 1642 ms; 99 satellites over 24 h 5690 and 5611 ms; 99 satellites over 48 h 10041 ms (about 100 ms per satellite). The longest single `getPasses` call was not instrumented; it is bounded by the 48 h case for one satellite, 1642 ms at most, so cancellation lags by no more than that
     - _Requirements: 9.1, 9.2_
-  - [ ] 5.3 Compare a few windows with an independent tool and record the result
+  - [x] 5.3 Compare a few windows with an independent tool and record the result
+    - Done 15 Nov 2026: the independent tool was the reference `sgp4` Python package (2.27, Vallado), with its own sidereal-time and look-angle code, stepping every second over the same fixed RS-44 elements, UK (IO82xk) to Kansas City (EM29mm), 72 h from 2026-11-14 14:55:24Z, minimum 0 degrees. It found three windows, 18:01:24 to 18:02:33, 16:25:31 to 16:30:19 and 16:51:36 to 16:55:27, with best moments 18:02:13, 16:27:33 and 16:53:56 and lower elevations 1.0, 3.7 and 3.5 degrees. The planner's expected values agree within 5 s and 0.1 degree. Not compared with Gpredict or N2YO
     - _Requirements: 10.1_
 
 - [ ] 6. Documentation

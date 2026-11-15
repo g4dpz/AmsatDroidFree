@@ -22,6 +22,7 @@ import java.util.Locale
 class DisplayFormats(val locale: Locale, val zone: ZoneId = ZoneId.systemDefault()) {
     private val date = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale).withZone(zone)
     private val time = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale).withZone(zone)
+    private val timeSeconds = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(locale).withZone(zone)
     private val utcTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale).withZone(java.time.ZoneOffset.UTC)
     private val dateTime = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
         .withLocale(locale).withZone(zone)
@@ -49,6 +50,9 @@ class DisplayFormats(val locale: Locale, val zone: ZoneId = ZoneId.systemDefault
     /** The time of day in UTC, for times two stations in different time zones both need (the contact planner). */
     fun utcTime(instant: Instant): String = utcTime.format(instant)
     fun time(instant: Instant): String = time.format(instant)
+
+    /** The time of day with seconds, for the rows of a window's timeline, where a start or end is rarely on a minute. */
+    fun timeSeconds(instant: Instant): String = timeSeconds.format(instant)
     fun dateTime(instant: Instant): String = dateTime.format(instant)
     fun dateTime(millis: Long): String = dateTime(Instant.ofEpochMilli(millis))
 
