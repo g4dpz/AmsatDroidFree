@@ -101,8 +101,11 @@ With any report please say which device and Android version you have, and the
 app version (menu, then About). Please don't post your exact home
 coordinates; a four-character locator such as IO91 is enough.
 
-The app is open source (GPL-3.0) and has no ads, accounts or tracking. More
-information, including features and the privacy policy, is on the project wiki:
+The app is open source (GPL-3.0) and has no ads, accounts or tracking. Test
+builds send a crash report if the app crashes (the error, app version and
+device model; the app does not add your location, name or any account); you
+can switch that off in Settings, under Privacy. More information, including features and the
+privacy policy, is on the project wiki:
 https://github.com/g4dpz/AmsatDroidFree/wiki
 
 Thanks, and 73,
