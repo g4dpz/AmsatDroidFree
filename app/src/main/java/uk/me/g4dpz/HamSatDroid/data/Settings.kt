@@ -134,7 +134,7 @@ class SettingsRepository(private val store: KeyValueStore) {
     val autoRedNight = Setting(store.getBoolean(AUTO_RED_NIGHT, false)) { store.putBoolean(AUTO_RED_NIGHT, it) }
 
     /**
-     * Whether anonymous crash reports may be sent. Only builds that carry a Sentry DSN send anything. On by default
+     * Whether crash reports may be sent. Only builds that carry a Sentry DSN send anything. On by default
      * in the testing environments and off by default in production (see `sentryEnvironment` in build.gradle.kts).
      */
     val crashReports = Setting(store.getBoolean(CRASH_REPORTS, BuildConfig.CRASH_REPORTS_DEFAULT)) { store.putBoolean(CRASH_REPORTS, it) }
