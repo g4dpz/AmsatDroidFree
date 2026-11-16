@@ -4,7 +4,10 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
-## [2.1.0] - 2026-11-15 (versionCode 2101)
+## [2.2.0] - 2026-11-16 (versionCode 2102)
+### Added
+- Settings, Display, "Centre the map on my location": the world map puts your home in the middle and wraps round, so a station in Australia or New Zealand sees the Pacific whole. Off by default.
+## [2.1.0] - 2026-11-15 (versionCode 2101, not released on its own)
 ### Added
 - Contact planner (menu): see when a satellite is above the horizon at both your station and another one you save by name and locator, with the best moment and look angles at both ends.
 ### Changed
