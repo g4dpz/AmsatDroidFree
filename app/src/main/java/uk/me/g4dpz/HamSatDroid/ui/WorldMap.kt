@@ -48,6 +48,8 @@ fun WorldMap(
     satellite: GeoPoint?,
     home: GeoPoint?,
     modifier: Modifier = Modifier,
+    /** The longitude in the middle of the map; 0 is the original map, anything else wraps the picture round. */
+    centreLongitudeDeg: Double = 0.0,
 ) {
     val world = ImageBitmap.imageResource(R.drawable.world)
     val satelliteIcon = ImageBitmap.imageResource(R.drawable.saticon)
@@ -66,7 +68,7 @@ fun WorldMap(
 
                 fun pathOf(points: List<GeoPoint>?): Path = Path().apply {
                     if (points != null) {
-                        for (line in MapProjection.polylines(points, w.toDouble(), h.toDouble())) {
+                        for (line in MapProjection.polylines(points, w.toDouble(), h.toDouble(), centreLongitudeDeg)) {
                             moveTo(line[0], line[1])
                             for (i in 1 until line.size / 2) lineTo(line[2 * i], line[2 * i + 1])
                         }
@@ -76,11 +78,21 @@ fun WorldMap(
                 val trackPath = pathOf(track)
                 val footprintPath = pathOf(footprint)
                 val homeAt = home?.let {
-                    Pair(MapProjection.x(it.longitudeDeg, w.toDouble()), MapProjection.y(it.latitudeDeg, h.toDouble()))
+                    Pair(
+                        MapProjection.x(it.longitudeDeg, w.toDouble(), centreLongitudeDeg),
+                        MapProjection.y(it.latitudeDeg, h.toDouble()),
+                    )
                 }
                 val satelliteAt = satellite?.let {
-                    Pair(MapProjection.x(it.longitudeDeg, w.toDouble()), MapProjection.y(it.latitudeDeg, h.toDouble()))
+                    Pair(
+                        MapProjection.x(it.longitudeDeg, w.toDouble(), centreLongitudeDeg),
+                        MapProjection.y(it.latitudeDeg, h.toDouble()),
+                    )
                 }
+                // The picture has longitude -180 at its left edge; with another centre it is drawn in two pieces.
+                val mapWidthPx = w.roundToInt()
+                val mapHeightPx = h.roundToInt()
+                val pieces = MapProjection.picturePieces(centreLongitudeDeg, world.width, mapWidthPx)
                 val trackStroke = Stroke(
                     width = strokeWidth * colors.trackWidthScale, cap = StrokeCap.Round, join = StrokeJoin.Round,
                 )
@@ -108,13 +120,17 @@ fun WorldMap(
                 }
 
                 onDrawBehind {
-                    drawImage(
-                        world,
-                        srcSize = IntSize(world.width, world.height),
-                        dstSize = IntSize(w.roundToInt(), h.roundToInt()),
-                        colorFilter = filter,
-                        filterQuality = FilterQuality.Medium,
-                    )
+                    for (piece in pieces) {
+                        drawImage(
+                            world,
+                            srcOffset = IntOffset(piece.srcX, 0),
+                            srcSize = IntSize(piece.srcWidth, world.height),
+                            dstOffset = IntOffset(piece.dstX, 0),
+                            dstSize = IntSize(piece.dstWidth, mapHeightPx),
+                            colorFilter = filter,
+                            filterQuality = FilterQuality.Medium,
+                        )
+                    }
                     drawPath(trackPath, colors.mapTrack, style = trackStroke)
                     drawPath(footprintPath, colors.mapFootprint, style = footprintStroke)
                     homeAt?.let { icon(homeIcon, it) }

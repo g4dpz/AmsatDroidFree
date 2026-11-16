@@ -71,7 +71,7 @@ warning. (The exact coordinates are redacted.)*
   satellite. It can be skipped, and reopened from the menu at any time.
 - **Pass prediction** for your location, with a selectable time window and start time.
 - **Sky view** of the selected pass, with the live satellite position.
-- **Ground-track map** with footprint, updated each second.
+- **Ground-track map** with footprint, updated each second, optionally centred on your home longitude.
 - **Doppler-corrected frequencies** from the OscarWatch transponder database
   (see [Satellite frequencies](#satellite-frequencies)): pick a transponder
   mode and see the downlink to tune and the uplink to transmit, corrected in

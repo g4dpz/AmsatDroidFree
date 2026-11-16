@@ -75,6 +75,7 @@ fun SettingsScreen(
     val pointingAxis by settings.pointingAxis.state.collectAsStateWithLifecycle()
     val themeMode by settings.themeMode.state.collectAsStateWithLifecycle()
     val autoRedNight by settings.autoRedNight.state.collectAsStateWithLifecycle()
+    val centreMapOnHome by settings.centreMapOnHome.state.collectAsStateWithLifecycle()
     val crashReports by settings.crashReports.state.collectAsStateWithLifecycle()
 
     var message by remember { mutableStateOf<String?>(null) }
@@ -141,6 +142,11 @@ fun SettingsScreen(
                     onCheckedChange = { settings.autoRedNight.value = it },
                 )
             }
+            SwitchRow(
+                label = stringResource(R.string.settings_centre_map),
+                checked = centreMapOnHome,
+                onCheckedChange = { settings.centreMapOnHome.value = it },
+            )
             SwitchRow(
                 label = stringResource(R.string.settings_keep_screen_on),
                 checked = keepScreenOn,

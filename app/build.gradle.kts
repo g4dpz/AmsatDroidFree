@@ -52,8 +52,8 @@ android {
         applicationId = "uk.me.g4dpz.amsatdroid"
         minSdk = 30
         targetSdk = 36
-        versionCode = 2101
-        versionName = "2.1.0"
+        versionCode = 2102
+        versionName = "2.2.0"
         buildConfigField("String", "SENTRY_DSN", "\"$sentryDsn\"")
         buildConfigField("String", "SENTRY_ENVIRONMENT", "\"$sentryEnvironment\"")
         buildConfigField("boolean", "CRASH_REPORTS_DEFAULT", (sentryEnvironment != "production").toString())
