@@ -42,6 +42,7 @@ class SettingsRepositoryTest {
         assertTrue(s.keepScreenOn.value)
         assertEquals(ThemeMode.SYSTEM, s.themeMode.value)
         assertFalse(s.autoRedNight.value)
+        assertFalse(s.centreMapOnHome.value)
         assertEquals(12, s.overviewHours.value)
         assertEquals(0, s.overviewMinElevation.value)
         assertFalse(s.setupFinished.value)
@@ -80,6 +81,7 @@ class SettingsRepositoryTest {
         a.keepScreenOn.value = false
         a.themeMode.value = ThemeMode.RED_NIGHT
         a.autoRedNight.value = true
+        a.centreMapOnHome.value = true
         a.overviewHours.value = 24
         a.overviewMinElevation.value = 20
         a.setupFinished.value = true
@@ -102,6 +104,7 @@ class SettingsRepositoryTest {
         assertFalse(b.keepScreenOn.value)
         assertEquals(ThemeMode.RED_NIGHT, b.themeMode.value)
         assertTrue(b.autoRedNight.value)
+        assertTrue(b.centreMapOnHome.value)
         assertEquals(24, b.overviewHours.value)
         assertEquals(20, b.overviewMinElevation.value)
         assertTrue(b.setupFinished.value)

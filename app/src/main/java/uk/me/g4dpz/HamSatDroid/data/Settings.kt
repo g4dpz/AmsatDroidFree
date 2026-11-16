@@ -133,6 +133,9 @@ class SettingsRepository(private val store: KeyValueStore) {
     }
     val autoRedNight = Setting(store.getBoolean(AUTO_RED_NIGHT, false)) { store.putBoolean(AUTO_RED_NIGHT, it) }
 
+    /** Whether the world map is centred on the home longitude (the picture wraps round) instead of longitude 0. */
+    val centreMapOnHome = Setting(store.getBoolean(CENTRE_MAP_ON_HOME, false)) { store.putBoolean(CENTRE_MAP_ON_HOME, it) }
+
     /**
      * Whether anonymous crash reports may be sent. Only builds that carry a Sentry DSN send anything. On by default
      * in the testing environments and off by default in production (see `sentryEnvironment` in build.gradle.kts).
@@ -210,6 +213,7 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val KEEP_SCREEN_ON = "keepScreenOn"
         const val THEME_MODE = "themeMode"
         const val AUTO_RED_NIGHT = "autoRedNight"
+        const val CENTRE_MAP_ON_HOME = "centreMapOnHome"
         const val CRASH_REPORTS = "crashReports"
         const val OVERVIEW_HOURS = "overviewHours"
         const val OVERVIEW_MIN_ELEVATION = "overviewMinElevation"
