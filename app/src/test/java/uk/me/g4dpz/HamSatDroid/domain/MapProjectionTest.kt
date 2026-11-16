@@ -73,6 +73,113 @@ class MapProjectionTest {
         assertEquals(0.0, MapProjection.x(180.0000001, 1000.0), 1e-3)
     }
 
+    // ---- centred on another longitude ----
+
+    private val sydney = 151.2
+
+    @Test
+    fun theCentreLongitudeIsInTheMiddle() {
+        for (centre in listOf(0.0, sydney, -122.4, 180.0, -180.0, 359.9, 45.0)) {
+            assertEquals("centre $centre", 500.0, MapProjection.x(centre, 1000.0, centre), 1e-9)
+        }
+    }
+
+    @Test
+    fun aCentreOfZeroIsTheOriginalProjection() {
+        for (lon in listOf(-180.0, -179.9, -90.0, 0.0, 90.0, 151.2, 180.0, 270.0, 359.9)) {
+            assertEquals("lon $lon", MapProjection.x(lon, 1000.0), MapProjection.x(lon, 1000.0, 0.0), 0.0)
+        }
+        assertEquals(1000.0, MapProjection.x(180.0, 1000.0, 0.0), 1e-9) // the date line stays on the right edge
+    }
+
+    @Test
+    fun theMapWrapsRoundWhenCentredOnSydney() {
+        // 10 degrees east of Sydney is 10/360 of the width right of the middle, 10 west the same to the left
+        assertEquals(500.0 + 1000.0 * 10 / 360, MapProjection.x(sydney + 10, 1000.0, sydney), 1e-9)
+        assertEquals(500.0 - 1000.0 * 10 / 360, MapProjection.x(sydney - 10, 1000.0, sydney), 1e-9)
+        // New Zealand (175 east) is right of Sydney, Hawaii (-155) is further east still and wraps past the date line
+        assertTrue(MapProjection.x(175.0, 1000.0, sydney) > 500.0)
+        assertTrue(MapProjection.x(-155.0, 1000.0, sydney) > MapProjection.x(175.0, 1000.0, sydney))
+        // the far side of the Earth from Sydney is at the edges: just east of it at the left, just west of it at the right
+        val antipode = sydney + 180.0
+        assertEquals(0.0, MapProjection.x(antipode + 1, 1000.0, sydney), 3.0)
+        assertEquals(1000.0, MapProjection.x(antipode - 1, 1000.0, sydney), 3.0)
+    }
+
+    @Test
+    fun aCentreWrittenInEitherNotationGivesTheSameMap() {
+        assertEquals(MapProjection.x(10.0, 1000.0, -122.4), MapProjection.x(10.0, 1000.0, 237.6), 1e-9)
+        assertEquals(MapProjection.x(-170.0, 1000.0, 179.0), MapProjection.x(190.0, 1000.0, -181.0), 1e-9)
+    }
+
+    @Test
+    fun aLineCrossingTheNewSeamIsBrokenThere() {
+        // centred on Sydney the seam is at 331.2 east (28.8 west): a track going east across it must be split
+        val points = listOf(GeoPoint(0.0, -40.0), GeoPoint(0.0, -30.0), GeoPoint(0.0, -20.0), GeoPoint(0.0, -10.0))
+        assertEquals(2, MapProjection.polylines(points, 1000.0, 500.0, sydney).size)
+        // the same track on the original map has no break
+        assertEquals(1, MapProjection.polylines(points, 1000.0, 500.0).size)
+    }
+
+    @Test
+    fun aLineNotCrossingTheSeamIsNotBroken() {
+        // the original seam (the date line) is now in the middle of the Pacific side, but this track is nowhere near it
+        val points = listOf(GeoPoint(0.0, 120.0), GeoPoint(0.0, 140.0), GeoPoint(0.0, 160.0), GeoPoint(0.0, 175.0))
+        assertEquals(1, MapProjection.polylines(points, 1000.0, 500.0, sydney).size)
+        // a track across the date line, which broke on the original map, does not break now (it is far from the seam)
+        val dateLine = listOf(GeoPoint(0.0, 170.0), GeoPoint(0.0, 179.0), GeoPoint(0.0, -179.0), GeoPoint(0.0, -170.0))
+        assertEquals(2, MapProjection.polylines(dateLine, 1000.0, 500.0).size)
+        assertEquals(1, MapProjection.polylines(dateLine, 1000.0, 500.0, sydney).size)
+    }
+
+    // ---- drawing the picture in pieces ----
+
+    @Test
+    fun aCentreOfZeroDrawsTheWholePictureInOnePiece() {
+        for (centre in listOf(0.0, 360.0, -360.0)) {
+            assertEquals(listOf(PicturePiece(0, 2000, 0, 1000)), MapProjection.picturePieces(centre, 2000, 1000))
+        }
+    }
+
+    @Test
+    fun theTwoPiecesMeetExactlyWithNoGapOrOverlap() {
+        for (pictureWidth in listOf(1024, 1999, 2000, 4321)) {
+            for (mapWidth in listOf(300, 800, 1000, 1340, 2361)) {
+                for (centre in listOf(sydney, -122.4, 180.0, -180.0, 0.1, 359.9, 45.0, -0.1)) {
+                    val pieces = MapProjection.picturePieces(centre, pictureWidth, mapWidth)
+                    val label = "picture $pictureWidth map $mapWidth centre $centre"
+                    // the destinations cover the map exactly, in order
+                    assertEquals(label, 0, pieces.first().dstX)
+                    pieces.zipWithNext { a, b -> assertEquals(label, a.dstX + a.dstWidth, b.dstX) }
+                    assertEquals(label, mapWidth, pieces.last().dstX + pieces.last().dstWidth)
+                    // the sources cover the picture once; a sliver narrower than one map pixel may be left out
+                    val sliver = Math.ceil(pictureWidth.toDouble() / mapWidth).toInt()
+                    val covered = pieces.sumOf { it.srcWidth }
+                    assertTrue("$label covered $covered", covered <= pictureWidth && pictureWidth - covered <= sliver)
+                    assertTrue(label, pieces.all { it.srcX >= 0 && it.srcX + it.srcWidth <= pictureWidth && it.srcWidth > 0 && it.dstWidth > 0 })
+                }
+            }
+        }
+    }
+
+    @Test
+    fun thePictureLinesUpWithTheProjectionToHalfAPixel() {
+        // a feature at longitude L is at picture column (L + 180) / 360 * pictureWidth; it must land where x() puts it
+        val pictureWidth = 2000
+        val mapWidth = 1340
+        for (centre in listOf(sydney, -122.4, 179.9, -179.9, 45.0)) {
+            val pieces = MapProjection.picturePieces(centre, pictureWidth, mapWidth)
+            for (lon in listOf(-170.0, -90.0, 0.5, 90.0, 151.2, 170.0)) {
+                val column = (lon + 180.0) / 360.0 * pictureWidth
+                val piece = pieces.first { column >= it.srcX && column < it.srcX + it.srcWidth }
+                val drawnAt = piece.dstX + (column - piece.srcX) * piece.dstWidth / piece.srcWidth
+                val projectedAt = MapProjection.x(lon, mapWidth.toDouble(), centre)
+                // the picture split is rounded to a picture pixel, so allow a pixel and a half (the stretch is under 1 percent)
+                assertEquals("lon $lon centre $centre", projectedAt, drawnAt, 1.5)
+            }
+        }
+    }
+
     @Test
     fun northIsAtTheTop() {
         assertEquals(0.0, MapProjection.y(90.0, 500.0), 1e-9)
