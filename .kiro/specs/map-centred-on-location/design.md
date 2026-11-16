@@ -11,7 +11,7 @@ Add a centre longitude (degrees, default `0.0`) to `x` and to `polylines`:
 
     fun x(longitudeDeg: Double, mapWidth: Double, centreDeg: Double = 0.0): Double
 
-The shift is the longitude relative to the centre, wrapped to -180..180, then moved so the centre is in the middle: `((lon - centre + 540) mod 360) / 360 * mapWidth`. With `centreDeg = 0` this gives the present results, which the existing tests prove. `polylines` passes the centre to `x`, so its "jump larger than half the width" rule breaks lines at the new seam with no other change.
+The shift keeps the existing rule and applies it to the longitude relative to the centre: `rel = normalise(lon - centre)` (0..360, as `normalise` does today), then `shifted = if (rel <= 180.0) rel + 180.0 else rel - 180.0`, then `x = shifted * mapWidth / 360`. The `<= 180.0` branch is kept, so with `centreDeg = 0` every result is identical to today's, including longitude 180 landing on the right edge (`MapProjectionTest.theDateLineIsAtAnEdge`). `polylines` passes the centre to `x`, so its "jump larger than half the width" rule breaks lines at the new seam with no other change.
 
 ### The picture
 Draw the Blue Marble bitmap in two pieces with `drawImage(srcOffset, srcSize, dstOffset, dstSize)`:
