@@ -6,7 +6,14 @@ The bullet points of the newest entry are also what goes into the Play Console r
 
 ## [2.2.0] - 2026-11-16 (versionCode 2102)
 ### Added
-- Settings, Display, "Centre the map on my location": the world map puts your home in the middle and wraps round, so a station in Australia or New Zealand sees the Pacific whole. Off by default.
+- Settings, Display, "Centre the map on my location" puts your home in the middle of the world map, wrapping round, so the Pacific is whole for Australia and New Zealand. Off by default.
+- Contact planner (menu): when a satellite is above the horizon at both your station and another you save by name and locator.
+### Changed
+- Red night mode is 20 percent brighter.
+- The compass is off until you switch it on.
+### Fixed
+- The locator is checked as you type it.
+- Each setup guide step opens at the top.
 ## [2.1.0] - 2026-11-15 (versionCode 2101, not released on its own)
 ### Added
 - Contact planner (menu): see when a satellite is above the horizon at both your station and another one you save by name and locator, with the best moment and look angles at both ends.
