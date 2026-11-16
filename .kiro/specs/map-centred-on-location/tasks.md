@@ -14,7 +14,7 @@ Order: pure logic first, then the setting, then the drawing. One branch, one PR;
 - [ ] 3. Drawing
   - [ ] 3.1 `WorldMap`: new `centreLongitudeDeg` parameter, picture drawn in two pieces, home, satellite, track and footprint through the shifted `x`; the caller passes the home longitude when the setting is on and the location is set
     - _Requirements: 1.3, 1.4, 2, 3, 4.1, 5.3_
-  - [ ] 3.2 Checkpoint: on the tablet and the emulator with home set to Sydney (IO..., 151.2 east), then San Francisco and 179.9 east: the home icon is in the middle, no seam or gap, the track and footprint line up with the coast, a pass over Australia is no longer split, red night looks right, the switch is off by default and the map is unchanged when off; send a screenshot to the requester's contact
+  - [ ] 3.2 Checkpoint: on the tablet and the emulator with home set to Sydney (about 151.2 east), then San Francisco and 179.9 east: the home icon is in the middle, no seam or gap, the track and footprint line up with the coast, a pass over Australia is no longer split, red night looks right, the switch is off by default and the map is unchanged when off; keep a screenshot for David to share with the requester
     - _Requirements: all_
 - [ ] 4. Release
   - [ ] 4.1 CHANGELOG entry and version bump for 2.2.0 (next versionCode after the last upload), wiki Help (Map view section) and README feature line; check the privacy policy still holds (it does: nothing new is sent)
