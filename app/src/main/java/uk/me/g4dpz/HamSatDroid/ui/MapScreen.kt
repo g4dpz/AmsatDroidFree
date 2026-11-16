@@ -64,6 +64,7 @@ fun MapContent(viewModel: AppViewModel, state: AppUiState, keepScreenOn: Boolean
     val home = remember(state.selectedCatnum) { viewModel.newGroundStation() }
 
     val tick by rememberTicker(POSITION_REFRESH_MILLIS)
+    val mapCentre by viewModel.mapCentreDeg.collectAsStateWithLifecycle()
 
     val reading by produceState<MapReading?>(null, satellite, tick) {
         val s = satellite
@@ -105,6 +106,7 @@ fun MapContent(viewModel: AppViewModel, state: AppUiState, keepScreenOn: Boolean
             satellite = reading?.subPoint,
             home = home?.let { GeoPoint(it.latitude, it.longitude) },
             modifier = Modifier.fillMaxWidth(),
+            centreLongitudeDeg = mapCentre,
         )
 
         home?.let { h ->

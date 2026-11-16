@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -31,6 +32,7 @@ import uk.me.g4dpz.HamSatDroid.data.StoredPasses
 import uk.me.g4dpz.HamSatDroid.domain.CalcResult
 import uk.me.g4dpz.HamSatDroid.domain.ElementAge
 import uk.me.g4dpz.HamSatDroid.domain.HomeLocation
+import uk.me.g4dpz.HamSatDroid.domain.MapCentre
 import uk.me.g4dpz.HamSatDroid.domain.PassCalculator
 import uk.me.g4dpz.HamSatDroid.domain.PassHeader
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
@@ -77,6 +79,15 @@ class AppViewModel(
         .stateIn(
             viewModelScope, SharingStarted.Eagerly,
             _state.value.selectedCatnum ?: settings.selectedCatnum.value.takeIf { it > 0 },
+        )
+
+    /** The longitude in the middle of the world map: the home longitude when the setting is on and the home is set, else 0. */
+    val mapCentreDeg: StateFlow<Double> = combine(
+        settings.centreMapOnHome.state, settings.homeLat.state, settings.homeLon.state,
+    ) { on, lat, lon -> MapCentre.longitude(on, lat, lon) }
+        .stateIn(
+            viewModelScope, SharingStarted.Eagerly,
+            MapCentre.longitude(settings.centreMapOnHome.value, settings.homeLat.value, settings.homeLon.value),
         )
 
     private val _events = Channel<UiEvent>(Channel.BUFFERED)
