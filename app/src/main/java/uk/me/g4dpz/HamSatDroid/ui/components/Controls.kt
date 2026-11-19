@@ -26,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import uk.me.g4dpz.HamSatDroid.ui.LargeFont
 import androidx.compose.ui.unit.dp
@@ -39,7 +41,7 @@ fun rememberIsLargeFont(): Boolean = LargeFont.isLarge(LocalDensity.current.font
  *
  * At a normal font size the label floats in the border of the box (one line, with an ellipsis if it is too long). At a
  * large font size a floating label that wraps collides with the border, so the label is shown above the box instead,
- * wrapping as needed, and the label and the box are read together by a screen reader.
+ * wrapping as needed, and the box carries the label as its content description so a screen reader still names it.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +69,9 @@ fun <T> DropdownField(
                 maxLines = 2,
                 label = if (largeFont) null else ({ Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) }),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                    // With no floating label (large font) the box would be read without its name, so name it.
+                    .then(if (largeFont) Modifier.semantics { contentDescription = label } else Modifier),
             )
             ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 for (option in options) {
@@ -83,8 +87,14 @@ fun <T> DropdownField(
         }
     }
     if (largeFont) {
-        Column(modifier = modifier.semantics(mergeDescendants = true) {}) {
-            Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Column(modifier = modifier) {
+            // Seen but not announced separately: the box below carries the label as its description.
+            Text(
+                label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clearAndSetSemantics {},
+            )
             Spacer(Modifier.height(4.dp))
             box()
         }
