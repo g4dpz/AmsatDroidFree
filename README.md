@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/g4dpz/AmsatDroidFree/actions/workflows/ci.yml/badge.svg)](https://github.com/g4dpz/AmsatDroidFree/actions/workflows/ci.yml)
 [![License: GPL v3+](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
-![Android 11+](https://img.shields.io/badge/Android-11%2B-3DDC84?logo=android&logoColor=white)
+![Android 10+](https://img.shields.io/badge/Android-10%2B-3DDC84?logo=android&logoColor=white)
 [![Latest release](https://img.shields.io/github/v/release/g4dpz/AmsatDroidFree?include_prereleases)](https://github.com/g4dpz/AmsatDroidFree/releases)
 
 Amateur radio satellite pass calculator and companion for Android.
@@ -98,13 +98,13 @@ warning. (The exact coordinates are redacted.)*
 
 | | |
 |---|---|
-| Minimum Android | 11 (API 30) |
+| Minimum Android | 10 (API 29) |
 | Target / compile SDK | Android 16 (API 36) |
 | Language | Kotlin, Jetpack Compose (Material 3) |
 | Build | Gradle (wrapper 8.13), AGP 8.13, JDK 17 |
 
 Primary development/test device: **Samsung Galaxy Tab A7 Lite, SM-T225**
-(1340 × 800, no gyroscope). The app also runs on any Android 11+ phone or tablet.
+(1340 × 800, no gyroscope). The app also runs on any Android 10+ phone or tablet (checked on a Galaxy A6 running Android 10).
 
 ## Building
 
