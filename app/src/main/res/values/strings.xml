@@ -90,6 +90,7 @@
     <string name="passes_change_start_time">Change start time</string>
     <string name="passes_use_current_time">Use current time</string>
     <string name="passes_calculate">Calculate pass</string>
+    <string name="passes_sky_view">Sky view</string>
     <string name="passes_loading">Loading satellites…</string>
     <string name="passes_none_yet">Choose a satellite and press Calculate pass.</string>
     <plurals name="passes_elements_stale">
