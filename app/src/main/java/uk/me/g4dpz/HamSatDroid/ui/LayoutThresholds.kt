@@ -83,14 +83,3 @@ object PassesPaneLayout {
 
     fun scrollWholePane(paneHeightDp: Float): Boolean = paneHeightDp < SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP
 }
-
-/**
- * How the layouts react to a large font size (the system font scale, set in Android's display settings). A floating
- * label that wraps collides with the border of its box, and two fields side by side leave each too little width, so from
- * [LARGE_FONT_SCALE] labels go above their fields and fields that sat side by side are stacked.
- */
-object LargeFont {
-    const val LARGE_FONT_SCALE = 1.3f
-
-    fun isLarge(fontScale: Float): Boolean = fontScale >= LARGE_FONT_SCALE
-}

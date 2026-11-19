@@ -45,7 +45,6 @@ import uk.me.g4dpz.HamSatDroid.domain.OverviewRows
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
 import uk.me.g4dpz.HamSatDroid.domain.UpNowRow
 import uk.me.g4dpz.HamSatDroid.ui.components.DropdownField
-import uk.me.g4dpz.HamSatDroid.ui.components.rememberIsLargeFont
 import uk.me.g4dpz.HamSatDroid.ui.components.rememberTicker
 import java.time.Duration
 import java.time.Instant
@@ -109,38 +108,23 @@ fun OverviewScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item(key = "controls") {
-                // Side by side, or one above the other at a large font size, where each would get too little width.
-                val stack = rememberIsLargeFont()
-                val windowPicker: @Composable (Modifier) -> Unit = { m ->
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                     DropdownField(
                         label = stringResource(R.string.overview_window),
                         options = SettingsRepository.OVERVIEW_HOUR_CHOICES,
                         selected = state.hours,
                         optionLabel = { stringResource(R.string.overview_hours_option, it) },
                         onSelected = viewModel::setHours,
-                        modifier = m,
+                        modifier = Modifier.weight(1f),
                     )
-                }
-                val elevationPicker: @Composable (Modifier) -> Unit = { m ->
                     DropdownField(
                         label = stringResource(R.string.overview_min_elevation),
                         options = SettingsRepository.OVERVIEW_MIN_ELEVATION_CHOICES,
                         selected = state.minElevation,
                         optionLabel = { stringResource(R.string.overview_degrees_option, it) },
                         onSelected = viewModel::setMinElevation,
-                        modifier = m,
+                        modifier = Modifier.weight(1f),
                     )
-                }
-                if (stack) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                        windowPicker(Modifier.fillMaxWidth())
-                        elevationPicker(Modifier.fillMaxWidth())
-                    }
-                } else {
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                        windowPicker(Modifier.weight(1f))
-                        elevationPicker(Modifier.weight(1f))
-                    }
                 }
             }
             item(key = "status") {

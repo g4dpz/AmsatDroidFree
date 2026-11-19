@@ -184,58 +184,33 @@ fun LocationEditor(
             // told as it is typed, not only when the field is left (I082xl: the zero for the letter O)
             error = locatorProblemText(locatorDraft),
         )
-        // Latitude and longitude side by side, or one above the other at a large font size (see [LargeFont]).
-        val stack = rememberIsLargeFont()
-        val latitudeField: @Composable (Modifier) -> Unit = { m ->
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
             CommitField(
                 label = stringResource(R.string.settings_latitude_label),
                 value = latDraft,
                 onValueChange = { latDraft = it },
                 keyboardType = KeyboardType.Ascii, // the numeric keypad has no minus sign
-                modifier = m,
+                modifier = Modifier.weight(1f),
                 onCommit = { if (latDraft != storedLat) commit(LocatorSync.editLatitude(latDraft, current())) },
             )
-        }
-        val longitudeField: @Composable (Modifier) -> Unit = { m ->
             CommitField(
                 label = stringResource(R.string.settings_longitude_label),
                 value = lonDraft,
                 onValueChange = { lonDraft = it },
                 keyboardType = KeyboardType.Ascii, // the numeric keypad has no minus sign
-                modifier = m,
+                modifier = Modifier.weight(1f),
                 onCommit = { if (lonDraft != storedLon) commit(LocatorSync.editLongitude(lonDraft, current())) },
             )
         }
-        if (stack) {
-            latitudeField(Modifier.fillMaxWidth())
-            longitudeField(Modifier.fillMaxWidth())
-        } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                latitudeField(Modifier.weight(1f))
-                longitudeField(Modifier.weight(1f))
-            }
-        }
-        val gpsButton: @Composable () -> Unit = {
+
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             if (locationFetcher.hasGps) {
                 OutlinedButton(onClick = { useProvider(LocationManager.GPS_PROVIDER) }) {
                     Text(stringResource(R.string.settings_use_gps))
                 }
             }
-        }
-        val networkButton: @Composable () -> Unit = {
             OutlinedButton(onClick = { useProvider(LocationManager.NETWORK_PROVIDER) }) {
                 Text(stringResource(R.string.settings_use_network))
-            }
-        }
-        if (stack) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                gpsButton()
-                networkButton()
-            }
-        } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                gpsButton()
-                networkButton()
             }
         }
         if (!locationFetcher.hasGps) {
