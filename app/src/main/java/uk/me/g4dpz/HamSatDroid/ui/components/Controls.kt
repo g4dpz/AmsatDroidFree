@@ -63,10 +63,10 @@ fun <T> DropdownField(
                 onValueChange = {},
                 readOnly = true,
                 enabled = enabled,
-                // Up to two lines, so a long value (a satellite name such as "RS-44 & BREEZE-KM R/B" on a narrow screen
-                // or at a large font size) wraps instead of being cut off without any sign.
+                // Up to two lines (three at a large font), so a long value (a satellite name such as "RS-44 &
+                // BREEZE-KM R/B" on a narrow screen or at a large font size) wraps instead of being cut off without any sign.
                 singleLine = false,
-                maxLines = 2,
+                maxLines = if (largeFont) 3 else 2,
                 label = if (largeFont) null else ({ Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) }),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
