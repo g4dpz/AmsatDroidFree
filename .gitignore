@@ -14,8 +14,6 @@ app/build
 
 # Release signing: never commit the keystore or its passwords
 keystore.properties
-# Sentry DSN for the internal-test crash reports
-sentry.properties
 *.jks
 *.keystore
 

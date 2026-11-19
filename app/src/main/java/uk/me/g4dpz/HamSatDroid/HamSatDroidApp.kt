@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import uk.me.g4dpz.HamSatDroid.alert.AlertNotifier
 import uk.me.g4dpz.HamSatDroid.alert.PassAlertStore
-import uk.me.g4dpz.HamSatDroid.crash.CrashReporting
 import uk.me.g4dpz.HamSatDroid.data.FileStore
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.data.SharedPreferencesStore
@@ -46,12 +45,6 @@ open class HamSatDroidApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Crash reports: start Sentry here, before anything else, so a failure during start-up is caught; later changes
-        // of the setting start or stop it (no DSN means nothing starts).
-        CrashReporting.apply(this, settings.crashReports.value)
-        scope.launch {
-            settings.crashReports.state.collect { enabled -> CrashReporting.apply(this@HamSatDroidApp, enabled) }
-        }
         AlertNotifier(this).ensureChannel()
         val scheduler = KepsScheduler(this)
         // A StateFlow delivers the current value first (applied at start-up) and then every change.
