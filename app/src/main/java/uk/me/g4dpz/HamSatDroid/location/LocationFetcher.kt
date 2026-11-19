@@ -95,10 +95,16 @@ class LocationFetcher(private val context: Context) {
         val handler = Handler(Looper.getMainLooper())
         var answered = false
         lateinit var listener: LocationListener
+        // Stops the timeout and removes the listener from the LocationManager, which keeps its side of the registration
+        // until removeUpdates is called, even after a single update has been delivered. Safe to call more than once.
+        fun finish() {
+            handler.removeCallbacksAndMessages(null)
+            manager.removeUpdates(listener)
+        }
         val timeout = Runnable {
             if (!answered) {
                 answered = true
-                manager.removeUpdates(listener)
+                finish()
                 onResult(Outcome.NoFix)
             }
         }
@@ -106,7 +112,7 @@ class LocationFetcher(private val context: Context) {
             override fun onLocationChanged(location: Location) {
                 if (answered) return
                 answered = true
-                handler.removeCallbacks(timeout)
+                finish()
                 onResult(outcomeOf(location))
             }
 
@@ -118,11 +124,16 @@ class LocationFetcher(private val context: Context) {
         }
         cancel.setOnCancelListener {
             answered = true
-            handler.removeCallbacks(timeout)
-            manager.removeUpdates(listener)
+            finish()
         }
         manager.requestSingleUpdate(provider, listener, Looper.getMainLooper())
         handler.postDelayed(timeout, TIMEOUT_MILLIS)
+        // A cancel that came before the request existed ran finish() too early (there was nothing to remove yet), so
+        // look again now that the request and the timeout are in place.
+        if (cancel.isCanceled) {
+            answered = true
+            finish()
+        }
     }
 
     private fun outcomeOf(location: Location?): Outcome =
