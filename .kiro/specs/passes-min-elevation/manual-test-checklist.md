@@ -6,7 +6,8 @@
 - [ ] The heading says the filter is on and what it is; with every pass below the minimum the message says so
 - [ ] Choosing 0 again brings every pass back (nothing was lost)
 - [ ] The choice survives a restart and applies to a different satellite
-- [ ] Next pass only with 30: shows the next pass that reaches 30, or says none does within the limit
+- [ ] Changing the minimum on the passes screen changes it on the All satellites screen, and the other way round
+- [ ] Next pass only with 30: shows the next pass that reaches 30, or says none does in the next 24 hours
 - [ ] Changing the minimum with Next pass only recalculates
 - [ ] A selected pass stays in the list and in the sky view when the filter would hide it, and is marked below the minimum
 - [ ] Setting an alert on a listed pass works as before; the overview, planner and widget are unchanged

@@ -1,11 +1,11 @@
 # Implementation Plan: Minimum elevation filter on the passes screen
 
-Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after each task. The golden regression test must stay green. Branch per task group, one PR at a time, CI and Copilot before merging (merge commit). Waits for the answers to O1 and O2.
+Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after each task. The golden regression test must stay green. Branch per task group, one PR at a time, CI and Copilot before merging (merge commit).
 
 - [ ] 1. Logic
   - [ ] 1.1 `PassFilter.visible` in `domain` with `PassFilterTest` (zero, boundary at exactly the minimum, kept id, empty list)
     - _Requirements: 1.1, 2.1, 2.4, 4.1_
-  - [ ] 1.2 `passesMinElevation` setting (default 0, validated choices) with `SettingsRepositoryTest` cases
+  - [ ] 1.2 Expose the shared `overviewMinElevation` setting to the passes screen as `AppViewModel.minElevation` (read and write; no new setting), with `AppViewModelTest` cases showing that a change on either screen is seen on the other
     - _Requirements: 1.1, 1.2_
   - [ ] 1.3 `PassCalculator.nextPassReaching` with tests: first pass already high enough, second pass is the first to qualify, none within the limit, cancellation between steps
     - _Requirements: 3.1, 3.2_
