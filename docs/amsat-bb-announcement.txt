@@ -23,7 +23,7 @@ What it does:
 - Tablet and foldable layouts, per-app language, and a red night mode for
   observing without spoiling your night vision
 
-It runs on Android 11 and later and is free and open source (GPL-3.0). The
+It runs on Android 10 and later and is free and open source (GPL-3.0). The
 source, with screenshots, is on GitHub:
 
 https://github.com/g4dpz/AmsatDroidFree
