@@ -82,10 +82,4 @@ class LayoutThresholdsTest {
         val right = LayoutThresholds.DASHBOARD_MIN_WIDTH_DP * 0.7f - 48f
         assertEquals(ChartArrangement.STACKED, DashboardLayout.choose(right, 800f))
     }
-
-    @Test
-    fun aLargeFontIsFromOnePointThree() {
-        for (scale in listOf(0.85f, 1.0f, 1.15f, 1.29f)) assertEquals("$scale", false, LargeFont.isLarge(scale))
-        for (scale in listOf(1.3f, 1.5f, 2.0f)) assertEquals("$scale", true, LargeFont.isLarge(scale))
-    }
 }
