@@ -27,7 +27,7 @@ This spec adds the same filter to the Passes screen, for the selected satellite.
 **User story:** As an operator, I want to hide low passes so the list only shows ones worth setting up for.
 1. The Passes screen SHALL offer a **Minimum elevation** picker with the choices 0, 10, 20 and 30 degrees, default 0.
 2. The choice SHALL persist across restarts and apply to every satellite.
-3. The picker SHALL be near the range picker, and SHALL stack with it and move its label above it by the same rules as the other pickers (narrow panes, large font).
+3. The picker SHALL be near the range picker, and SHALL stack with the other pickers below a pane width of 700 dp.
 4. Changing the choice SHALL update the list at once, without pressing Calculate, for the 6, 12 and 24 hour ranges.
 
 ## Requirement 2: What is shown
@@ -47,7 +47,7 @@ This spec adds the same filter to the Passes screen, for the selected satellite.
 3. The golden regression test and the existing pass tests SHALL pass unchanged.
 
 ## Requirement 5: Looks and accessibility
-1. The picker SHALL have a visible label, readable at 200 percent font, with no clipping on a 360 dp phone in portrait and landscape.
+1. The picker SHALL have a visible label and no clipping on a 360 dp phone in portrait and landscape.
 2. The active filter SHALL be stated in text, not shown by colour alone.
 3. Red night mode SHALL apply as to the other pickers.
 

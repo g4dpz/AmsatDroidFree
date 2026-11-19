@@ -3,7 +3,7 @@
 ## Where things are today
 - `AppViewModel.calculate()` calls `PassCalculator.calculate(tle, lat, lon, start, hours)`, which calls `PassPredictor.getPasses(start, hoursAhead, true)`; `hoursAhead` 0 returns the next pass only. The result is kept in `rawPasses` and in `AppUiState.passes` (a list of `PassSummary`, each with `maxElevationDeg`), and saved by `PassStore`.
 - `OverviewRows.upcoming(results, minElevation, now)` already filters by maximum elevation as a pure function with tests; the Contact planner does it inside its search.
-- Pickers: `DropdownField` (large font handled in #63). `PassesPaneLayout` stacks the range and start-time controls in narrow panes.
+- Pickers: `DropdownField` (a long value wraps over two lines; a long label has an ellipsis). `PassesPaneLayout` stacks the range and satellite pickers in narrow panes (under 480 dp). Large font sizes are not supported (David, 20 Nov 2026), so nothing here depends on the font scale.
 
 ## The change
 ### Setting
@@ -25,7 +25,7 @@ The no-argument `calculate()` clears the selected pass. A calculation started be
 The stored heading (`PassHeader.Predictions`) is set when results are calculated or restored, so a fixed-range picker change, which only changes the setting, would leave it stale. The filter clause and the "no pass reaches" message are therefore **derived** in the UI state from the current minimum and the unfiltered results (including restored ones), not stored in the header: the screen shows `Predictions` as now, plus a line "Passes reaching at least N degrees" computed from the setting, and `NoPassReaches` when the unfiltered results contain no pass at or above the minimum. That test uses the unfiltered list and ignores a below-minimum pass kept only because it is selected. For "Next pass only" a search that found nothing sets the `NoPassReaches` header at calculation time, with the limit in hours. New strings with the number as a placeholder; plurals are not needed (a number of degrees).
 
 ### UI
-A `DropdownField` for the minimum next to the range picker, added to `PassesControls`. The stacking rule is `PassesPaneLayout.stackPickers(paneWidthDp, fontScale)`, which exists from PR #66 with its call site in `PassesScreen` and `PassesPaneLayoutTest` cases. **With three pickers one breakpoint applies, in dp of normal-sized text** (the pane width, divided by the font scale from 1.3 up): the pickers stack below **700**. Side by side, three pickers get under 180 dp each in a 528 dp pane, so the limit is higher than the 480 for two (and, at a large font, 600 for two). Test expectations: 528 dp at 100 percent stacks; 700 dp at 100 percent does not; 975 dp at 200 percent (487 dp of normal text) stacks; 1500 dp at 200 percent (750) does not. `DropdownField` moves only its own label above the box at a large font; it does not stack neighbouring fields.
+A `DropdownField` for the minimum next to the range picker, added to `PassesControls`. **With three pickers the stacking breakpoint is higher than for two**: side by side, three pickers get under 180 dp each in a 528 dp pane, so `PassesPaneLayout.stackPickers` stacks the group below **700 dp** of pane width (a new `STACK_THREE_PICKERS_BELOW_WIDTH_DP`; the 480 dp limit stays for two pickers). Test expectations in `PassesPaneLayoutTest`: 528 dp stacks, 699 dp stacks, 700 dp does not. The font scale plays no part (large fonts are not supported).
 
 ## What this does not change
 The prediction code, `PassStore`'s format, the overview, the planner, the widget and alerts.

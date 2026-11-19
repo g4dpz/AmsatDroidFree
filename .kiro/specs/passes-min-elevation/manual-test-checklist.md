@@ -10,5 +10,5 @@
 - [ ] Changing the minimum with Next pass only recalculates
 - [ ] A selected pass stays in the list and in the sky view when the filter would hide it, and is marked below the minimum
 - [ ] Setting an alert on a listed pass works as before; the overview, planner and widget are unchanged
-- [ ] No clipping on the A6 (360 dp) in portrait and landscape; at 200 percent font the picker's label is above it
+- [ ] No clipping on the A6 (360 dp) in portrait and landscape
 - [ ] Red night mode: the picker looks like the others

@@ -15,9 +15,9 @@ Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after e
   - [ ] 2.2 `PassHeader` states for the filter and the "no pass reaches" message; `AppViewModelTest` cases
     - _Requirements: 2.2, 2.3, 3.2_
 - [ ] 3. Screen
-  - [ ] 3.1 The picker in `PassesControls` (stacked and labelled above at narrow widths and large fonts), the note on a selected pass below the minimum, the new strings
+  - [ ] 3.1 The picker in `PassesControls` (stacked below a pane width of 700 dp), the note on a selected pass below the minimum, the new strings
     - _Requirements: 1.3, 2.2, 5_
-  - [ ] 3.2 Checkpoint: the manual checklist on the SM-T225, the A6 and the emulators, at 100 and 200 percent font, portrait and landscape, and red night mode
+  - [ ] 3.2 Checkpoint: the manual checklist on the SM-T225, the A6 and the emulators, portrait and landscape, and red night mode
     - _Requirements: all_
 - [ ] 4. Release
   - [ ] 4.1 CHANGELOG, version bump, wiki Help (Passes section) and README line; reply to the tester
