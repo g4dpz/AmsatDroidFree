@@ -60,7 +60,9 @@ class PassesPaneLayoutTest {
         assertFalse(PassesPaneLayout.stackPickers(560f, 1.15f))
         assertTrue(PassesPaneLayout.stackPickers(560f, 1.3f)) // 431 dp worth of normal text
         assertTrue(PassesPaneLayout.stackPickers(560f, 2.0f))
-        assertFalse(PassesPaneLayout.stackPickers(1000f, 2.0f)) // 500 dp worth
+        assertTrue(PassesPaneLayout.stackPickers(975f, 2.0f)) // the SM-T225 landscape pane at 200 percent: 487 dp worth
+        assertFalse(PassesPaneLayout.stackPickers(975f, 1.3f)) // 750 dp worth: side by side is fine
+        assertFalse(PassesPaneLayout.stackPickers(1300f, 2.0f)) // 650 dp worth
     }
 
     @Test

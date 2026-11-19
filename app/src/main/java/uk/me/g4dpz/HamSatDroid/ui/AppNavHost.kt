@@ -36,7 +36,10 @@ private fun NavController.popOrGoHome(route: String) {
  * (a notification opened [route] as the start), replaces it with the passes screen.
  */
 private fun NavController.returnToPasses(route: String) {
-    if (!popBackStack(Routes.PASSES, inclusive = false)) navigate(Routes.PASSES) { popUpTo(route) { inclusive = true } }
+    if (!popBackStack(Routes.PASSES, inclusive = false)) {
+        // Whatever is left (an overview opened as the start, say) is replaced, as the route-request handler does.
+        navigate(Routes.PASSES) { popUpTo(graph.id) { inclusive = true } }
+    }
 }
 
 /** Navigation destinations. */

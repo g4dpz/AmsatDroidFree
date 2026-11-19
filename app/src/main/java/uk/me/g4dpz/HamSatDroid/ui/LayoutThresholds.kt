@@ -81,17 +81,27 @@ object PassesPaneLayout {
      */
     const val STACK_PICKERS_BELOW_WIDTH_DP = 480f
 
+    /** The same limit at a large font, in dp of normal-sized text (the width divided by the font scale). */
+    const val STACK_PICKERS_LARGE_FONT_BELOW_WIDTH_DP = 600f
+
     /**
      * Below this pane height, in dp, the controls scroll away with the pass list instead of staying pinned above it.
      * Pinned, they take most of a phone's 411 dp landscape height and leave the list a single line.
      */
     const val SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP = 520f
 
-    /** At a large font (see [LargeFont]) the pane width is divided by [fontScale], as for [WindowLayout.forWidth]. */
-    fun stackPickers(paneWidthDp: Float, fontScale: Float = 1f): Boolean {
-        val effective = if (LargeFont.isLarge(fontScale)) paneWidthDp / fontScale else paneWidthDp
-        return effective < STACK_PICKERS_BELOW_WIDTH_DP
-    }
+    /**
+     * At a large font (see [LargeFont]) the pane width is divided by [fontScale], as for [WindowLayout.forWidth], and
+     * the pickers stack below [STACK_PICKERS_LARGE_FONT_BELOW_WIDTH_DP] of that. A satellite name such as
+     * "RS-44 & BREEZE-KM R/B" needs three lines in half of a 975 dp pane at 200 percent (487 dp of normal text), one more
+     * than a picker shows, so the large-font limit is higher than the normal one.
+     */
+    fun stackPickers(paneWidthDp: Float, fontScale: Float = 1f): Boolean =
+        if (LargeFont.isLarge(fontScale)) {
+            paneWidthDp / fontScale < STACK_PICKERS_LARGE_FONT_BELOW_WIDTH_DP
+        } else {
+            paneWidthDp < STACK_PICKERS_BELOW_WIDTH_DP
+        }
 
     /**
      * At a large font (see [LargeFont]) the stacked pickers and the heading are taller, so the pane height is divided by
