@@ -18,8 +18,11 @@
 ### Next pass only
 With a minimum above 0, `calculate()` searches in steps: ask the predictor for the next pass; if its maximum elevation is below the minimum, start again from just after its end; stop at the first that reaches it or when the search has gone past the limit (O1, suggested 48 hours). The loop lives in `PassCalculator` (new function `nextPassReaching(tle, lat, lon, start, minElevationDeg, limitHours)`), testable with the same fakes as the existing calculator tests, and honours cancellation between steps. Changing the minimum while "Next pass only" is selected calls `calculate()` again.
 
+### Keeping the selected pass
+The no-argument `calculate()` clears the selected pass. A calculation started because the minimum changed (Next pass only) therefore uses the existing `calculate(keepSelected = selectedPass)` path, so the sky view keeps its pass (A4), including when no qualifying pass is found. A calculation the user starts with Calculate behaves as today.
+
 ### Heading and messages
-New `PassHeader` states carry the minimum: `Predictions(..., minElevation)` adds a clause; `NoPassReaches(name, ..., minElevation, hours)` for Requirement 2.3 and 3.2. New strings with the number as a placeholder, plurals not needed (a number of degrees).
+The stored heading (`PassHeader.Predictions`) is set when results are calculated or restored, so a fixed-range picker change, which only changes the setting, would leave it stale. The filter clause and the "no pass reaches" message are therefore **derived** in the UI state from the current minimum and the unfiltered results (including restored ones), not stored in the header: the screen shows `Predictions` as now, plus a line "Passes reaching at least N degrees" computed from the setting, and `NoPassReaches` when the unfiltered results contain no pass at or above the minimum. That test uses the unfiltered list and ignores a below-minimum pass kept only because it is selected. For "Next pass only" a search that found nothing sets the `NoPassReaches` header at calculation time, with the limit in hours. New strings with the number as a placeholder; plurals are not needed (a number of degrees).
 
 ### UI
 A `DropdownField` for the minimum next to the range picker, using the same stacking rule (`PassesPaneLayout.stackPickers`), added to `PassesControls`. A selected pass that the filter would hide is listed with a note "below the minimum".
