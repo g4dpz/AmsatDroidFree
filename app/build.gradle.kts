@@ -50,7 +50,7 @@ android {
 
     defaultConfig {
         applicationId = "uk.me.g4dpz.amsatdroid"
-        minSdk = 30
+        minSdk = 29
         targetSdk = 36
         versionCode = 2103
         versionName = "2.2.1"
