@@ -69,7 +69,7 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
   - [x] 6.2 Run `manual-test-checklist.md` and record the results
     - Done 15 Nov 2026: David confirmed every box in the checklist and asked for them to be ticked (29 were ticked at his request, not individually run by the agent). The device scripts had already covered layouts (45/45 on both devices); TalkBack and split-screen were not run by script.
 
-- [ ] 7. Release
-  - [ ] 7.1 CHANGELOG entry, bump `versionName` and `versionCode`, build the signed bundle from the merged commit, check the built version, upload to the test track
-    - 15 Nov 2026: CHANGELOG entry and the bump to 2.1.0 (versionCode 2100) are merged (PR #56, master `217a50d`). Still to do by David: build the signed bundle from that commit, check the built version, upload to the test track and press "Save and publish".
+- [x] 7. Release
+  - [x] 7.1 CHANGELOG entry, bump `versionName` and `versionCode`, build the signed bundle from the merged commit, check the built version, upload to the test track
+    - 15 to 19 Nov 2026: PR #56 merged the 2.1.0 CHANGELOG entry and bump with versionCode 29 (master `217a50d`); PR #57 then set the code to 2100. 2.1.0 was never uploaded on its own: the planner shipped in 2.2.0 (2102) and 2.2.1 (2103, built from master `ab5c68a`), which David published on 19 Nov 2026.
     - _Requirements: 11.3_

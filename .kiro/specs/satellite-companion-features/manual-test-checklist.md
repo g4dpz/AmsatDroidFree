@@ -65,7 +65,7 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [x] Alert set while the pass is already in progress shows the "is up" state
 
 ## Compass
-- [x] Compass is on by default
+- [x] Compass is off by default on a fresh install (decision D3, 15 Nov 2026), and switching it on persists
 - [x] Sky view rotates as the phone turns; facing direction at top
 - [x] Facing north gives the same picture as the non-compass view
 - [x] Rotate device to reverse landscape: heading still correct
@@ -87,12 +87,12 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [x] Leaving the screen stops the sensors
 
 ## Doppler
-- [x] Add a downlink and uplink for a satellite; they persist after restart
+- [ ] The frequency card shows the transponder database entry for the satellite, read-only (the editor was removed in tasks 11.4 and 11.5); a satellite with several entries has a mode picker
 - [x] During a pass the corrected downlink falls as the satellite recedes and rises as it approaches (check the sign against a known pass or another tool)
 - [x] The shift in Hz is plausible (a few kHz on 435 MHz, a few kHz less on 145 MHz)
 - [x] Below the horizon: values shown with the "not currently visible" note
-- [x] Comma-decimal device locale: entering frequencies still works
-- [x] Edit and delete entries; satellite with no entries shows the add prompt
+- [ ] Comma-decimal device locale: frequencies are shown with the locale's separators
+- [ ] A satellite with no database entry shows the no-data message
 - [x] Values update every second and stop updating when the screen is left
 
 ## Red night mode
@@ -148,7 +148,7 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 
 ## Galaxy Tab A7 Lite (SM-T225) specifics
 - [x] Record: model number (SM-T225), Android and One UI version, window width in dp (portrait and landscape), and whether `FEATURE_LOCATION_GPS` is present
-- [x] Portrait and landscape both show the two-pane layout
+- [x] Portrait shows the two-pane layout; full-screen landscape shows the dashboard (list, sky chart and map together)
 - [x] Samsung split-screen and pop-up window: layout adapts live; no lost state
 - [x] If the device reports no GPS: "Use GPS" hidden or disabled with an explanation; entering a locator works
 - [x] GPS: an outdoor fix sets the location (note time to fix); indoors, network location may be poor or empty
@@ -176,3 +176,5 @@ Note: a screenshot pass on the emulator found no clipping in the items above, ex
 - [x] Pass times match the pre-migration app for the same satellite, location and start time
 
 Note (15 Nov 2026): David confirmed all boxes in this checklist himself and asked for them to be ticked. Items that ask for a recorded value (for example a time in seconds) were ticked without a value being written down.
+
+Corrected 20 Nov 2026 after review: the compass default item now says off by default; the three Doppler items that described the removed frequency editor were replaced by checks for the read-only database card and left unticked until someone confirms them; the landscape item now says dashboard.
