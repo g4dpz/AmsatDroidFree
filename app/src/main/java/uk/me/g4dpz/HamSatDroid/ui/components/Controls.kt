@@ -2,6 +2,10 @@
 package uk.me.g4dpz.HamSatDroid.ui.components
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenuItem
@@ -20,9 +24,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import uk.me.g4dpz.HamSatDroid.ui.LargeFont
 import androidx.compose.ui.unit.dp
 
-/** A labelled drop-down list. [label] shows the text for each option; the current option is [selected]. */
+/** True when the system font size is large enough that labels go above their fields (see [LargeFont]). */
+@Composable
+fun rememberIsLargeFont(): Boolean = LargeFont.isLarge(LocalDensity.current.fontScale)
+
+/**
+ * A labelled drop-down list. [optionLabel] shows the text for each option; the current option is [selected].
+ *
+ * At a normal font size the label floats in the border of the box (one line, with an ellipsis if it is too long). At a
+ * large font size a floating label that wraps collides with the border, so the label is shown above the box instead,
+ * wrapping as needed, and the box carries the label as its content description so a screen reader still names it.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> DropdownField(
@@ -35,28 +55,51 @@ fun <T> DropdownField(
     enabled: Boolean = true,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { if (enabled) expanded = it }, modifier = modifier) {
-        OutlinedTextField(
-            value = selected?.let { optionLabel(it) } ?: "",
-            onValueChange = {},
-            readOnly = true,
-            enabled = enabled,
-            singleLine = true,
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            for (option in options) {
-                DropdownMenuItem(
-                    text = { Text(optionLabel(option)) },
-                    onClick = {
-                        expanded = false
-                        onSelected(option)
-                    },
-                )
+    val largeFont = rememberIsLargeFont()
+    val box: @Composable () -> Unit = {
+        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { if (enabled) expanded = it }) {
+            OutlinedTextField(
+                value = selected?.let { optionLabel(it) } ?: "",
+                onValueChange = {},
+                readOnly = true,
+                enabled = enabled,
+                // Up to two lines, so a long value (a satellite name such as "RS-44 & BREEZE-KM R/B" on a narrow screen
+                // or at a large font size) wraps instead of being cut off without any sign.
+                singleLine = false,
+                maxLines = 2,
+                label = if (largeFont) null else ({ Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) }),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                    // With no floating label (large font) the box would be read without its name, so name it.
+                    .then(if (largeFont) Modifier.semantics { contentDescription = label } else Modifier),
+            )
+            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                for (option in options) {
+                    DropdownMenuItem(
+                        text = { Text(optionLabel(option)) },
+                        onClick = {
+                            expanded = false
+                            onSelected(option)
+                        },
+                    )
+                }
             }
         }
+    }
+    if (largeFont) {
+        Column(modifier = modifier) {
+            // Seen but not announced separately: the box below carries the label as its description.
+            Text(
+                label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clearAndSetSemantics {},
+            )
+            Spacer(Modifier.height(4.dp))
+            box()
+        }
+    } else {
+        Box(modifier = modifier) { box() }
     }
 }
 
