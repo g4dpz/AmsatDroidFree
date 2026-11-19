@@ -324,7 +324,7 @@ private fun PassesPane(
 ) {
     BoxWithConstraints(modifier) {
         val stackPickers = PassesPaneLayout.stackPickers(maxWidth.value, LocalDensity.current.fontScale)
-        val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value)
+        val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value, LocalDensity.current.fontScale)
         val controls: @Composable () -> Unit = {
             PassesControls(viewModel, state, formats, stackPickers, onChangeStartTime, locationSet, onOpenSetup)
         }

@@ -93,7 +93,15 @@ object PassesPaneLayout {
         return effective < STACK_PICKERS_BELOW_WIDTH_DP
     }
 
-    fun scrollWholePane(paneHeightDp: Float): Boolean = paneHeightDp < SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP
+    /**
+     * At a large font (see [LargeFont]) the stacked pickers and the heading are taller, so the pane height is divided by
+     * [fontScale] first, as the width is for [stackPickers]; at 200 percent the controls scroll with the list in any
+     * pane under 1040 dp tall, so they cannot take all of it and hide the list.
+     */
+    fun scrollWholePane(paneHeightDp: Float, fontScale: Float = 1f): Boolean {
+        val effective = if (LargeFont.isLarge(fontScale)) paneHeightDp / fontScale else paneHeightDp
+        return effective < SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP
+    }
 }
 
 /**

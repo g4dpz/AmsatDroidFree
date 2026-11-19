@@ -62,4 +62,13 @@ class PassesPaneLayoutTest {
         assertTrue(PassesPaneLayout.stackPickers(560f, 2.0f))
         assertFalse(PassesPaneLayout.stackPickers(1000f, 2.0f)) // 500 dp worth
     }
+
+    @Test
+    fun aLargeFontScrollsThePaneWholeInATallerPane() {
+        assertFalse(PassesPaneLayout.scrollWholePane(1000f)) // tablet portrait, normal font: controls pinned
+        assertFalse(PassesPaneLayout.scrollWholePane(1000f, 1.15f))
+        assertTrue(PassesPaneLayout.scrollWholePane(1000f, 2.0f)) // 500 dp worth
+        assertTrue(PassesPaneLayout.scrollWholePane(600f, 1.3f)) // 461 dp worth
+        assertFalse(PassesPaneLayout.scrollWholePane(1100f, 2.0f)) // 550 dp worth
+    }
 }
