@@ -5,7 +5,7 @@ off by default for production (set `environment=production` in `sentry.propertie
 
 ## What is sent
 
-When the app crashes or stops responding, and "Send anonymous crash reports" in Settings is on (the default in this
+When the app crashes or stops responding, and "Send crash reports" in Settings is on (the default in this
 build), Sentry receives the error and its stack trace, the app version, the Android version, the device model, and the
 time. The app removes the user, the server name, breadcrumbs and the device's own name before sending, and sends no
 screenshots, performance data or session tracking. It never adds the home location, locator, callsign or any account.
@@ -14,10 +14,10 @@ project settings (switch it on).
 
 ## Privacy policy paragraph (wiki, Beta testers section)
 
-> **Crash reports (test builds).** Internal and closed test builds can send an anonymous crash report to Sentry
+> **Crash reports (test builds).** Internal and closed test builds can send a crash report to Sentry
 > (sentry.io, hosted in the EU) when the app crashes or stops responding. It contains the error and stack trace, the
-> app version, the Android version and the device model. It does not contain your location, name, callsign, email
-> address or any account or advertising identifier. You can switch it off in Settings, Privacy, "Send anonymous crash
+> app version, the Android version and the device model. The app does not add your location, name, callsign, email
+> address or any account or advertising identifier. You can switch it off in Settings, Privacy, "Send crash
 > reports". In production builds the switch is off until you turn it on.
 
 ## Play Console, Data safety (App content)

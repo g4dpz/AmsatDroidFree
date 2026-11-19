@@ -137,7 +137,7 @@ class SettingsRepository(private val store: KeyValueStore) {
     val centreMapOnHome = Setting(store.getBoolean(CENTRE_MAP_ON_HOME, false)) { store.putBoolean(CENTRE_MAP_ON_HOME, it) }
 
     /**
-     * Whether anonymous crash reports may be sent. Only builds that carry a Sentry DSN send anything. On by default
+     * Whether crash reports may be sent. Only builds that carry a Sentry DSN send anything. On by default
      * in the testing environments and off by default in production (see `sentryEnvironment` in build.gradle.kts).
      */
     val crashReports = Setting(store.getBoolean(CRASH_REPORTS, BuildConfig.CRASH_REPORTS_DEFAULT)) { store.putBoolean(CRASH_REPORTS, it) }

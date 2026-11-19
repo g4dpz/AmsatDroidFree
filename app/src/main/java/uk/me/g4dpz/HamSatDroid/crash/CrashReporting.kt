@@ -8,7 +8,7 @@ import io.sentry.android.core.SentryAndroid
 import uk.me.g4dpz.HamSatDroid.BuildConfig
 
 /**
- * Anonymous crash reports through Sentry.
+ * Crash reports through Sentry.
  *
  * Sentry is started by hand (the manifest turns its automatic start off) and only when the user allows crash reports
  * and the build carries a DSN. Without a DSN, as on CI and in a fresh clone, nothing starts. What is sent is the

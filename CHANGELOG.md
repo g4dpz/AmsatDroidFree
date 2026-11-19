@@ -22,7 +22,7 @@ The bullet points of the newest entry are also what goes into the Play Console r
 ### Added
 - Contact planner (menu): see when a satellite is above the horizon at both your station and another one you save by name and locator, with the best moment and look angles at both ends.
 ### Changed
-- Test builds can send anonymous crash reports, with a switch in Settings to turn them off.
+- Test builds can send crash reports, with a switch in Settings to turn them off.
 - Red night mode is 20 percent brighter and easier to read in a dark room.
 - The compass is off until you switch it on.
 ### Fixed
