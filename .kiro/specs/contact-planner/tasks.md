@@ -51,7 +51,7 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
     - Done: the strings came in with 4.1, 4.2 and 4.3, with plurals where a count is followed by a word (lint is clean)
     - _Requirements: D4_
 
-- [ ] 5. Quality
+- [x] 5. Quality
   - [x] 5.1 Layouts: phone portrait and landscape, tablet portrait and landscape, split-screen; red night mode; 200 percent font; TalkBack headings, labels and reading order
     - Done 15 Nov 2026: layout script 45/45 on the emulator and 45/45 on the SM-T225 (portrait and landscape, 100 and 200 percent font). Not run: TalkBack listening and split-screen, which adb cannot drive; reading order, labels and the button role on the card summary were checked by the accessibility tree only
     - _Requirements: 6.6, 8.1, 8.2, 8.3, 8.4_
@@ -62,11 +62,14 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
     - Done 15 Nov 2026: the independent tool was the reference `sgp4` Python package (2.27, Vallado), with its own sidereal-time and look-angle code, stepping every second over the same fixed RS-44 elements, UK (IO82xk) to Kansas City (EM29mm), 72 h from 2026-11-14 14:55:24Z, minimum 0 degrees. It found three windows, 18:01:24 to 18:02:33, 16:25:31 to 16:30:19 and 16:51:36 to 16:55:27, with best moments 18:02:13, 16:27:33 and 16:53:56 and lower elevations 1.0, 3.7 and 3.5 degrees. The planner's expected values agree within 5 s and 0.1 degree. Not compared with Gpredict or N2YO
     - _Requirements: 10.1_
 
-- [ ] 6. Documentation
-  - [ ] 6.1 Wiki Help (a Contact planner section; update "written for version"), wiki Home and README feature lists; check the privacy policy still holds
+- [x] 6. Documentation
+  - [x] 6.1 Wiki Help (a Contact planner section; update "written for version"), wiki Home and README feature lists; check the privacy policy still holds
+    - 15 Nov 2026: the README line was already in. The Contact planner section is published on the wiki Help page (after "All satellites") and the Home feature list (wiki commit 5881e7f). "Written for version" on the Help page now says 2.1.0 (wiki commit 73f8f38). Privacy policy: the planner's saved stations (name and locator, up to 10) stay on the device, which the policy's "operational settings remain on your device" already covers, so no change proposed.
     - _Requirements: 11.1, 11.2, 11.4_
-  - [ ] 6.2 Run `manual-test-checklist.md` and record the results
+  - [x] 6.2 Run `manual-test-checklist.md` and record the results
+    - Done 15 Nov 2026: David confirmed every box in the checklist and asked for them to be ticked (29 were ticked at his request, not individually run by the agent). The device scripts had already covered layouts (45/45 on both devices); TalkBack and split-screen were not run by script.
 
 - [ ] 7. Release
   - [ ] 7.1 CHANGELOG entry, bump `versionName` and `versionCode`, build the signed bundle from the merged commit, check the built version, upload to the test track
+    - 15 Nov 2026: CHANGELOG entry and the bump to 2.1.0 (versionCode 2100) are merged (PR #56, master `217a50d`). Still to do by David: build the signed bundle from that commit, check the built version, upload to the test track and press "Save and publish".
     - _Requirements: 11.3_

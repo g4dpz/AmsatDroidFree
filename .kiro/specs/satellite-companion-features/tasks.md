@@ -108,7 +108,7 @@ Order: data layer, then Compose migration (parity first), then features on the n
   - [x] 6.4 Verify 90 Hz behaviour: screens redraw only when inputs change; check with the Compose recomposition tools and on the device
     - _Requirements: 8.11_
 
-- [ ] 7. Red night mode
+- [x] 7. Red night mode
   - [x] 7.1 `NightPalette`, `ChartColors` red-night variant, theme mode setting and picker; make all screens, dialogs and charts use the theme
     - Done: `NightPalette` sets every Material 3 role (including the "fixed" roles) to a shade of pure red (green and blue zero); `NightPaletteTest` finds every role by reflection and fails if one is missed (checked by removing one). `ChartColors.RedNight`: dim frame, mid labels, bright track drawn 1.75x thicker, dashed map footprint; map photograph filtered to red luminance at 0.55, icons boosted to 1.6 so they stand out. Theme picker (System default, Light, Dark, Red night) in Settings > Display. `LocalRedNight` switches the charts. Theme changes recompose in place (no activity restart).
     - System bars: the system draws its bar icons only in white or grey, so in red night the status and navigation bars are hidden (swipe from the edge shows them briefly). Android shows a one-time white "Viewing full screen" hint the first time. In Light and Dark the bar icons now follow the app's theme, not the system's.
@@ -120,12 +120,12 @@ Order: data layer, then Compose migration (parity first), then features on the n
   - [x] 7.3 `AmbientLightProvider` and the "switch automatically" setting (hidden when no light sensor); lifecycle-bound registration
     - Done: `AmbientLightProvider` (callback flow over `TYPE_LIGHT`), `rememberAmbientNight` collects only while STARTED and only when the setting is on; the last reading is re-fed every 0.5 s because light sensors report only changes. Verified on the emulator with `adb emu sensor set light`: light at 3 s in the dark, red at 7 s, stays red at 10 lux, red 1 s after bright, light at 5 s. `dumpsys sensorservice` shows the listener while visible and none in the background.
     - _Requirements: 14.3, 14.4, 14.5_
-  - [ ] 7.4 Checkpoint: manual checks "Red night mode" (tune thresholds and contrast on the device)
+  - [x] 7.4 Checkpoint: manual checks "Red night mode" (tune thresholds and contrast on the device)
     - Installed on the SM-T225 (light sensor tsl2540). David: covering the light sensor switches to red night and back, and the red display looks good (checked indoors in daylight).
-    - Still to do: readability with dark-adapted eyes in a dark room, and whether the 5 / 20 lux thresholds suit real night conditions.
+    - Done 15 Nov 2026: David checked in the dark on the SM-T225 ("red light is much better") and confirmed the 5 / 20 lux thresholds are fine. No code change. The remaining boxes in the manual checklist's "Red night mode" section are left for David to tick.
     - _Requirements: 14.8_
 
-- [ ] 8. All-satellite overview
+- [x] 8. All-satellite overview
   - Satellite list order (Requirement 16, added after David saw the list by catalogue number): `SatelliteOrder` (pure, `SatelliteOrderTest`, 8 tests) sorts OSCAR satellites first by number then prefix letters (read from the name as an `xO-nn` tag), then the rest alphabetically. Used by the passes-screen chooser; the overview keeps its own order. Checked against the tablet's 98-satellite list; false positives (KKS-1, UWE-3, OTP-2, RS-44) are excluded by requiring the trailing O.
   - [x] 8.1 `OverviewCalculator` (per-satellite predictor and ground-station copy, parallel, streaming, cancellable) and `OverviewCalculatorTest` (parallel equals sequential, skips never-visible, cancellation)
     - Done: `OverviewCalculator.calculate` returns a `Flow<OverviewItem>`, one coroutine per satellite on `Dispatchers.Default.limitedParallelism(cores)`, each with its own predictor and ground station; the flow completes when every satellite has reported. `OverviewItem.Result` carries "up now" (az/el), the LOS of a pass in progress, and the passes in the window; `Skipped` for never-rises / bad elements / a stationary satellite out of view. 10 tests (parallel equals sequential, inside-window and sorted, agree with the passes screen, never-rises skipped, up-now with LOS, cancellation returns early, QO-100 geostationary up/skip).
@@ -137,10 +137,10 @@ Order: data layer, then Compose migration (parity first), then features on the n
     - Fixed a pre-existing bug this exposed: at start-up `onStart` could reload the keps before the first load set the selection, resetting it to the first satellite. It now falls back to the saved `selectedCatnum`. Checked over 8 restarts.
     - _Requirements: 16.1, 16.2, 16.3, 16.7, 16.8_
   - [x] 8.3 Measure and record calculation time on the SM-T225 (and the emulator); adjust defaults if too slow
-    - Emulator (Tab A11 AVD, Android 15, swiftshader): 98 satellites, first run 12 h about 4.0 s (cold, JIT warming up), then 24 h about 0.4 s. Fast enough; defaults left at 12 h / 0 degrees. Not yet measured on the physical SM-T225 (checklist item left open).
+    - Emulator (Tab A11 AVD, Android 15, swiftshader): 98 satellites, first run 12 h about 4.0 s (cold, JIT warming up), then 24 h about 0.4 s. Fast enough; defaults left at 12 h / 0 degrees. SM-T225 (Android 12, 99 satellites, from the app's own `Overview` log line): first run after a cold start, 12 h, 2.59 s; 24 h, 2.55 s, then 2.62 s and 2.77 s on "Calculate again". About 2.6 s for a full 24 h calculation, so the defaults stay at 12 h / 0 degrees. Responsiveness while calculating was not measured here.
     - _Requirements: 16.10_
 
-- [ ] 9. Pass alerts
+- [x] 9. Pass alerts
   - [x] 9.1 `PassAlert`, `PassAlertStore`, `AlertTiming` with `PassAlertStoreTest` and `AlertTimingTest`
     - Done: `PassAlert` (id = catnum + AOS-to-the-second), `PassAlertStore` (`alerts.json` via `FileStore`; add/remove/contains/pruneEnded; corrupt file reads empty), `AlertTiming` (lead/AOS/LOS triggers, past ones dropped, `stageNow` for late delivery). 11 tests.
     - _Requirements: 1.3, 1.5, 2.1, 2.2, 2.3, 7.4_
@@ -162,10 +162,11 @@ Order: data layer, then Compose migration (parity first), then features on the n
   - [x] 9.7 `SpokenAnnouncer` (TTS, ducking, timeout, `goAsync`), spoken string resources, settings switch (default off); call from the receiver at lead, AOS and LOS
     - Done: `SpokenAnnouncer` takes transient ducking audio focus, speaks with QUEUE_FLUSH, shuts down on completion or an 8 s timeout, and fails silently; the receiver uses `goAsync` and speaks only when "Speak pass alerts" is on. Spoken strings are separate resources (minutes as a plural). Not yet heard on a device (left for 9.8).
     - _Requirements: 19.1 to 19.7_
-  - [ ] 9.8 Checkpoint: manual checks "Pass alerts" and "Spoken alerts"
+  - [x] 9.8 Checkpoint: manual checks "Pass alerts" and "Spoken alerts"
     - On the SM-T225 for checking. Left to verify on the device: a real alert arriving at the set time, the countdown, tapping it opens the sky view, survival across a reboot and a clock change, spoken announcements (and ducking), and behaviour when notifications are denied. Note Samsung's background limits may delay a late-running announcement.
+    - Done 15 Nov 2026: David confirmed the manual checklist on the SM-T225 and asked for this checkpoint to be ticked; the checklist boxes were ticked at his request, not individually verified here.
 
-- [ ] 10. Compass and aiming aid
+- [x] 10. Compass and aiming aid
   - [x] 10.1 `HeadingMath` and `HeadingMathTest` (wrap-around, declination, flat/upright selection with hysteresis)
     - Done: circular smoothing and signed delta across 0/360, true heading from declination, flat/upright from gravity with a hysteresis dead band. 6 tests.
     - _Requirements: 4.2, 4.4, 4.10, 7.4_
@@ -181,10 +182,11 @@ Order: data layer, then Compose migration (parity first), then features on the n
   - [x] 10.5 Aim mode on the sky screen: bearings, deltas as text and arrows, on-target state, below-horizon message, accuracy and magnet warning, pointing-axis setting
     - Done: an Aim chip (off by default) shows the pointing and satellite bearings, "turn left/right" and "raise/lower" as text, an OnTarget state with an icon and text (not colour alone), a below-horizon message, the compass accuracy and the magnet/metal warning. Pointing-axis setting (top edge / back) in Settings > Display. Verified on the SM-T225: the panel showed live pointing az/el from the geomagnetic sensor and the below-horizon message for a satellite under the horizon.
     - _Requirements: 17.1 to 17.8_
-  - [ ] 10.6 Checkpoint: manual checks "Compass" and "Aiming aid"
+  - [x] 10.6 Checkpoint: manual checks "Compass" and "Aiming aid"
     - On the SM-T225 (geomagnetic rotation vector, no gyroscope). Done so far: compass rotates the chart, aim panel shows bearings and deltas, accuracy and warning shown. Left to verify properly: heading accuracy against a known bearing, the calibration hint when accuracy drops, portrait vs landscape and flat vs upright, and aiming at a satellite that is actually up (needs a live pass). Note the compass had been toggled off in testing; its stored default is on.
+    - Done 15 Nov 2026: David confirmed the manual checklist on the SM-T225 and asked for this checkpoint to be ticked; the checklist boxes were ticked at his request, not individually verified here.
 
-- [ ] 11. Doppler
+- [x] 11. Doppler
   - Design change (David, after Peter's OscarWatch repo became available): the satellite frequencies now come from the OscarWatch transponder database (`satellite_database.json`) — a bundled copy plus a sync from `https://tle.oscarwatch.org/satellite_database.json` — read-only in the app, matched to satellites by NORAD id. This replaces the user-entered frequency editor and store (A11, Requirement 15 rewritten). The database also carries modulation modes (USB/LSB/CW/FM/FMN), a NOR/REV Doppler direction and an optional FM uplink CTCSS tone.
   - [x] 11.1 `DopplerMath` with `DopplerMathTest` (agrees with `PassPredictor`, signs, extremes)
     - Done: the library's first-order formulas (c = 2.99792458E8, range rate in km/s). 5 tests, including one that checks `DopplerMath` equals `PassPredictor.getDownlinkFreq`/`getUplinkFreq` for AO-07 at a golden time, using the range rate from the same `SatPos` the sky screen computes. Still valid; the correction maths are unchanged, only the source of the frequencies changes.
@@ -204,7 +206,7 @@ Order: data layer, then Compose migration (parity first), then features on the n
   - [x] 11.6 Checkpoint: manual checks "Doppler"
     - Done on the SM-T225 (David): Doppler is working perfectly. The debug build installed and launched cleanly (no crash in logcat); on start-up the app synced the published database from tle.oscarwatch.org (57 satellites) into `files/satellite_database.json`, recorded in `transponder_sync_status.json`, so it is running from the synced copy rather than the bundled fallback. The mode picker, corrected downlink/uplink and the read-only card were confirmed on the device.
 
-- [ ] 12. Widget
+- [x] 12. Widget
   - [x] 12.1 Persist the selected satellite; implement `WidgetUpdater.compute` and `WidgetState`, with tests for the state logic
     - Done: the selected satellite was already persisted (`selectedCatnum`). `WidgetState` (NoLocation / NoSatellite / Ready / Error); `WidgetUpdater.decide` is a pure state chooser (`WidgetUpdaterTest`, 5 tests) and `compute` loads the keps and runs `PassPredictor.nextSatPass` with the same prediction code as the app.
     - _Requirements: 11.1, 11.2, 11.6, 7.4_
@@ -214,10 +216,11 @@ Order: data layer, then Compose migration (parity first), then features on the n
   - [x] 12.3 `WidgetRefreshWorker` and update triggers (keps refresh, satellite/location change, enable/disable)
     - Done: `WidgetRefreshScheduler` starts a unique ~30 min periodic `WidgetRefreshWorker` in the receiver's `onEnabled` and cancels it in `onDisabled`; `WidgetRefresh.updateAll` is called from `AppViewModel` after a keps reload and when the satellite changes (wired through `onDataChanged`, so the ViewModel stays context-free and tests keep the no-op default).
     - _Requirements: 11.3, 11.4_
-  - [ ] 12.4 Checkpoint: manual checks "Widget"
+  - [x] 12.4 Checkpoint: manual checks "Widget"
     - On the SM-T225. The provider registers and the Glance compose path runs without error on the emulator, but a widget cannot be placed or rendered from the shell, so it must be checked by hand: add it from the launcher, confirm the states (no location, no satellite, next pass with the detail at a larger size), tap to open, change satellite and refresh keps to see it update, resize it, check light/dark, and remove the last one to stop the periodic work.
+    - 15 Nov 2026: David checked on the SM-T225 that tapping the widget opens the app (Requirement 11.5). The rest of the widget checks were ticked in the manual checklist at his request, not individually verified here.
 
-- [ ] 13. Localisation and wrap-up
+- [x] 13. Localisation and wrap-up
   - [x] 13.1 String audit: remove remaining literals and concatenations from UI, notification, spoken and widget code; plurals where needed
     - Done: removed the last concatenations and literals (settings accuracy line, sky-chart "45" ring label, aim "turn/raise" joiner, widget AOS line) into resources with placeholders; made the five remaining count strings plurals (location accuracy, keps updated, about-keps count, the two prediction headers). Lint reports zero HardcodedText. Verified with the en-XA pseudolocale on the emulator: every label is bracketed and accented, only genuine data (satellite names, numbers, coordinates) stays plain, and no raw %d leaks.
     - Enabled `isPseudoLocalesEnabled` for the debug build only, so the pseudolocale audit can be repeated.
@@ -228,6 +231,7 @@ Order: data layer, then Compose migration (parity first), then features on the n
   - [x] 13.3 Zero Kotlin compiler warnings; run lint and fix or consciously suppress new findings
     - Done: clean build has no Kotlin compiler warnings. Lint is down from 10 to 5 warnings: the 5 PluralsCandidate are fixed; the remaining 4 are IconLocation on the original bundled images (home/icon/saticon/world, out of scope to move) and 1 is the deliberate AGP-version note (documented in app/lint.xml).
     - _Requirements: 7.3_
-  - [ ] 13.4 Run the full manual checklist on the Galaxy Tab A7 Lite SM-T225 (and an emulator for the rest) and record results, including the Samsung-specific section
+  - [x] 13.4 Run the full manual checklist on the Galaxy Tab A7 Lite SM-T225 (and an emulator for the rest) and record results, including the Samsung-specific section
+    - Done 15 Nov 2026: David is happy with the manual test on the SM-T225. The emulator-only part was run on the Galaxy A16 AVD (411 x 891 dp): Aim mode in landscape (891 x 411 dp, two panes) with a pass selected shows the Pointing, Satellite and below-horizon lines, compass accuracy and the satellite position, all readable and reachable by scrolling the right pane, nothing clipped. The "no light sensor" and "no gyroscope" items could not be tested on this AVD: it has a light sensor, gyroscope and magnetometer, so those boxes rest on David's confirmation.
     - This is David's end-to-end pass on the hardware. All feature code is complete, builds clean (289 tests), and is installed on the SM-T225. The checklist (and the per-feature checkpoints 7.4, 8.3, 9.8, 10.6, 11.4, 12.4) remain for a device run, including the Samsung-specific section. (The emulator AVD is named `TabA11_API35` for historical reasons; it is configured to match the SM-T225's 800 x 1340 at 213 dpi, not an actual Tab A11.)
     - _Requirements: all_
