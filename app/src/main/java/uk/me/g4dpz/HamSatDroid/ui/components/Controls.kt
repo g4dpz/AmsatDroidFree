@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 /** A labelled drop-down list. [label] shows the text for each option; the current option is [selected]. */
@@ -41,8 +42,13 @@ fun <T> DropdownField(
             onValueChange = {},
             readOnly = true,
             enabled = enabled,
-            singleLine = true,
-            label = { Text(label) },
+            // Up to two lines, so a long value (a satellite name such as "RS-44 & BREEZE-KM R/B" on a narrow screen or at a
+            // large font size) wraps instead of being cut off without any sign.
+            singleLine = false,
+            maxLines = 2,
+            // One line with an ellipsis: a floating label that wraps (a long label at a large font size) collides with the
+            // border of the box. The full text stays in the accessibility tree, so TalkBack still reads all of it.
+            label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
         )
