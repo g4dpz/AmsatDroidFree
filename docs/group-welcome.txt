@@ -17,7 +17,7 @@ Hello all,
 
 This group started in 2014 for the beta testers of the original app. AmsatDroid is back, rebuilt from the ground up for current Android, and it's now being tested on Google Play. The old test links in the 2014 posts below no longer work for it.
 
-What it does: pass prediction with a sky chart and a ground-track map, Doppler-corrected up and down link frequencies (from Peter Goodhall MM9SQL's OscarWatch database), pass alerts, a compass and aiming aid, a next-pass widget, an all-satellites overview and a red night mode. It needs Android 11 or later. It's free and open source (GPL-3.0), with no ads, accounts or tracking.
+What it does: pass prediction with a sky chart and a ground-track map, Doppler-corrected up and down link frequencies (from Peter Goodhall MM9SQL's OscarWatch database), pass alerts, a compass and aiming aid, a next-pass widget, an all-satellites overview and a red night mode. It needs Android 10 or later. It's free and open source (GPL-3.0), with no ads, accounts or tracking.
 
 More about the app, including a short guide to setting your location and the privacy policy:
 https://github.com/g4dpz/AmsatDroidFree/wiki
