@@ -126,7 +126,14 @@ class AppViewModel(
     fun selectSatellite(catnum: Int) {
         if (_tles.value.none { it.catnum == catnum }) return
         settings.selectedCatnum.value = catnum
-        _state.update { it.copy(selectedCatnum = catnum) }
+        // A selected pass belongs to one satellite; the sky view prefers it to the satellite, so leaving it selected
+        // would show the old satellite's chart and Doppler frequencies after choosing another.
+        _state.update {
+            it.copy(
+                selectedCatnum = catnum,
+                selectedPassId = if (it.selectedPass?.catnum == catnum) it.selectedPassId else null,
+            )
+        }
         viewModelScope.launch { onDataChanged() }
     }
 

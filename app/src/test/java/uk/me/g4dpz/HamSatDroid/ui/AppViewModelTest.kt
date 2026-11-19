@@ -350,6 +350,30 @@ class AppViewModelTest {
     }
 
     @Test
+    fun choosingAnotherSatelliteClearsThePassSelectedForTheFirst() {
+        val vm = viewModel()
+        vm.selectSatellite(7530)
+        vm.setHoursAhead(24)
+        vm.calculate()
+        vm.selectPass(vm.state.value.passes.first().id)
+        vm.selectSatellite(25509)
+        assertNull(vm.state.value.selectedPassId) // the sky view would otherwise still show AO-7
+        assertEquals(25509, vm.state.value.selectedCatnum)
+    }
+
+    @Test
+    fun choosingTheSameSatelliteAgainKeepsTheSelectedPass() {
+        val vm = viewModel()
+        vm.selectSatellite(7530)
+        vm.setHoursAhead(24)
+        vm.calculate()
+        val id = vm.state.value.passes.first().id
+        vm.selectPass(id)
+        vm.selectSatellite(7530)
+        assertEquals(id, vm.state.value.selectedPassId)
+    }
+
+    @Test
     fun aNewCalculationClearsTheSelectedPass() {
         val vm = viewModel()
         vm.selectSatellite(7530)
