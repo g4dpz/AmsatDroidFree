@@ -30,6 +30,15 @@ private fun NavController.popOrGoHome(route: String) {
     if (!popBackStack()) navigate(Routes.PASSES) { popUpTo(route) { inclusive = true } }
 }
 
+/**
+ * Goes back to the passes screen, wherever [route] sits above it (for example passes, overview, sky), so a screen that a
+ * wide layout shows beside the list does not leave the overview in between. When the passes screen is not behind it
+ * (a notification opened [route] as the start), replaces it with the passes screen.
+ */
+private fun NavController.returnToPasses(route: String) {
+    if (!popBackStack(Routes.PASSES, inclusive = false)) navigate(Routes.PASSES) { popUpTo(route) { inclusive = true } }
+}
+
 /** Navigation destinations. */
 object Routes {
     const val PASSES = "passes"
@@ -117,13 +126,14 @@ fun AppNavHost(
             val keepScreenOn by settings.keepScreenOn.state.collectAsStateWithLifecycle()
             // After rotating to a wide window the sky view is already shown beside the list. When this screen was the
             // start route (opened from a notification) there is nothing to pop, so go to the passes screen instead.
-            if (layout != WindowLayout.SINGLE_PANE) LaunchedEffect(Unit) { navController.popOrGoHome(Routes.SKY) }
-            SkyScreen(viewModel, keepScreenOn, onBack = { navController.popBackStack() })
+            if (layout != WindowLayout.SINGLE_PANE) LaunchedEffect(Unit) { navController.returnToPasses(Routes.SKY) }
+            // Back also goes home when this screen was the start route (opened from a notification): nothing to pop.
+            SkyScreen(viewModel, keepScreenOn, onBack = { navController.popOrGoHome(Routes.SKY) })
         }
         composable(Routes.MAP) {
             val keepScreenOn by settings.keepScreenOn.state.collectAsStateWithLifecycle()
-            if (layout == WindowLayout.DASHBOARD) LaunchedEffect(Unit) { navController.popOrGoHome(Routes.MAP) }
-            MapScreen(viewModel, keepScreenOn, onBack = { navController.popBackStack() })
+            if (layout == WindowLayout.DASHBOARD) LaunchedEffect(Unit) { navController.returnToPasses(Routes.MAP) }
+            MapScreen(viewModel, keepScreenOn, onBack = { navController.popOrGoHome(Routes.MAP) })
         }
         composable(Routes.OVERVIEW) {
             // Belongs to this screen: leaving it cancels a calculation in progress
