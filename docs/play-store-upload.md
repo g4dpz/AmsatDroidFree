@@ -9,7 +9,7 @@ How to build the Android App Bundle (AAB) and upload it in the Play Console. Pla
 | Package name | `uk.me.g4dpz.amsatdroid` (fixed for the life of the listing) |
 | versionName | `2.0.0` (shown to users) |
 | versionCode | `20` (must be higher than every earlier upload of this package) |
-| minSdk / targetSdk | 30 / 36 |
+| minSdk / targetSdk | 29 / 36 |
 | File to upload | `app-release.aab` (an App Bundle, not an APK) |
 
 Every new release needs a higher `versionCode` in `app/build.gradle.kts`. Play rejects a bundle whose code was already used, even from an earlier draft or test track.
