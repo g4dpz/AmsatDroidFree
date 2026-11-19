@@ -40,6 +40,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -227,6 +228,8 @@ fun HomeScreen(
                 viewModel, state, formats, alerts, highlightSelection = false,
                 onChangeStartTime = { showStartPicker = true }, onPassClick = onPassClick, onPassLongClick = onPassLongClick,
                 locationSet = locationSet, onOpenSetup = onOpenSetup,
+                // The sky view of the satellite itself, for one with no pass to tap (a geostationary satellite).
+                onOpenSky = onOpenPass,
                 modifier = Modifier.fillMaxSize().padding(padding).then(paneModifier),
             )
             WindowLayout.TWO_PANE -> Row(Modifier.fillMaxSize().padding(padding)) {
@@ -320,12 +323,14 @@ private fun PassesPane(
     locationSet: Boolean,
     onOpenSetup: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Opens the sky view of the selected satellite; null where the sky view is already beside the list. */
+    onOpenSky: (() -> Unit)? = null,
 ) {
     BoxWithConstraints(modifier) {
         val stackPickers = PassesPaneLayout.stackPickers(maxWidth.value)
         val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value)
         val controls: @Composable () -> Unit = {
-            PassesControls(viewModel, state, formats, stackPickers, onChangeStartTime, locationSet, onOpenSetup)
+            PassesControls(viewModel, state, formats, stackPickers, onChangeStartTime, locationSet, onOpenSetup, onOpenSky)
         }
         val passes: LazyListScope.() -> Unit = {
             items(state.passes, key = { it.id }) { pass ->
@@ -366,6 +371,7 @@ private fun PassesControls(
     onChangeStartTime: () -> Unit,
     locationSet: Boolean,
     onOpenSetup: () -> Unit,
+    onOpenSky: (() -> Unit)?,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Until a home location is set nothing can be calculated; say so at the top, with the way to fix it.
@@ -421,9 +427,20 @@ private fun PassesControls(
             }
         }
 
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        FlowRow(
+            itemVerticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             Button(onClick = viewModel::calculate, enabled = state.selectedCatnum != null && !state.calculating) {
                 Text(stringResource(R.string.passes_calculate))
+            }
+            // Where the sky view opens from a pass card, a satellite with no passes (a geostationary one such as QO-100)
+            // would have no way in; this opens the sky view of the selected satellite itself.
+            if (onOpenSky != null) {
+                OutlinedButton(onClick = onOpenSky, enabled = state.selectedCatnum != null) {
+                    Text(stringResource(R.string.passes_sky_view))
+                }
             }
             if (state.calculating) CircularProgressIndicator(modifier = Modifier.padding(4.dp))
         }
