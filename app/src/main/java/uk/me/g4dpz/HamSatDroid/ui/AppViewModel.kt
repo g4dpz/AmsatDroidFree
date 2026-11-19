@@ -209,7 +209,10 @@ class AppViewModel(
                         val (summaries, selected) = withPass(calculated, keepSelected)
                         _state.update {
                             it.copy(
-                                passes = summaries, selectedPassId = selected,
+                                passes = summaries,
+                                // Only while this satellite is still the selected one: the user may have chosen another
+                                // while the calculation ran, and its sky view must not show this pass.
+                                selectedPassId = selected.takeIf { _ -> it.selectedCatnum == tle.catnum },
                                 header = PassHeader.Predictions(tle.name, lat, lon, locator, hours, start),
                             )
                         }
@@ -218,7 +221,8 @@ class AppViewModel(
                         rawPasses = emptyList()
                         _state.update {
                             it.copy(
-                                passes = listOfNotNull(keepSelected), selectedPassId = keepSelected?.id,
+                                passes = listOfNotNull(keepSelected),
+                                selectedPassId = keepSelected?.id.takeIf { _ -> it.selectedCatnum == tle.catnum },
                                 header = PassHeader.NoPasses(tle.name, lat, lon, locator, NO_PASS_SEARCH_HOURS),
                             )
                         }
