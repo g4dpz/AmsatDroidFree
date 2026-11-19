@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import uk.me.g4dpz.HamSatDroid.BuildConfig
 import uk.me.g4dpz.HamSatDroid.aim.PointingAxis
 import uk.me.g4dpz.HamSatDroid.night.ThemeMode
 
@@ -136,11 +135,6 @@ class SettingsRepository(private val store: KeyValueStore) {
     /** Whether the world map is centred on the home longitude (the picture wraps round) instead of longitude 0. */
     val centreMapOnHome = Setting(store.getBoolean(CENTRE_MAP_ON_HOME, false)) { store.putBoolean(CENTRE_MAP_ON_HOME, it) }
 
-    /**
-     * Whether crash reports may be sent. Only builds that carry a Sentry DSN send anything. On by default
-     * in the testing environments and off by default in production (see `sentryEnvironment` in build.gradle.kts).
-     */
-    val crashReports = Setting(store.getBoolean(CRASH_REPORTS, BuildConfig.CRASH_REPORTS_DEFAULT)) { store.putBoolean(CRASH_REPORTS, it) }
 
     // ---- overview ----
     val overviewHours = Setting(
@@ -214,7 +208,6 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val THEME_MODE = "themeMode"
         const val AUTO_RED_NIGHT = "autoRedNight"
         const val CENTRE_MAP_ON_HOME = "centreMapOnHome"
-        const val CRASH_REPORTS = "crashReports"
         const val OVERVIEW_HOURS = "overviewHours"
         const val OVERVIEW_MIN_ELEVATION = "overviewMinElevation"
         const val PLANNER_STATIONS = "plannerStations"
