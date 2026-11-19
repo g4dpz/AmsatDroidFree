@@ -4,6 +4,10 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
+## [2.2.1] - 2026-11-19 (versionCode 2103)
+### Fixed
+- Long satellite names in the drop-downs wrap onto a second line instead of being cut off.
+- At large font sizes the drop-down labels sit above their boxes, and the All satellites pickers and the location fields stack, so nothing overlaps or is cut off.
 ## [2.2.0] - 2026-11-16 (versionCode 2102)
 ### Added
 - Settings, Display, "Centre the map on my location" puts your home in the middle of the world map, wrapping round, so the Pacific is whole for Australia and New Zealand. Off by default.
