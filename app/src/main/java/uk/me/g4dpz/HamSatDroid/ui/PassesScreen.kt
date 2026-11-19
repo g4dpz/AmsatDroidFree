@@ -59,6 +59,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
@@ -322,7 +323,7 @@ private fun PassesPane(
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier) {
-        val stackPickers = PassesPaneLayout.stackPickers(maxWidth.value)
+        val stackPickers = PassesPaneLayout.stackPickers(maxWidth.value, LocalDensity.current.fontScale)
         val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value)
         val controls: @Composable () -> Unit = {
             PassesControls(viewModel, state, formats, stackPickers, onChangeStartTime, locationSet, onOpenSetup)

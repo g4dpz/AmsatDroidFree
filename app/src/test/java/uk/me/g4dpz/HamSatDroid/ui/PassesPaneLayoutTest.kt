@@ -53,4 +53,13 @@ class PassesPaneLayoutTest {
         assertTrue(PassesPaneLayout.scrollWholePane(519.9f))
         assertFalse(PassesPaneLayout.scrollWholePane(520f))
     }
+
+    @Test
+    fun aLargeFontStacksThePickersInAWiderPane() {
+        assertFalse(PassesPaneLayout.stackPickers(560f)) // normal font: side by side
+        assertFalse(PassesPaneLayout.stackPickers(560f, 1.15f))
+        assertTrue(PassesPaneLayout.stackPickers(560f, 1.3f)) // 431 dp worth of normal text
+        assertTrue(PassesPaneLayout.stackPickers(560f, 2.0f))
+        assertFalse(PassesPaneLayout.stackPickers(1000f, 2.0f)) // 500 dp worth
+    }
 }

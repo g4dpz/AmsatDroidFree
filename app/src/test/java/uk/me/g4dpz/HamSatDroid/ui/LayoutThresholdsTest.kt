@@ -88,4 +88,26 @@ class LayoutThresholdsTest {
         for (scale in listOf(0.85f, 1.0f, 1.15f, 1.29f)) assertEquals("$scale", false, LargeFont.isLarge(scale))
         for (scale in listOf(1.3f, 1.5f, 2.0f)) assertEquals("$scale", true, LargeFont.isLarge(scale))
     }
+
+    @Test
+    fun aFontScaleBelowTheLargeFontScaleChangesNothing() {
+        for (scale in listOf(0.85f, 1.0f, 1.15f, 1.29f)) {
+            assertEquals(WindowLayout.TWO_PANE, WindowLayout.forWidth(601, scale))
+            assertEquals(WindowLayout.DASHBOARD, WindowLayout.forWidth(1007, scale))
+        }
+    }
+
+    @Test
+    fun aLargeFontNeedsMoreWidthForEachLayout() {
+        // the SM-T225: 601 dp portrait, 1007 dp landscape
+        assertEquals(WindowLayout.SINGLE_PANE, WindowLayout.forWidth(601, 1.3f)) // 462 dp worth of normal text
+        assertEquals(WindowLayout.SINGLE_PANE, WindowLayout.forWidth(601, 2.0f))
+        assertEquals(WindowLayout.DASHBOARD, WindowLayout.forWidth(1007, 1.0f))
+        assertEquals(WindowLayout.TWO_PANE, WindowLayout.forWidth(1007, 1.3f)) // 774
+        assertEquals(WindowLayout.SINGLE_PANE, WindowLayout.forWidth(1007, 2.0f)) // 503
+        assertEquals(WindowLayout.TWO_PANE, WindowLayout.forWidth(1340, 1.5f)) // 893
+        assertEquals(WindowLayout.DASHBOARD, WindowLayout.forWidth(1340, 1.3f)) // 1030
+        // a big tablet still gets its panes at 200 percent
+        assertEquals(WindowLayout.TWO_PANE, WindowLayout.forWidth(1280, 2.0f)) // 640
+    }
 }

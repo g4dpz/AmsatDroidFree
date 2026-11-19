@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import android.annotation.SuppressLint
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import uk.me.g4dpz.HamSatDroid.HamSatDroidApp
 import uk.me.g4dpz.HamSatDroid.alert.PassAlertScheduler
@@ -75,7 +76,7 @@ fun AppNavHost(
             finished = settings.setupFinished.value,
         )
     }
-    val layout = WindowLayout.forWidth(LocalConfiguration.current.screenWidthDp)
+    val layout = WindowLayout.forWidth(LocalConfiguration.current.screenWidthDp, LocalDensity.current.fontScale)
     LaunchedEffect(navController, routeRequests) {
         routeRequests.collect { route ->
             // On a fresh install the setup guide can be the only screen, with no passes screen below it to return to.

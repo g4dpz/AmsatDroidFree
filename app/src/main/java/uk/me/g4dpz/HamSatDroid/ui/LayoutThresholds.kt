@@ -29,10 +29,18 @@ enum class WindowLayout {
     DASHBOARD;
 
     companion object {
-        fun forWidth(widthDp: Int): WindowLayout = when {
-            widthDp >= LayoutThresholds.DASHBOARD_MIN_WIDTH_DP -> DASHBOARD
-            widthDp >= LayoutThresholds.TWO_PANE_MIN_WIDTH_DP -> TWO_PANE
-            else -> SINGLE_PANE
+        /**
+         * The layout for a window [widthDp] wide. At a large font (see [LargeFont]) the text takes more room, so the
+         * width is divided by [fontScale] first: at 200 percent a 601 dp tablet is treated as 300 dp wide and gets one
+         * pane, and a 1007 dp one as 503 dp. Below the large-font scale the font has no effect.
+         */
+        fun forWidth(widthDp: Int, fontScale: Float = 1f): WindowLayout {
+            val effective = if (LargeFont.isLarge(fontScale)) (widthDp / fontScale).toInt() else widthDp
+            return when {
+                effective >= LayoutThresholds.DASHBOARD_MIN_WIDTH_DP -> DASHBOARD
+                effective >= LayoutThresholds.TWO_PANE_MIN_WIDTH_DP -> TWO_PANE
+                else -> SINGLE_PANE
+            }
         }
     }
 }
@@ -79,7 +87,11 @@ object PassesPaneLayout {
      */
     const val SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP = 520f
 
-    fun stackPickers(paneWidthDp: Float): Boolean = paneWidthDp < STACK_PICKERS_BELOW_WIDTH_DP
+    /** At a large font (see [LargeFont]) the pane width is divided by [fontScale], as for [WindowLayout.forWidth]. */
+    fun stackPickers(paneWidthDp: Float, fontScale: Float = 1f): Boolean {
+        val effective = if (LargeFont.isLarge(fontScale)) paneWidthDp / fontScale else paneWidthDp
+        return effective < STACK_PICKERS_BELOW_WIDTH_DP
+    }
 
     fun scrollWholePane(paneHeightDp: Float): Boolean = paneHeightDp < SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP
 }
