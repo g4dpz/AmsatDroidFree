@@ -87,7 +87,7 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [x] Leaving the screen stops the sensors
 
 ## Doppler
-- [ ] The frequency card shows the transponder database entry for the satellite, read-only (the editor was removed in tasks 11.4 and 11.5); a satellite with several entries has a mode picker
+- [x] The frequency card shows the transponder database entry for the satellite, read-only (the editor was removed in tasks 11.4 and 11.5); a satellite with several entries has a mode picker (confirmed by David on the SM-T225, recorded in task 11.6)
 - [x] During a pass the corrected downlink falls as the satellite recedes and rises as it approaches (check the sign against a known pass or another tool)
 - [x] The shift in Hz is plausible (a few kHz on 435 MHz, a few kHz less on 145 MHz)
 - [x] Below the horizon: values shown with the "not currently visible" note
@@ -177,4 +177,4 @@ Note: a screenshot pass on the emulator found no clipping in the items above, ex
 
 Note (15 Nov 2026): David confirmed all boxes in this checklist himself and asked for them to be ticked. Items that ask for a recorded value (for example a time in seconds) were ticked without a value being written down.
 
-Corrected 20 Nov 2026 after review: the compass default item now says off by default; the three Doppler items that described the removed frequency editor were replaced by checks for the read-only database card and left unticked until someone confirms them; the landscape item now says dashboard.
+Corrected 20 Nov 2026 after review: the compass default item now says off by default; the three Doppler items that described the removed frequency editor were replaced by checks for the read-only database card (confirmed in task 11.6, so ticked), locale formatting and the no-data message (not yet confirmed, left unticked); the landscape item now says dashboard.
