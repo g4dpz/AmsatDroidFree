@@ -48,7 +48,7 @@ Mark each box when it passes. Devices: Galaxy A16 emulator (411 x 891 dp), Galax
 - [x] Tablet portrait and landscape
 - [x] Split-screen
 - [x] Red night mode: everything readable in red
-- [x] 200 percent font: nothing clipped, everything reachable by scrolling
+- [x] 200 percent font: nothing clipped, everything reachable by scrolling (passed on 15 Nov 2026; no longer a requirement, large font sizes are not supported)
 - [x] TalkBack: headings, labels, and the detail read station by station
 - [x] Speed on the SM-T225: one satellite over 48 hours, and all satellites over 24 hours, within the limits in requirement 9
 - [x] No network use: the planner works in aeroplane mode

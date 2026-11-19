@@ -54,6 +54,7 @@ Status 14 November 2026: spec written; P1 to P8 and O1 to O5 decided and confirm
 - [x] 5. Quality
   - [x] 5.1 Layouts: phone portrait and landscape, tablet portrait and landscape, split-screen; red night mode; 200 percent font; TalkBack headings, labels and reading order
     - Done 15 Nov 2026: layout script 45/45 on the emulator and 45/45 on the SM-T225 (portrait and landscape, 100 and 200 percent font). Not run: TalkBack listening and split-screen, which adb cannot drive; reading order, labels and the button role on the card summary were checked by the accessibility tree only
+    - Note 20 Nov 2026: large font sizes are no longer supported, so the 200 percent part of this check is historical.
     - _Requirements: 6.6, 8.1, 8.2, 8.3, 8.4_
   - [x] 5.2 Speed on the SM-T225: one satellite over 48 hours; all Amateur satellites over 24 hours (first results, finish); the longest single `getPasses` call (how long cancellation can lag). Record the numbers here
     - Done 15 Nov 2026, SM-T225, from the app's log line: one satellite over 48 h 1642 ms; 99 satellites over 24 h 5690 and 5611 ms; 99 satellites over 48 h 10041 ms (about 100 ms per satellite). The longest single `getPasses` call was not instrumented; it is bounded by the 48 h case for one satellite, 1642 ms at most, so cancellation lags by no more than that

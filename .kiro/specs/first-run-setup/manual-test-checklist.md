@@ -47,7 +47,7 @@ Mark each box when it passes. Devices: Galaxy A16 emulator (411 x 891 dp), Galax
 ## Layout and access
 
 - [x] Phone portrait, phone landscape, tablet portrait, tablet landscape, split-screen: content scrolls and is not clipped
-- [x] 200 percent font size: nothing clipped
+- [x] 200 percent font size: nothing clipped (passed on 14 Nov 2026; no longer a requirement, large font sizes are not supported)
 - [x] TalkBack reads each step title as a heading and every button by name
 - [x] Red night mode: all steps readable
 - [x] Step indicator is text ("Step 1 of 2"), not colour only

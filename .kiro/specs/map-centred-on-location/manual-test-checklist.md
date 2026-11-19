@@ -10,4 +10,3 @@
 - [ ] Red night mode: picture, icons, track and footprint still red and readable, no visible seam
 - [ ] The switch redraws the map at once and the choice survives a restart
 - [ ] With the home location unset, the switch does nothing and the map stays centred on 0
-- [ ] 200 percent font: the Settings switch is readable and reachable
