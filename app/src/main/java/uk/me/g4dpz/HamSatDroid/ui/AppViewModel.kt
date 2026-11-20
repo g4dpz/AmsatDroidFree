@@ -31,6 +31,7 @@ import uk.me.g4dpz.HamSatDroid.data.RefreshResult
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.data.StoredPasses
 import uk.me.g4dpz.HamSatDroid.domain.CalcResult
+import uk.me.g4dpz.HamSatDroid.domain.CatnumList
 import uk.me.g4dpz.HamSatDroid.domain.ElementAge
 import uk.me.g4dpz.HamSatDroid.domain.HomeLocation
 import uk.me.g4dpz.HamSatDroid.domain.MapCentre
@@ -375,7 +376,8 @@ class AppViewModel(
     }
 
     private fun initialLoad() {
-        val loaded = loadAndApply(settings.selectedCatnum.value.takeIf { it > 0 })
+        // With no satellite saved yet, start on the ISS (or the first one if the elements lack it).
+        val loaded = loadAndApply(settings.selectedCatnum.value.takeIf { it > 0 } ?: CatnumList.ISS)
 
         // Show the passes from the previous session, if any. Not while the location is unset (or not a number): up to
         // version 2.0.2 Calculate pass saved passes for the default 0, 0, and they must not appear under the "location
