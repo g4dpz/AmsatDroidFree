@@ -204,7 +204,7 @@ The unset-location message and Set up button from the overview are reused (requi
 
 ### Station editor (`Routes.PLANNER_STATION = "planner/station?id={id}"`)
 
-A full screen, not a dialog. Text fields in Compose dialogs are hard to drive from adb, which the emulator checks rely on, and a screen gives room at 200 percent font. It has Name, IARU locator, Latitude, Longitude, and Save, Cancel and (when editing) Delete with a confirmation dialog.
+A full screen, not a dialog. Text fields in Compose dialogs are hard to drive from adb, which the emulator checks rely on, and a screen gives more room. It has Name, IARU locator, Latitude, Longitude, and Save, Cancel and (when editing) Delete with a confirmation dialog.
 
 The location fields use `LocatorSync` directly, with the same field order, labels and messages as `LocationEditor`. A 4-character square (O5) is turned into the 6-character locator at its centre by adding `mm` before it reaches `LocatorSync` (EM29 becomes EM29mm); the field then shows EM29mm and a line under it says "EM29 is the whole square; this uses its centre". They hold drafts in the editor's own state, not in `SettingsRepository`. There are no GPS or network buttons: the other station is not where the device is. `LocationEditor` itself is not changed; extracting a shared stateless field group from it is possible later but not needed now.
 

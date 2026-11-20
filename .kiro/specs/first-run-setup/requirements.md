@@ -127,7 +127,7 @@ Withdrawn. The notification permission is still asked for when the first alert i
 #### Acceptance criteria
 
 1. The guide SHALL work on phones and tablets in portrait and landscape; the content SHALL scroll when the screen is short and SHALL be centred with a maximum width on wide screens.
-2. Text SHALL stay readable and not clip at 200 percent font size.
+2. Text SHALL stay readable and not clip at the default font size. Large font sizes are not supported (David, 20 Nov 2026).
 3. Step titles SHALL be marked as headings for screen readers; every control SHALL have a spoken label; state SHALL NOT be conveyed by colour alone.
 4. The guide SHALL follow the theme, including red night mode.
 

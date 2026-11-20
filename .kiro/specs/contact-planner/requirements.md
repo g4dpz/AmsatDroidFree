@@ -140,7 +140,7 @@ Related specs: `first-run-setup`, `pass-card-layout` and `multi-satellite-passes
 #### Acceptance criteria
 
 1. The planner SHALL work on phones and tablets in portrait and landscape, and in split-screen; the content SHALL scroll and SHALL be centred with a maximum width on wide screens.
-2. Text SHALL stay readable and not clip at 200 percent font size.
+2. Text SHALL stay readable and not clip at the default font size. Large font sizes are not supported (David, 20 Nov 2026).
 3. Section titles SHALL be headings for screen readers; every control SHALL have a spoken label; state SHALL NOT be conveyed by colour alone.
 4. The planner SHALL follow the theme, including red night mode.
 

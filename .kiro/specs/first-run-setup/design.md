@@ -113,4 +113,4 @@ New resources (English): `setup_title_location`, `setup_title_satellite`, `setup
 ## Testing
 
 - Unit: `HomeLocationTest` (zero, `"0.0"`, `"0,0"`, `"-0.0"`, one zero one not, whitespace, blank, non-numeric, comma decimals), `SetupPolicyTest` (all four combinations), `SettingsRepositoryTest` (`setupFinished` default and round trip), `AppViewModelTest` (unset gives `LocationNotSet` and no calculation; set calculates; invalid text still `InvalidLocation`), `WidgetUpdaterTest` (unset gives `NoLocation`), `OverviewViewModelTest` (unset gives the not-set state).
-- Manual: `manual-test-checklist.md` in this folder, on a fresh install (`adb shell pm clear`), an upgrade over existing data, phone and tablet, landscape, 200 percent font, TalkBack, red night.
+- Manual: `manual-test-checklist.md` in this folder, on a fresh install (`adb shell pm clear`), an upgrade over existing data, phone and tablet, landscape, TalkBack, red night.
