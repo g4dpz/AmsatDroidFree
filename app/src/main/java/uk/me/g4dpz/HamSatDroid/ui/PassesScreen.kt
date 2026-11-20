@@ -494,7 +494,7 @@ private fun PassesControls(
             state.loading -> Text(stringResource(R.string.passes_loading))
             state.header != null -> {
                 Text(state.header.text(formats), style = MaterialTheme.typography.bodyMedium)
-                if (minElevation > 0 && state.header is PassHeader.Predictions) {
+                if (minElevation > 0 && (state.header is PassHeader.Predictions || state.header is PassHeader.Restored)) {
                     Text(
                         stringResource(R.string.passes_min_elevation_filter, minElevation),
                         style = MaterialTheme.typography.bodyMedium,

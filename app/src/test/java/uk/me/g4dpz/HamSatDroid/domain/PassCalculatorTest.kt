@@ -129,6 +129,19 @@ class PassCalculatorTest {
     }
 
     @Test
+    fun neverReturnsAPassThatWasOverBeforeTheStartTime() {
+        // start just after each pass has ended: winding back must not hand that pass back as the next one
+        for (ended in passesIn24Hours("AO-07").take(6)) {
+            val from = Date(ended.endTime.time + 2 * 60_000L)
+            val result = PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, from, 1, 24)
+            if (result is CalcResult.Passes) {
+                val pass = result.passes.single()
+                assertTrue("started ${from}: got the pass that ended ${pass.endTime}", pass.endTime.after(from))
+            }
+        }
+    }
+
+    @Test
     fun saysSoWhenNoPassInTheLimitReachesTheMinimum() {
         // no pass is ever above 89 degrees in 24 hours of AO-07 from London
         val result = PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, start, 89, 24)

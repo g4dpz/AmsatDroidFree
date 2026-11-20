@@ -65,7 +65,8 @@ open class PassCalculator {
      *
      * The first lookup winds back (so a pass already in progress at [start] is found); later ones start just after the
      * pass that was rejected, with winding back OFF, because winding back rewinds by a quarter orbit and would find the
-     * same pass again instead of the next one. [keepGoing] is asked between lookups so a cancelled calculation can stop
+     * same pass again instead of the next one. A pass that was already over at [start] (winding back can return one) is
+     * skipped like a pass that is too low; one still in progress at [start] counts. [keepGoing] is asked between lookups so a cancelled calculation can stop
      * early (the library call itself cannot be interrupted); when it says no, [CalcResult.NoPasses] is returned.
      */
     open fun nextPassReaching(
@@ -91,7 +92,11 @@ open class PassCalculator {
                     break
                 }
                 val pass = predictor.getPasses(from, 0, windBack).firstOrNull()
-                if (pass == null || pass.maxEl == 0.0) {
+                if (pass != null && pass.maxEl != 0.0 && pass.endTime.time <= start.time) {
+                    // Winding back (a quarter orbit) can return a pass that was over before [start]: not the next pass.
+                    from = Date(pass.endTime.time + 1_000L)
+                    windBack = false
+                } else if (pass == null || pass.maxEl == 0.0) {
                     // The library's "nothing found"
                     result = CalcResult.NoPasses
                 } else if (pass.maxEl >= minElevationDeg) {
