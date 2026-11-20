@@ -341,7 +341,7 @@ private fun PassesPane(
         val passes: LazyListScope.() -> Unit = {
             // Only the passes that reach the minimum elevation, plus the selected one; nothing is removed from the state.
             val visible = PassFilter.visible(state.passes, minElevation, state.selectedPassId)
-            if (state.hoursAhead > 0 && minElevation > 0 && state.passes.isNotEmpty() &&
+            if ((state.hoursAhead > 0 || state.header is PassHeader.Restored) && minElevation > 0 && state.passes.isNotEmpty() &&
                 state.passes.none { it.maxElevationDeg >= minElevation }
             ) {
                 item(key = "none-reach-minimum") {
