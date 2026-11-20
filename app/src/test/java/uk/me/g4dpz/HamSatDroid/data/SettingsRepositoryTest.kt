@@ -54,6 +54,32 @@ class SettingsRepositoryTest {
     }
 
     @Test
+    fun mySatellitesReadsAsTheIssWhenNothingIsSavedAndWritesNothing() {
+        assertEquals(setOf(25544), settings().mySatellites.value)
+        assertFalse(store.map.containsKey("mySatellites"))
+    }
+    @Test
+    fun mySatellitesIsReadBackExactly() {
+        settings().mySatellites.value = setOf(44909, 7530)
+        assertEquals("7530,44909", store.map["mySatellites"])
+        assertEquals(setOf(7530, 44909), settings().mySatellites.value)
+    }
+    @Test
+    fun anEmptyMySatellitesListStaysEmpty() {
+        settings().mySatellites.value = emptySet()
+        assertEquals(emptySet<Int>(), settings().mySatellites.value)
+    }
+    @Test
+    fun junkInASavedMySatellitesListIsIgnored() {
+        store.map["mySatellites"] = "7530,abc,,0,7530"
+        assertEquals(setOf(7530), settings().mySatellites.value)
+    }
+    @Test
+    fun aMySatellitesValueOfTheWrongTypeReadsAsTheIss() {
+        store.map["mySatellites"] = 5
+        assertEquals(setOf(25544), settings().mySatellites.value)
+    }
+    @Test
     fun existingHomeLocationFromAnOlderVersionIsRead() {
         // Values exactly as the original app stored them under the same keys.
         store.map["homeLat"] = "51.5"

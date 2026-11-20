@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import uk.me.g4dpz.HamSatDroid.aim.PointingAxis
+import uk.me.g4dpz.HamSatDroid.domain.CatnumList
 import uk.me.g4dpz.HamSatDroid.night.ThemeMode
 
 /** The few operations settings need from a key-value store, so they can be tested without Android. */
@@ -184,6 +185,16 @@ class SettingsRepository(private val store: KeyValueStore) {
         store.putBoolean(PLANNER_ALL_SATELLITES, it)
     }
 
+    // ---- chosen satellites ----
+    /**
+     * The satellites the user has chosen to be offered. While the key is absent (nothing chosen yet) this reads as the
+     * ISS and nothing is written; once saved, the stored value is read back exactly, even when empty.
+     */
+    val mySatellites = Setting(
+        if (store.getString(MY_SATELLITES, ABSENT) == ABSENT) setOf(CatnumList.ISS)
+        else CatnumList.parse(store.getString(MY_SATELLITES, ""))
+    ) { store.putString(MY_SATELLITES, CatnumList.format(it)) }
+
     private inline fun <reified E : Enum<E>> enumOrDefault(name: String, default: E): E =
         enumValues<E>().firstOrNull { it.name == name } ?: default
 
@@ -215,6 +226,9 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val PLANNER_MIN_ELEVATION = "plannerMinElevation"
         const val PLANNER_HOURS = "plannerHours"
         const val PLANNER_ALL_SATELLITES = "plannerAllSatellites"
+        const val MY_SATELLITES = "mySatellites"
+        // A value no saved list can equal (a saved list holds digits and commas only).
+        private const val ABSENT = "\u0000absent"
 
         const val DEFAULT_ALERT_LEAD_MINUTES = 5
         val ALERT_LEAD_CHOICES = listOf(5, 10, 15, 30)

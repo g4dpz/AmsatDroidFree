@@ -3,12 +3,12 @@
 Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after each task. The golden regression test must stay green. Every task must leave the app building and runnable, and a user who updates must keep the satellite they have selected at every step.
 Branch per task group, one PR at a time; merge only when CI is green and Copilot has approved (merge commit). Order agreed by David on 20 Nov 2026: this feature first, then the pass card.
 
-- [ ] 1. The list
-  - [ ] 1.1 `CatnumList` (parse, format, junk and duplicates, `ISS`) with `CatnumListTest`
+- [x] 1. The list
+  - [x] 1.1 `CatnumList` (parse, format, junk and duplicates, `ISS`) with `CatnumListTest`
     - _Requirements: 1.3, 1.4_
-  - [ ] 1.2 `mySatellites` in `SettingsRepository`: an absent key reads as `{ISS}` and nothing is written; a saved value, including an empty one, is read back exactly; junk entries ignored; tests for each case
+  - [x] 1.2 `mySatellites` in `SettingsRepository`: an absent key reads as `{ISS}` and nothing is written; a saved value, including an empty one, is read back exactly; junk entries ignored; tests for each case
     - _Requirements: 1.1, 1.2, 1.3_
-  - [ ] 1.3 `SatelliteChoice.offered` and `forSearch` with `SatelliteChoiceTest` (empty, ISS only, some missing, none present, selected outside the list); a new install selects the ISS in `AppViewModel.initialLoad` (A8) with a test
+  - [x] 1.3 `SatelliteChoice.offered` and `forSearch` with `SatelliteChoiceTest` (empty, ISS only, some missing, none present, selected outside the list); a new install selects the ISS in `AppViewModel.initialLoad` (A8) with a test
     - _Requirements: 3.1, 3.5, 4, 5_
 - [ ] 2. The chooser
   - [ ] 2.1 `ChooseSatellitesScreen` and `Routes.CHOOSE_SATELLITES`: search, count, Select all, Clear all, chosen first, not-in-current-elements group, Done and Cancel; draft kept with `rememberSaveable`; Done with nothing ticked saves an empty list
