@@ -16,9 +16,12 @@ object SatelliteChoice {
     fun offered(all: List<SatelliteItem>, chosen: Set<Int>, selectedCatnum: Int?): List<SatelliteItem> =
         all.filter { it.catnum in chosen || it.catnum == selectedCatnum }
 
-    /** The chosen satellites that exist in [all], and the number of chosen ones that do not. */
+    /**
+     * The chosen satellites that exist in [all], once each (a keps file can repeat a catalogue number; the first record
+     * is used), and the number of chosen ones that do not.
+     */
     fun forSearch(all: List<TLE>, chosen: Set<Int>): Selection {
-        val found = all.filter { it.catnum in chosen }
-        return Selection(found, chosen.size - found.map { it.catnum }.toSet().size)
+        val found = all.filter { it.catnum in chosen }.distinctBy { it.catnum }
+        return Selection(found, chosen.size - found.size)
     }
 }

@@ -46,6 +46,11 @@ class SatelliteChoiceTest {
         assertEquals(emptyList<TLE>(), s.tles)
         assertEquals(0, s.missing)
     }
+    @Test fun searchTakesARepeatedCatalogueNumberOnce() {
+        val s = SatelliteChoice.forSearch(listOf(iss, rs44, TLE(iss)), setOf(25544))
+        assertEquals(listOf(25544), s.tles.map { it.catnum })
+        assertEquals(0, s.missing)
+    }
     @Test fun searchWhenNoneArePresent() {
         val s = SatelliteChoice.forSearch(allTles, setOf(1, 2))
         assertEquals(emptyList<TLE>(), s.tles)

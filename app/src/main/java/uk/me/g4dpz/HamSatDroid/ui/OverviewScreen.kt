@@ -166,12 +166,13 @@ fun OverviewScreen(
             }
             if (state.foundCount == 0) return@LazyColumn
             item(key = "up-now-title") { SectionHeading(stringResource(R.string.overview_up_now)) }
-            if (upNow.isEmpty()) {
+            if (upNow.none { it.catnum in state.results }) {
                 item(key = "up-now-none") {
                     Text(stringResource(R.string.overview_none_up), style = MaterialTheme.typography.bodyMedium)
                 }
             }
-            items(upNow, key = { "now-${it.catnum}" }) { row ->
+            // The up-now rows refresh every few seconds; until then, drop any satellite no longer in the results
+            items(upNow.filter { it.catnum in state.results }, key = { "now-${it.catnum}" }) { row ->
                 UpNowCard(row, now, formats, onClick = row.pass?.let { pass -> { onOpenPass(pass) } })
             }
 
