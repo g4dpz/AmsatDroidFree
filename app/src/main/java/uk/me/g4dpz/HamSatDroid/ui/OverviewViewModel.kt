@@ -25,6 +25,7 @@ import uk.me.g4dpz.HamSatDroid.domain.HomeLocation
 import uk.me.g4dpz.HamSatDroid.domain.OverviewCalculator
 import uk.me.g4dpz.HamSatDroid.domain.OverviewItem
 import uk.me.g4dpz.HamSatDroid.domain.OverviewRows
+import uk.me.g4dpz.HamSatDroid.domain.SatelliteChoice
 import uk.me.g4dpz.HamSatDroid.domain.UpNowRow
 import uk.me.g4dpz.satellite.GroundStationPosition
 import uk.me.g4dpz.satellite.SatelliteFactory
@@ -45,6 +46,9 @@ data class OverviewUiState(
     val results: Map<Int, OverviewItem.Result> = emptyMap(),
     /** How long the last complete calculation took, for recording on the device (Requirement 16.10). */
     val elapsedMillis: Long? = null,
+    /** How many satellites the user has chosen, and how many of those are in the current elements (and calculated). */
+    val chosenCount: Int = 0,
+    val foundCount: Int = 0,
 )
 
 /**
@@ -69,14 +73,17 @@ class OverviewViewModel(
     private var job: Job? = null
 
     /** The inputs last calculated for, so the same inputs are not calculated twice. */
-    private data class Key(val tles: List<TLE>, val lat: String, val lon: String, val hours: Int)
+    private data class Key(val tles: List<TLE>, val lat: String, val lon: String, val hours: Int, val chosen: Set<Int>)
 
     private var lastKey: Key? = null
 
     init {
         viewModelScope.launch {
-            combine(tles, settings.homeLat.state, settings.homeLon.state, settings.overviewHours.state) { t, lat, lon, h ->
-                Key(t, lat, lon, h)
+            // Only the user's chosen satellites are calculated; a change of the list recalculates.
+            combine(
+                tles, settings.homeLat.state, settings.homeLon.state, settings.overviewHours.state, settings.mySatellites.state,
+            ) { t, lat, lon, h, chosen ->
+                Key(SatelliteChoice.forSearch(t, chosen).tles, lat, lon, h, chosen)
             }.collect { key -> if (key != lastKey) start(key) }
         }
     }
@@ -99,6 +106,7 @@ class OverviewViewModel(
     private fun start(key: Key) {
         lastKey = key
         job?.cancel()
+        _state.update { it.copy(chosenCount = key.chosen.size, foundCount = key.tles.size) }
         val lat = LocationText.toDegrees(key.lat)
         val lon = LocationText.toDegrees(key.lon)
         if (lat == null || lon == null || !HomeLocation.isSet(key.lat, key.lon) || key.tles.isEmpty()) {

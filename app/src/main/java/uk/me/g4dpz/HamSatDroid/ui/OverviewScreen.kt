@@ -27,6 +27,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -64,6 +65,8 @@ fun OverviewScreen(
     onBack: () -> Unit,
     /** Opens the setup guide; offered while no home location is set. */
     onOpenSetup: () -> Unit,
+    /** Opens the "Choose satellites" screen. */
+    onChooseSatellites: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val upNow by viewModel.upNow.collectAsStateWithLifecycle()
@@ -144,6 +147,24 @@ fun OverviewScreen(
             if (!state.locationValid) {
                 item(key = "set-up") { Button(onClick = onOpenSetup) { Text(stringResource(R.string.banner_set_up)) } }
             }
+            // Which satellites these are, and the way to change them; with none to calculate, say why and stop here.
+            item(key = "scope") {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        when {
+                            state.chosenCount == 0 -> stringResource(R.string.scope_none_chosen)
+                            state.foundCount == 0 -> stringResource(R.string.scope_none_present)
+                            else -> pluralStringResource(R.plurals.scope_showing, state.foundCount, state.foundCount)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = onChooseSatellites) {
+                        Text(stringResource(if (state.foundCount == 0) R.string.settings_choose_satellites else R.string.scope_change))
+                    }
+                }
+            }
+            if (state.foundCount == 0) return@LazyColumn
             item(key = "up-now-title") { SectionHeading(stringResource(R.string.overview_up_now)) }
             if (upNow.isEmpty()) {
                 item(key = "up-now-none") {
