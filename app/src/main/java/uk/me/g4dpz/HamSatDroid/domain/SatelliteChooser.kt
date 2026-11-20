@@ -18,8 +18,9 @@ object SatelliteChooser {
      * each group in [all]'s order. Based on [initial] and not the draft so that ticking a row does not move it.
      */
     fun shown(all: List<SatelliteItem>, initial: Set<Int>, query: String): List<SatelliteItem> {
-        // A catalogue number can appear twice in a keps file; the list shows (and keys) each one once.
-        val found = all.distinctBy { it.catnum }.filter { matches(it, query) }
+        // A catalogue number can appear twice in a keps file, perhaps under two names; filter first so a match on either
+        // name is found, then show (and key) each number once.
+        val found = all.filter { matches(it, query) }.distinctBy { it.catnum }
         return found.filter { it.catnum in initial } + found.filter { it.catnum !in initial }
     }
 

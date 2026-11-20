@@ -27,6 +27,10 @@ class SatelliteChooserTest {
     }
     @Test fun aRepeatedCatalogueNumberIsListedOnce() =
         assertEquals(listOf(ao7, iss), SatelliteChooser.shown(listOf(ao7, iss, ao7), emptySet(), ""))
+    @Test fun aSecondNameForTheSameNumberIsStillSearchable() {
+        val twin = SatelliteItem(7530, "OSCAR 7")
+        assertEquals(listOf(twin), SatelliteChooser.shown(listOf(ao7, twin), emptySet(), "OSCAR"))
+    }
     @Test fun toggleUnticks() = assertEquals(setOf(1), SatelliteChooser.toggle(setOf(1, 2), 2))
     @Test fun selectAllAddsOnlyWhatIsShown() =
         assertEquals(setOf(99, 7530, 27607), SatelliteChooser.selectAll(setOf(99), listOf(ao7, so50)))
