@@ -345,7 +345,8 @@ private fun PassesPane(
     BoxWithConstraints(modifier) {
         val minElevation by viewModel.minElevation.collectAsStateWithLifecycle()
         val stackPickers = PassesPaneLayout.stackPickers(maxWidth.value)
-        val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value)
+        // The banner adds height the layout rule does not count, so scroll the whole pane while it shows: nothing is clipped
+        val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value) || choice.showPrompt
         val controls: @Composable () -> Unit = {
             PassesControls(
                 viewModel, state, formats, stackPickers, minElevation, onChangeStartTime, locationSet, onOpenSetup, onOpenSky, choice,
