@@ -7,10 +7,10 @@
 
 ## The change
 ### The list
-- `CatnumList` (pure, `domain`): `parse(text): Set<Int>` (comma separated, trims, drops junk and duplicates), `format(set): String` (sorted, comma separated), and `ISS = 25544`.
+- `CatnumList` (pure, `domain`): `parse(text): Set<Int>` (comma separated, trims, drops entries that are not whole numbers and duplicates; keeps every valid number, including ones no current source has, so the chooser can show them as "not in the current elements"), `format(set): String` (sorted, comma separated), and `ISS = 25544`.
 - `mySatellites` in `SettingsRepository`: `Setting<Set<Int>>` stored as one string under the key `mySatellites`; it may be empty.
 - **No chosen list.** While the key is absent the setting reads as `{ISS}` (`CatnumList.ISS`); nothing is written. The key is written only when the user presses Done in the chooser, and from then on the stored value is exactly what the user chose, so an empty string is a deliberately empty list and the app never overwrites it.
-- **Selected satellite on a new install:** `AppViewModel.initialLoad` falls back to the ISS, then to the first satellite, when no satellite has been selected yet (A8).
+- **Selected satellite when none has been picked:** `AppViewModel.initialLoad` falls back to the ISS, then to the first satellite, when no `selectedCatnum` is saved (A8). It does not need to tell a new install from an update: nothing is migrated, so a user who never picked a satellite sees the ISS, and one who did keeps theirs.
 
 ### One rule, used three times
 `SatelliteChoice` (pure, `domain`):

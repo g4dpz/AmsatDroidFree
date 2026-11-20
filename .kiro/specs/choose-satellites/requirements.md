@@ -27,13 +27,13 @@ The user picks the satellites once, in a list with search. Three places then off
 - A5. A satellite in the saved list that is **not in the current orbital elements** (another keps source, or a satellite that has dropped out) is skipped everywhere, and shown in a separate group in the chooser so it can be removed.
 - A6. The satellite **currently selected** stays in the picker even if it is not in the list, until another is picked, so the picker never shows something different from the screen and is never blank.
 - A7. The saved list is stored as comma-separated catalogue numbers in the preferences (key `mySatellites`). A missing key means no list has been chosen, which reads as the ISS alone. A present value, including an empty one, is exactly the list the user chose.
-- A8. A new install **selects the ISS**: it is both the list and the selected satellite, so the first satellite a new user sees is the ISS, not the first satellite in the download. The setup guide's satellite step keeps offering every satellite.
+- A8. **Nobody has a satellite selected until one is saved, and then the ISS is selected.** The app today falls back to the first satellite in the download without saving it; it will fall back to the ISS (when the ISS is in the elements, else the first satellite) and still not save it. A user who has never picked a satellite, new or existing, therefore sees the ISS, which matches the picker. A user who has picked one keeps it. The setup guide's satellite step keeps offering every satellite.
 
 ## Requirement 1: The saved list
 **User story:** As an operator, I want to say once which satellites I use.
 1. The app SHALL keep one list of chosen satellites, by catalogue number, in the settings.
 2. WHEN the user has not chosen a list THEN the list SHALL be the ISS (catalogue number 25544), for a new install and for an update alike (A0). WHEN the user has saved a list THEN the list SHALL be exactly what was saved, and SHALL be allowed to be empty. The app SHALL never write a list the user did not choose.
-3. The list SHALL survive a restart and an app update; unknown or junk entries SHALL be ignored and never crash the app.
+3. The list SHALL survive a restart and an app update. Entries that are not valid catalogue numbers (junk, not whole numbers) SHALL be ignored and never crash the app. A valid catalogue number that is not in the current orbital elements (another keps source, a satellite that has dropped out) SHALL stay saved and SHALL be shown in the chooser's "not in the current elements" group, so a choice is not lost by switching source.
 4. Duplicates SHALL be removed and the order SHALL not matter (satellites are always shown in the app's usual order).
 5. The list SHALL stay on the device; no network request and no new permission is added.
 
@@ -65,7 +65,7 @@ The user picks the satellites once, in a list with search. Three places then off
 1. The scope button that searches across satellites SHALL be labelled "My satellites" and SHALL search exactly the chosen satellites that are in the current elements, with the same progress, cancellation, order and limits as an all-satellites search.
 2. Chosen satellites missing from the current elements SHALL be skipped and the screen SHALL say how many were left out.
 3. WHEN the list is empty THEN that search SHALL say "No satellites chosen" with a link to the chooser and search nothing.
-4. WHEN the list changes THEN a running search SHALL restart and results for the old list SHALL not be shown.
+4. WHEN the list changes THEN a running My satellites search SHALL restart and its results for the old list SHALL not be shown. A "Selected satellite" search, and its results, SHALL not be affected by a change of the list.
 5. A "Selected satellite" search SHALL be unchanged.
 6. The planner's saved scope (`plannerAllSatellites`) SHALL keep its meaning: a tester who had the all-satellites search chosen before the update SHALL still have it chosen, now over the list.
 
