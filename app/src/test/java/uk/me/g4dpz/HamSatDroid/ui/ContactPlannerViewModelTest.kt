@@ -338,6 +338,33 @@ class ContactPlannerViewModelTest {
         assertEquals(setOf(7530), vm.state.value.windows.map { it.catnum }.toSet())
     }
     @Test
+    fun `a change of the list during a my satellites search never shows old results under the new list`() {
+        settings.plannerAllSatellites.value = true
+        settings.plannerStationId.value = "par"
+        var changed = false
+        val leaked = mutableListOf<Set<Int>>()
+        lateinit var vm: ContactPlannerViewModel
+        // Change the list at the first checkpoint, while the search over all three satellites is running; at every later
+        // checkpoint, a state for the new list must hold no window of the old one.
+        onCheckpoint = {
+            if (!changed) {
+                changed = true
+                settings.mySatellites.value = setOf(7530)
+            }
+            val st = vm.state.value
+            if (st.myCount == 1 && st.windows.any { it.catnum != 7530 }) leaked += st.windows.map { it.catnum }.toSet()
+        }
+        vm = viewModel()
+        vm.onStart()
+        assertTrue(changed)
+        assertTrue("old results shown under the new list: $leaked", leaked.isEmpty())
+        val s = vm.state.value
+        assertTrue("windows for AO-7", s.windows.isNotEmpty())
+        assertEquals(setOf(7530), s.windows.map { it.catnum }.toSet())
+        assertTrue(s.done)
+        assertFalse(s.searching)
+    }
+    @Test
     fun `a change of the list does not touch a selected satellite search`() {
         val vm = viewModel()
         vm.onStart()

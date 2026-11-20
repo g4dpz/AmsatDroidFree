@@ -229,7 +229,7 @@ private fun SearchSection(state: PlannerUiState, viewModel: ContactPlannerViewMo
                         },
                         style = MaterialTheme.typography.bodyMedium,
                     )
-                    if (found > 0 && state.myMissing > 0) {
+                    if (state.myMissing > 0) {
                         Text(
                             pluralStringResource(R.plurals.planner_left_out, state.myMissing, state.myMissing),
                             style = MaterialTheme.typography.bodySmall,

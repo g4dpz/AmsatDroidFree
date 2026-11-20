@@ -340,6 +340,8 @@ class ContactPlannerViewModel(
                         )
                     }
                 }
+            // A search that was stopped or replaced during its last result must not mark the new one as done
+            ensureActive()
             finished = true
             _state.update { it.copy(searching = false, done = true, progress = null) }
             dropEnded()
