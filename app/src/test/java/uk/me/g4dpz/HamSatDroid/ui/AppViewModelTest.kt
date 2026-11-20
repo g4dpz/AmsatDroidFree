@@ -439,6 +439,20 @@ class AppViewModelTest {
     }
 
     @Test
+    fun aChangeMadeOnTheOverviewScreenRecalculatesNextPassOnly() {
+        val vm = viewModel()
+        vm.selectSatellite(7530)
+        vm.setHoursAhead(0)
+        vm.calculate()
+        val before = vm.state.value.header
+        settings.overviewMinElevation.value = 20 // as the All satellites screen would write it
+        val after = vm.state.value
+        val header = after.header
+        assertTrue("the result must have been calculated again, got $header (was $before)", header !== before)
+        if (header is PassHeader.Predictions) assertTrue(after.passes.all { it.maxElevationDeg >= 20 })
+    }
+
+    @Test
     fun nextPassOnlyWithAMinimumNoPassReachesSaysSo() {
         val vm = viewModel()
         vm.selectSatellite(7530)

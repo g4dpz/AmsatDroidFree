@@ -98,17 +98,11 @@ class AppViewModel(
     val minElevation: StateFlow<Int> = settings.overviewMinElevation.state
 
     /**
-     * Sets the minimum elevation. For the 6, 12 and 24 hour ranges the list only needs filtering again; for "next pass
-     * only" the next pass that reaches the new minimum has to be found, so a result already on screen is recalculated,
-     * keeping the selected pass.
+     * Sets the minimum elevation (the shared setting). For the 6, 12 and 24 hour ranges the list only needs filtering
+     * again; for "next pass only" the observer set up in `init` calculates again, whichever screen made the change.
      */
     fun setMinElevation(degrees: Int) {
-        if (degrees == settings.overviewMinElevation.value) return
         settings.overviewMinElevation.value = degrees // rejects values other than 0, 10, 20 or 30
-        val current = _state.value
-        if (current.hoursAhead == 0 && current.header != null && current.selectedCatnum != null) {
-            calculate(keepSelected = current.selectedPass)
-        }
     }
 
     private val _events = Channel<UiEvent>(Channel.BUFFERED)
@@ -136,6 +130,19 @@ class AppViewModel(
         // without a download (each source keeps its own copy). A download that follows reloads again when it arrives.
         viewModelScope.launch(ioDispatcher) {
             settings.kepsSource.state.drop(1).collect { reload(currentSelection()) }
+        }
+        // The minimum elevation is shared with the All satellites screen, so it can change from either. For "next pass
+        // only" the result depends on it, so a result on screen, or one being calculated, is calculated again, keeping
+        // the selected pass. The other ranges only filter the list and need nothing.
+        viewModelScope.launch {
+            settings.overviewMinElevation.state.drop(1).collect {
+                val current = _state.value
+                if (current.hoursAhead == 0 && current.selectedCatnum != null &&
+                    (current.header != null || current.calculating)
+                ) {
+                    calculate(keepSelected = current.selectedPass)
+                }
+            }
         }
     }
 
