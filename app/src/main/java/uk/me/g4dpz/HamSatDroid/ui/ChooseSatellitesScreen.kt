@@ -41,8 +41,11 @@ import uk.me.g4dpz.HamSatDroid.R
 import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.domain.SatelliteChooser
 
-/** Keeps the ticked catalogue numbers across rotation and the process being recreated. */
-private val CATNUM_SET_SAVER = listSaver<Set<Int>, Int>(save = { it.toList() }, restore = { it.toSet() })
+/**
+ * Keeps the ticked catalogue numbers across rotation and the process being recreated. A marker is saved first so an
+ * empty set is a non-empty saved list: an emptied draft must come back empty, not as the saved list.
+ */
+private val CATNUM_SET_SAVER = listSaver<Set<Int>, Int>(save = { listOf(0) + it.toList() }, restore = { it.drop(1).toSet() })
 
 /**
  * Lets the user choose the satellites the app offers (the Satellite picker, the All satellites overview and the Contact
