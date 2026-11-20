@@ -20,7 +20,7 @@ Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after e
     - Done 20 Nov 2026 in PR #74 (merged), with the changes Copilot asked for: the observer on the shared setting in AppViewModel (so a change from either screen recalculates Next pass only), a pass that ended before the start time is skipped, the filter line and the none-reach message also for restored passes. Tests: PassFilterTest, PassCalculatorTest, AppViewModelTest, PassesPaneLayoutTest.
   - [ ] 3.2 Checkpoint: the manual checklist on the SM-T225, the A6 and the emulators, portrait and landscape, and red night mode
     - _Requirements: all_
-    - 20 Nov 2026: checked on the SM-T225 (Next pass only and 24 hours, 0 and 30 degrees, shared with the All satellites screen, red night mode) and a 411 dp window. Still to do: the Galaxy A6 (not attached at the time) and a hand-run of the checklist.
+    - 20 Nov 2026: checked on the SM-T225 (Next pass only and 24 hours, 0 and 30 degrees, shared with the All satellites screen, red night mode) and a 411 dp window. Also checked on the Galaxy A6 (Android 10, 360 dp) later the same day: three stacked pickers, Sky view button, 24 hours at 30 degrees showing only the 57 degree pass, Next pass only at 30 degrees, and the shared value seen on the All satellites screen; no crash in logcat. The same run confirmed the Android 10 location fallback with a real fix (Use network location set the home location in under 4 seconds with 12 m accuracy). Still to do: a hand-run of the manual checklist by David.
 - [ ] 4. Release
   - [ ] 4.1 CHANGELOG, version bump, wiki Help (Passes section) and README line; reply to the tester
     - _Requirements: 1.1_
