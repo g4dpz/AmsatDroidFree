@@ -4,6 +4,13 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
+## [2.3.0] - 2026-11-20 (versionCode 2104)
+### Added
+- Passes screen: a Minimum elevation picker hides low passes, and Next pass only finds the next pass that reaches it. It is the same setting as on All satellites.
+- A Sky view button opens the sky chart, position and Doppler frequencies of the selected satellite, so geostationary satellites such as QO-100 have a way in.
+### Changed
+- AmsatDroid now runs on Android 10.
+- Long satellite names in the drop-downs wrap onto a second line instead of being cut off.
 ## [2.2.1] - 2026-11-19 (versionCode 2103)
 ### Fixed
 - Long satellite names in the drop-downs wrap onto a second line instead of being cut off.
