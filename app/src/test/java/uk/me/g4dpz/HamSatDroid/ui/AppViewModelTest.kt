@@ -700,6 +700,16 @@ class AppViewModelTest {
     }
 
     @Test
+    fun onStartKeepsTheIssWhenNothingWasSaved() {
+        val vm = viewModel() // nothing saved: the ISS is selected from the bundled elements
+        assertEquals(25544, vm.state.value.selectedCatnum)
+        val worker = FakeDownloader().apply { next = { DownloadResponse(200, celestrakJson) } }
+        KepsRepository(files(), worker, { bundledTle }, { now }).refresh(KepsSource.AMATEUR_CELESTRAK)
+        vm.onStart()
+        assertEquals(8, vm.state.value.satellites.size)
+        assertEquals(25544, vm.state.value.selectedCatnum)
+    }
+    @Test
     fun onStartDoesNothingWhenTheElementsHaveNotChanged() {
         val vm = viewModel()
         val before = vm.state.value

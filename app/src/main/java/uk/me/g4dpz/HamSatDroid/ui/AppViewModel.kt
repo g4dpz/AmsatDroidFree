@@ -332,7 +332,8 @@ class AppViewModel(
             val modified = keps.lastModifiedMillis()
             // At start-up this can run before the first load has set the selection, so fall back to the saved one
             // (otherwise the first satellite in the list would replace it)
-            val preferred = _state.value.selectedCatnum ?: settings.selectedCatnum.value.takeIf { it > 0 }
+            val preferred = _state.value.selectedCatnum
+                ?: settings.selectedCatnum.value.takeIf { it > 0 } ?: CatnumList.ISS
             if (modified != null && modified != kepsModified) reload(preferred)
         }
     }
