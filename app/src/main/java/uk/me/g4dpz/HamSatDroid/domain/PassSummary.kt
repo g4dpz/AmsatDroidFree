@@ -90,6 +90,16 @@ sealed interface PassHeader {
         val searchedHours: Int,
     ) : PassHeader
 
+    /** "Next pass only" with a minimum elevation: no pass in the next [searchedHours] hours reaches [minElevationDeg]. */
+    data class NoPassReaches(
+        val satName: String,
+        val latitude: Double,
+        val longitude: Double,
+        val locator: String,
+        val minElevationDeg: Int,
+        val searchedHours: Int,
+    ) : PassHeader
+
     /**
      * The satellite is stationary in the sky (geostationary or similar): no passes, it is always up at
      * [position] or never visible from here.

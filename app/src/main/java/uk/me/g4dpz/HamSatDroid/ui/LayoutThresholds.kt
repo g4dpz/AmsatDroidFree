@@ -67,11 +67,12 @@ object DashboardLayout {
  */
 object PassesPaneLayout {
     /**
-     * Below this pane width, in dp, the two pickers are stacked, each the full width. Side by side each gets half, and
-     * under about 220 dp each the label "Calculate passes for the next" wraps and is clipped and a satellite name such
-     * as "OSCAR 7 (AO-7)" is cut off. A phone in portrait has a pane about 380 dp wide.
+     * Below this pane width, in dp, the three pickers (satellite, range and minimum elevation) are stacked, each the
+     * full width. Side by side each gets a third, and under about 220 dp each the label "Calculate passes for the next"
+     * wraps and is clipped and a satellite name such as "OSCAR 7 (AO-7)" is cut off. A phone in portrait has a pane
+     * about 380 dp wide; 700 dp keeps each of three at 220 dp or more.
      */
-    const val STACK_PICKERS_BELOW_WIDTH_DP = 480f
+    const val STACK_PICKERS_BELOW_WIDTH_DP = 700f
 
     /**
      * Below this pane height, in dp, the controls scroll away with the pass list instead of staying pinned above it.

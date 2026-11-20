@@ -67,8 +67,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.me.g4dpz.HamSatDroid.R
+import uk.me.g4dpz.HamSatDroid.data.SettingsRepository
 import uk.me.g4dpz.HamSatDroid.data.KepsSource
 import uk.me.g4dpz.HamSatDroid.domain.ElementAge
+import uk.me.g4dpz.HamSatDroid.domain.PassFilter
+import uk.me.g4dpz.HamSatDroid.domain.PassHeader
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
 import uk.me.g4dpz.HamSatDroid.ui.components.DropdownField
 import uk.me.g4dpz.HamSatDroid.ui.components.LocationNotSetBanner
@@ -327,16 +330,32 @@ private fun PassesPane(
     onOpenSky: (() -> Unit)? = null,
 ) {
     BoxWithConstraints(modifier) {
+        val minElevation by viewModel.minElevation.collectAsStateWithLifecycle()
         val stackPickers = PassesPaneLayout.stackPickers(maxWidth.value)
         val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value)
         val controls: @Composable () -> Unit = {
-            PassesControls(viewModel, state, formats, stackPickers, onChangeStartTime, locationSet, onOpenSetup, onOpenSky)
+            PassesControls(
+                viewModel, state, formats, stackPickers, minElevation, onChangeStartTime, locationSet, onOpenSetup, onOpenSky,
+            )
         }
         val passes: LazyListScope.() -> Unit = {
-            items(state.passes, key = { it.id }) { pass ->
+            // Only the passes that reach the minimum elevation, plus the selected one; nothing is removed from the state.
+            val visible = PassFilter.visible(state.passes, minElevation, state.selectedPassId)
+            if ((state.hoursAhead > 0 || state.header is PassHeader.Restored) && minElevation > 0 && state.passes.isNotEmpty() &&
+                state.passes.none { it.maxElevationDeg >= minElevation }
+            ) {
+                item(key = "none-reach-minimum") {
+                    Text(
+                        stringResource(R.string.passes_none_reach_minimum, minElevation),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+            items(visible, key = { it.id }) { pass ->
                 PassCard(
                     pass, formats,
                     selected = highlightSelection && pass.id == state.selectedPassId,
+                    belowMinimum = minElevation.takeIf { PassFilter.isBelowMinimum(pass, it) },
                     hasAlert = alerts.hasAlert(pass),
                     onClick = { onPassClick(pass) },
                     onLongClick = { onPassLongClick(pass) },
@@ -368,6 +387,7 @@ private fun PassesControls(
     state: AppUiState,
     formats: DisplayFormats,
     stackPickers: Boolean,
+    minElevation: Int,
     onChangeStartTime: () -> Unit,
     locationSet: Boolean,
     onOpenSetup: () -> Unit,
@@ -398,13 +418,26 @@ private fun PassesControls(
                 modifier = pickerModifier,
             )
         }
+        // The same minimum elevation as the All satellites screen: a pass is listed only if it reaches it.
+        val minElevationPicker: @Composable (Modifier) -> Unit = { pickerModifier ->
+            DropdownField(
+                label = stringResource(R.string.overview_min_elevation),
+                options = SettingsRepository.OVERVIEW_MIN_ELEVATION_CHOICES,
+                selected = minElevation,
+                optionLabel = { stringResource(R.string.overview_degrees_option, it) },
+                onSelected = viewModel::setMinElevation,
+                modifier = pickerModifier,
+            )
+        }
         if (stackPickers) {
             satellitePicker(Modifier.fillMaxWidth())
             rangePicker(Modifier.fillMaxWidth())
+            minElevationPicker(Modifier.fillMaxWidth())
         } else {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 satellitePicker(Modifier.weight(1f))
                 rangePicker(Modifier.weight(1f))
+                minElevationPicker(Modifier.weight(1f))
             }
         }
 
@@ -459,7 +492,15 @@ private fun PassesControls(
 
         when {
             state.loading -> Text(stringResource(R.string.passes_loading))
-            state.header != null -> Text(state.header.text(formats), style = MaterialTheme.typography.bodyMedium)
+            state.header != null -> {
+                Text(state.header.text(formats), style = MaterialTheme.typography.bodyMedium)
+                if (minElevation > 0 && (state.header is PassHeader.Predictions || state.header is PassHeader.Restored)) {
+                    Text(
+                        stringResource(R.string.passes_min_elevation_filter, minElevation),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
             else -> Text(stringResource(R.string.passes_none_yet), style = MaterialTheme.typography.bodyMedium)
         }
     }
@@ -474,6 +515,8 @@ private fun PassCard(
     hasAlert: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    /** The minimum elevation this pass is below, when it is listed only because it is selected; else null. */
+    belowMinimum: Int? = null,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = onLongClick),
@@ -486,6 +529,13 @@ private fun PassCard(
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 for (line in pass.lines(formats)) Text(line, style = MaterialTheme.typography.bodyMedium)
+                if (belowMinimum != null) {
+                    Text(
+                        stringResource(R.string.pass_below_minimum, belowMinimum),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
             if (hasAlert) {
                 Icon(

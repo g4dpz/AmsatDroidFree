@@ -91,6 +91,10 @@ fun PassHeader.text(formats: DisplayFormats): String = when (this) {
         R.plurals.header_no_passes, searchedHours,
         satName, formats.coordinate(latitude), formats.coordinate(longitude), locator, searchedHours,
     )
+    is PassHeader.NoPassReaches -> pluralStringResource(
+        R.plurals.header_no_pass_reaches, searchedHours,
+        satName, formats.coordinate(latitude), formats.coordinate(longitude), locator, minElevationDeg, searchedHours,
+    )
     is PassHeader.Stationary ->
         if (position.isUp) {
             stringResource(

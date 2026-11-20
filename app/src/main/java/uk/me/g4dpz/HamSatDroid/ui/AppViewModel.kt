@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -90,6 +91,20 @@ class AppViewModel(
             MapCentre.longitude(settings.centreMapOnHome.value, settings.homeLat.value, settings.homeLon.value),
         )
 
+    /**
+     * The minimum elevation, in degrees, a pass must reach to be listed: 0, 10, 20 or 30. It is the same saved value as
+     * the All satellites screen's, so a change on either screen shows on the other.
+     */
+    val minElevation: StateFlow<Int> = settings.overviewMinElevation.state
+
+    /**
+     * Sets the minimum elevation (the shared setting). For the 6, 12 and 24 hour ranges the list only needs filtering
+     * again; for "next pass only" the observer set up in `init` calculates again, whichever screen made the change.
+     */
+    fun setMinElevation(degrees: Int) {
+        settings.overviewMinElevation.value = degrees // rejects values other than 0, 10, 20 or 30
+    }
+
     private val _events = Channel<UiEvent>(Channel.BUFFERED)
 
     /** One-off messages for the user; collect them once and show them. */
@@ -115,6 +130,19 @@ class AppViewModel(
         // without a download (each source keeps its own copy). A download that follows reloads again when it arrives.
         viewModelScope.launch(ioDispatcher) {
             settings.kepsSource.state.drop(1).collect { reload(currentSelection()) }
+        }
+        // The minimum elevation is shared with the All satellites screen, so it can change from either. For "next pass
+        // only" the result depends on it, so a result on screen, or one being calculated, is calculated again, keeping
+        // the selected pass. The other ranges only filter the list and need nothing.
+        viewModelScope.launch {
+            settings.overviewMinElevation.state.drop(1).collect {
+                val current = _state.value
+                if (current.hoursAhead == 0 && current.selectedCatnum != null &&
+                    (current.header != null || current.calculating)
+                ) {
+                    calculate(keepSelected = current.selectedPass)
+                }
+            }
         }
     }
 
@@ -198,7 +226,15 @@ class AppViewModel(
         _state.update { it.copy(calculating = true) }
         calcJob = viewModelScope.launch(workDispatcher) {
             try {
-                val result = calculator.calculate(tle, lat, lon, Date.from(start), hours)
+                val minElevation = settings.overviewMinElevation.value
+                val result = if (hours == 0 && minElevation > 0) {
+                    // Next pass only, but only a pass that reaches the minimum: the search may go on past lower ones.
+                    calculator.nextPassReaching(
+                        tle, lat, lon, Date.from(start), minElevation, NO_PASS_SEARCH_HOURS, keepGoing = { isActive },
+                    )
+                } else {
+                    calculator.calculate(tle, lat, lon, Date.from(start), hours)
+                }
                 ensureActive() // a newer calculation has replaced this one
                 if (generation != calcGeneration) return@launch // or the location was unset meanwhile
                 val locator = IaruLocator(lat, lon).toMaidenhead()
@@ -214,6 +250,18 @@ class AppViewModel(
                                 // while the calculation ran, and its sky view must not show this pass.
                                 selectedPassId = selected.takeIf { _ -> it.selectedCatnum == tle.catnum },
                                 header = PassHeader.Predictions(tle.name, lat, lon, locator, hours, start),
+                            )
+                        }
+                    }
+                    is CalcResult.NoPassReaches -> {
+                        rawPasses = emptyList()
+                        _state.update {
+                            it.copy(
+                                passes = listOfNotNull(keepSelected),
+                                selectedPassId = keepSelected?.id.takeIf { _ -> it.selectedCatnum == tle.catnum },
+                                header = PassHeader.NoPassReaches(
+                                    tle.name, lat, lon, locator, result.minElevationDeg, result.searchedHours,
+                                ),
                             )
                         }
                     }
