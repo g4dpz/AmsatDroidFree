@@ -6,11 +6,11 @@ The bullet points of the newest entry are also what goes into the Play Console r
 
 ## [2.3.0] - 2026-11-20 (versionCode 2104)
 ### Added
-- Passes screen: a Minimum elevation picker hides low passes, and Next pass only finds the next pass that reaches it. It is the same setting as on All satellites.
-- A Sky view button opens the sky chart, position and Doppler frequencies of the selected satellite, so geostationary satellites such as QO-100 have a way in.
+- Passes: a Minimum elevation picker hides low passes, and Next pass only finds the next one that reaches it. Shared with All satellites.
+- Sky view button: opens the sky chart and Doppler frequencies of the selected satellite, even one with no passes, such as QO-100.
 ### Changed
 - AmsatDroid now runs on Android 10.
-- Long satellite names in the drop-downs wrap onto a second line instead of being cut off.
+- The large-font layouts added in 2.2.1 are removed; the app is designed for the default font size.
 ## [2.2.1] - 2026-11-19 (versionCode 2103)
 ### Fixed
 - Long satellite names in the drop-downs wrap onto a second line instead of being cut off.
