@@ -162,6 +162,7 @@ fun AppNavHost(
                 onOpenSetup = { navController.navigate(Routes.SETUP) },
                 onAddStation = { navController.navigate(Routes.plannerStation(null)) },
                 onEditStation = { id -> navController.navigate(Routes.plannerStation(id)) },
+                onChooseSatellites = { navController.navigate(Routes.CHOOSE_SATELLITES) },
             )
         }
         composable(

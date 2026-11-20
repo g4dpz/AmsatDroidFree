@@ -27,6 +27,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -67,6 +68,8 @@ fun ContactPlannerScreen(
     onOpenSetup: () -> Unit,
     onAddStation: () -> Unit,
     onEditStation: (String) -> Unit,
+    /** Opens the "Choose satellites" screen. */
+    onChooseSatellites: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val formats = rememberDisplayFormats()
@@ -109,7 +112,7 @@ fun ContactPlannerScreen(
                     StationsSection(state, viewModel, onAddStation, onEditStation, formats)
                 }
                 if (state.stations.isNotEmpty()) {
-                    item(key = "search") { SearchSection(state, viewModel) }
+                    item(key = "search") { SearchSection(state, viewModel, onChooseSatellites) }
                     item(key = "status") { StatusLine(state) }
                 }
                 state.staleElements?.let { stale ->
@@ -192,7 +195,7 @@ private fun StationsSection(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SearchSection(state: PlannerUiState, viewModel: ContactPlannerViewModel) {
+private fun SearchSection(state: PlannerUiState, viewModel: ContactPlannerViewModel, onChooseSatellites: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         SectionHeading(stringResource(R.string.planner_section_search))
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
@@ -213,6 +216,30 @@ private fun SearchSection(state: PlannerUiState, viewModel: ContactPlannerViewMo
                     ?: stringResource(R.string.planner_no_satellite),
                 style = MaterialTheme.typography.bodyMedium,
             )
+        } else {
+            // Which satellites are searched, how many are left out, and the way to change them
+            val found = state.myCount - state.myMissing
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        when {
+                            state.myCount == 0 -> stringResource(R.string.scope_none_chosen)
+                            found == 0 -> stringResource(R.string.scope_none_present)
+                            else -> pluralStringResource(R.plurals.planner_searching_mine, found, found)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    if (found > 0 && state.myMissing > 0) {
+                        Text(
+                            pluralStringResource(R.plurals.planner_left_out, state.myMissing, state.myMissing),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+                TextButton(onClick = onChooseSatellites) {
+                    Text(stringResource(if (found == 0) R.string.settings_choose_satellites else R.string.scope_change))
+                }
+            }
         }
         DropdownField(
             label = stringResource(R.string.planner_window),
@@ -263,7 +290,9 @@ private fun androidx.compose.foundation.lazy.LazyListScope.resultItems(
             )
         }
     }
-    if (state.done && state.windows.isEmpty() && state.usableNow.isEmpty()) {
+    // With My satellites and nothing to search, the line under the scope buttons already says why
+    val nothingToSearch = state.allSatellites && state.myCount - state.myMissing == 0
+    if (state.done && state.windows.isEmpty() && state.usableNow.isEmpty() && !nothingToSearch) {
         item(key = "none") {
             val distance = state.distanceKm
             Text(
