@@ -38,6 +38,7 @@ object Routes {
     const val OVERVIEW = "overview"
     const val SETUP = "setup"
     const val PLANNER = "planner"
+    const val CHOOSE_SATELLITES = "choose-satellites"
 
     /** The station editor; the optional id names the station to edit, none adds a new one. */
     const val PLANNER_STATION = "planner/station"
@@ -187,8 +188,12 @@ fun AppNavHost(
                     val app = context.applicationContext as HamSatDroidApp
                     PassAlertScheduler(context, app.passAlertStore, app.settings).rescheduleAll()
                 },
+                onChooseSatellites = { navController.navigate(Routes.CHOOSE_SATELLITES) },
                 onBack = { navController.popBackStack() },
             )
+        }
+        composable(Routes.CHOOSE_SATELLITES) {
+            ChooseSatellitesScreen(viewModel, settings, onLeave = { navController.popBackStack() })
         }
     }
 }

@@ -61,6 +61,7 @@ fun SettingsScreen(
     locationFetcher: LocationFetcher,
     hasLightSensor: Boolean,
     onLeadTimeChanged: () -> Unit,
+    onChooseSatellites: () -> Unit,
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -75,6 +76,7 @@ fun SettingsScreen(
     val themeMode by settings.themeMode.state.collectAsStateWithLifecycle()
     val autoRedNight by settings.autoRedNight.state.collectAsStateWithLifecycle()
     val centreMapOnHome by settings.centreMapOnHome.state.collectAsStateWithLifecycle()
+    val mySatellites by settings.mySatellites.state.collectAsStateWithLifecycle()
 
     var message by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(message) {
@@ -121,6 +123,14 @@ fun SettingsScreen(
                 onSelected = { settings.kepsSource.value = it },
                 modifier = Modifier.fillMaxWidth(),
             )
+
+            HorizontalDivider()
+            Text(
+                if (mySatellites.isEmpty()) stringResource(R.string.settings_chosen_none)
+                else stringResource(R.string.settings_chosen_count, mySatellites.size),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            OutlinedButton(onClick = onChooseSatellites) { Text(stringResource(R.string.settings_choose_satellites)) }
 
             HorizontalDivider()
             SectionTitle(R.string.settings_section_display)
