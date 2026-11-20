@@ -73,6 +73,8 @@ import uk.me.g4dpz.HamSatDroid.domain.ElementAge
 import uk.me.g4dpz.HamSatDroid.domain.PassFilter
 import uk.me.g4dpz.HamSatDroid.domain.PassHeader
 import uk.me.g4dpz.HamSatDroid.domain.PassSummary
+import uk.me.g4dpz.HamSatDroid.domain.SatelliteChoice
+import uk.me.g4dpz.HamSatDroid.ui.components.ChooseSatellitesBanner
 import uk.me.g4dpz.HamSatDroid.ui.components.DropdownField
 import uk.me.g4dpz.HamSatDroid.ui.components.LocationNotSetBanner
 import java.time.Instant
@@ -88,6 +90,15 @@ private val RANGE_HOURS = listOf(0, 6, 12, 24)
 
 /** A message dialog raised by a keps event. */
 private data class KepsDialog(val text: String)
+
+/** What the passes screen needs to offer only the user's chosen satellites. */
+data class SatelliteChoiceUi(
+    val chosen: Set<Int>,
+    /** Whether the "only the ISS is offered" banner shows. */
+    val showPrompt: Boolean,
+    val onChoose: () -> Unit,
+    val onNotNow: () -> Unit,
+)
 
 /**
  * The main screen: the app bar, its menu and dialogs, and a body that depends on [layout]: the pass list alone, the
@@ -108,6 +119,7 @@ fun HomeScreen(
     locationSet: Boolean,
     /** Opens the setup guide (menu item and banner). */
     onOpenSetup: () -> Unit,
+    choice: SatelliteChoiceUi,
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -230,7 +242,7 @@ fun HomeScreen(
             WindowLayout.SINGLE_PANE -> PassesPane(
                 viewModel, state, formats, alerts, highlightSelection = false,
                 onChangeStartTime = { showStartPicker = true }, onPassClick = onPassClick, onPassLongClick = onPassLongClick,
-                locationSet = locationSet, onOpenSetup = onOpenSetup,
+                locationSet = locationSet, onOpenSetup = onOpenSetup, choice = choice,
                 // The sky view of the satellite itself, for one with no pass to tap (a geostationary satellite).
                 onOpenSky = onOpenPass,
                 modifier = Modifier.fillMaxSize().padding(padding).then(paneModifier),
@@ -239,7 +251,7 @@ fun HomeScreen(
                 PassesPane(
                     viewModel, state, formats, alerts, highlightSelection = true,
                     onChangeStartTime = { showStartPicker = true }, onPassClick = onPassClick, onPassLongClick = onPassLongClick,
-                locationSet = locationSet, onOpenSetup = onOpenSetup,
+                locationSet = locationSet, onOpenSetup = onOpenSetup, choice = choice,
                     modifier = Modifier.weight(0.4f).fillMaxHeight().then(paneModifier),
                 )
                 VerticalDivider()
@@ -252,7 +264,7 @@ fun HomeScreen(
                 PassesPane(
                     viewModel, state, formats, alerts, highlightSelection = true,
                     onChangeStartTime = { showStartPicker = true }, onPassClick = onPassClick, onPassLongClick = onPassLongClick,
-                locationSet = locationSet, onOpenSetup = onOpenSetup,
+                locationSet = locationSet, onOpenSetup = onOpenSetup, choice = choice,
                     modifier = Modifier.weight(0.3f).fillMaxHeight().then(paneModifier),
                 )
                 VerticalDivider()
@@ -325,6 +337,7 @@ private fun PassesPane(
     onPassLongClick: (PassSummary) -> Unit,
     locationSet: Boolean,
     onOpenSetup: () -> Unit,
+    choice: SatelliteChoiceUi,
     modifier: Modifier = Modifier,
     /** Opens the sky view of the selected satellite; null where the sky view is already beside the list. */
     onOpenSky: (() -> Unit)? = null,
@@ -335,7 +348,7 @@ private fun PassesPane(
         val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value)
         val controls: @Composable () -> Unit = {
             PassesControls(
-                viewModel, state, formats, stackPickers, minElevation, onChangeStartTime, locationSet, onOpenSetup, onOpenSky,
+                viewModel, state, formats, stackPickers, minElevation, onChangeStartTime, locationSet, onOpenSetup, onOpenSky, choice,
             )
         }
         val passes: LazyListScope.() -> Unit = {
@@ -392,6 +405,7 @@ private fun PassesControls(
     locationSet: Boolean,
     onOpenSetup: () -> Unit,
     onOpenSky: (() -> Unit)?,
+    choice: SatelliteChoiceUi,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Until a home location is set nothing can be calculated; say so at the top, with the way to fix it.
@@ -400,12 +414,14 @@ private fun PassesControls(
         val satellitePicker: @Composable (Modifier) -> Unit = { pickerModifier ->
             DropdownField(
                 label = stringResource(R.string.passes_satellite_label),
-                options = state.satellites,
+                options = SatelliteChoice.offered(state.satellites, choice.chosen, state.selectedCatnum),
                 selected = state.selectedSatellite,
                 optionLabel = { it.name },
                 onSelected = { viewModel.selectSatellite(it.catnum) },
                 modifier = pickerModifier,
                 enabled = !state.loading,
+                footerLabel = stringResource(R.string.picker_choose_satellites),
+                onFooter = choice.onChoose,
             )
         }
         val rangePicker: @Composable (Modifier) -> Unit = { pickerModifier ->
@@ -441,6 +457,7 @@ private fun PassesControls(
             }
         }
 
+        if (choice.showPrompt) ChooseSatellitesBanner(onChoose = choice.onChoose, onNotNow = choice.onNotNow)
         // The start time gets a line of its own and the buttons sit below it. In one row the buttons took the width
         // they needed and squeezed the text into a narrow column (one or two characters a line on a phone with a
         // larger font). The buttons wrap onto a further line when even they do not fit side by side.

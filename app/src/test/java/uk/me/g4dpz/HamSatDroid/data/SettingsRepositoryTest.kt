@@ -80,6 +80,23 @@ class SettingsRepositoryTest {
         assertEquals(setOf(25544), settings().mySatellites.value)
     }
     @Test
+    fun mySatellitesChosenIsFalseUntilAListIsSavedThenStaysTrue() {
+        val a = settings()
+        assertFalse(a.mySatellitesChosen.value)
+        a.mySatellites.value = emptySet() // an empty list counts as chosen
+        assertTrue(a.mySatellitesChosen.value)
+        assertTrue(settings().mySatellitesChosen.value)
+    }
+    @Test
+    fun theChoosePromptIsNotDismissedUntilNotNowAndStaysDismissed() {
+        val a = settings()
+        assertFalse(a.choosePromptDismissed.value)
+        a.choosePromptDismissed.value = true
+        assertTrue(settings().choosePromptDismissed.value)
+        assertFalse(settings().mySatellitesChosen.value) // Not now does not choose a list
+        assertEquals(setOf(25544), settings().mySatellites.value)
+    }
+    @Test
     fun existingHomeLocationFromAnOlderVersionIsRead() {
         // Values exactly as the original app stored them under the same keys.
         store.map["homeLat"] = "51.5"
