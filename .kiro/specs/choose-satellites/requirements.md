@@ -45,7 +45,8 @@ The user picks the satellites once, in a list with search. Three places then off
 4. Chosen satellites SHALL be marked and be easy to find (shown first, or in a group at the top).
 5. Satellites in the saved list that are not in the current elements SHALL be shown in a separate group, marked as not in the current elements, and SHALL be removable.
 6. WHEN the user presses Done THEN the list SHALL be saved, even if it is empty; WHEN the user presses Back or Cancel THEN nothing SHALL change.
-7. The search field and the list SHALL both be usable with the keyboard open.
+7. WHEN no list has been saved yet THEN the chooser SHALL open with the ISS and the satellite currently selected ticked, so it matches what the picker offers; this is a draft and nothing SHALL be saved until Done. WHEN a list has been saved THEN the chooser SHALL show exactly that list.
+8. The search field and the list SHALL both be usable with the keyboard open.
 
 ## Requirement 3: The Satellite picker
 1. The picker SHALL offer only the chosen satellites that are in the current elements, plus the currently selected satellite (A6), in the usual order. With an empty list it SHALL therefore offer only the selected satellite.

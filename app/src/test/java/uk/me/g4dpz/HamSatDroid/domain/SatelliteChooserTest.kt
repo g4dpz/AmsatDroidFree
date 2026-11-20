@@ -27,6 +27,14 @@ class SatelliteChooserTest {
     }
     @Test fun aRepeatedCatalogueNumberIsListedOnce() =
         assertEquals(listOf(ao7, iss), SatelliteChooser.shown(listOf(ao7, iss, ao7), emptySet(), ""))
+    @Test fun beforeAListIsSavedTheSelectedSatelliteIsTickedToo() =
+        assertEquals(setOf(25544, 44909), SatelliteChooser.opening(setOf(25544), chosen = false, selectedCatnum = 44909))
+    @Test fun beforeAListIsSavedWithNoSelectionItIsJustTheDefault() =
+        assertEquals(setOf(25544), SatelliteChooser.opening(setOf(25544), chosen = false, selectedCatnum = null))
+    @Test fun aSavedListIsShownExactlyEvenWhenTheSelectedSatelliteIsNotInIt() =
+        assertEquals(setOf(7530), SatelliteChooser.opening(setOf(7530), chosen = true, selectedCatnum = 44909))
+    @Test fun aSavedEmptyListStaysEmpty() =
+        assertEquals(emptySet<Int>(), SatelliteChooser.opening(emptySet(), chosen = true, selectedCatnum = 44909))
     @Test fun toggleUnticks() = assertEquals(setOf(1), SatelliteChooser.toggle(setOf(1, 2), 2))
     @Test fun selectAllAddsOnlyWhatIsShown() =
         assertEquals(setOf(99, 7530, 27607), SatelliteChooser.selectAll(setOf(99), listOf(ao7, so50)))
