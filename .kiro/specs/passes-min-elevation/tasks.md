@@ -5,7 +5,7 @@ Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after e
 - [ ] 1. Logic
   - [ ] 1.1 `PassFilter.visible` in `domain` with `PassFilterTest` (zero, boundary at exactly the minimum, kept id, empty list)
     - _Requirements: 1.1, 2.1, 2.4, 4.1_
-  - [ ] 1.2 Expose the shared `overviewMinElevation` setting to the passes screen as `AppViewModel.minElevation` (read and write; no new setting), with `AppViewModelTest` cases showing that a change on either screen is seen on the other
+  - [ ] 1.2 Expose the shared `overviewMinElevation` setting to the passes screen as `AppViewModel.minElevation` (read and write; no new setting), with `AppViewModelTest` cases showing that a change on either screen is seen on the other, and that a change made while "Next pass only" is shown or being calculated calculates again
     - _Requirements: 1.1, 1.2_
   - [ ] 1.3 `PassCalculator.nextPassReaching` with tests: first pass already high enough, second pass is the first to qualify, none within the limit, cancellation between steps
     - _Requirements: 3.1, 3.2_
