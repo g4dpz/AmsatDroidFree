@@ -2,6 +2,7 @@
 
 - [ ] A new install: the ISS is selected, the picker offers the ISS, and the chooser shows the ISS ticked
 - [ ] An update over a build with a selected satellite and no saved list: the picker offers the ISS and that satellite, the passes screen still shows that satellite, and nothing else changes
+- [ ] While no list has been chosen the passes screen shows "Only the ISS is offered. Choose your favourite satellites." under the picker, with a button that opens the chooser; after Done (even with nothing ticked) it never appears again; red night looks right
 - [ ] Settings shows "Choose satellites" with the count; the end of the Satellite picker menu has "Choose satellites…"; both open the chooser
 - [ ] The chooser lists every satellite with a checkbox, in the picker's order; the search matches names and catalogue numbers, ignoring case
 - [ ] The count is right; Select all and Clear all work (and only on the satellites the search shows, when one is typed)

@@ -13,11 +13,13 @@ The user picks the satellites once, in a list with search. Three places then off
 ## Decisions made (David, 20 Nov 2026)
 - D1. **One saved list** serves the picker, the All satellites overview and the Contact planner.
 - D2. **If the user has chosen a list, the app uses it; otherwise it uses the ISS.** The user can empty a chosen list completely, and an empty chosen list means nothing is offered (see requirements 3 to 5 for what each screen then says). There is no "empty means everything".
+- D3a. **The prompt.** While no list has been chosen the app offers the ISS and tells the user to choose their favourites: being shown all 99 satellites was the original objection, so nobody is shown the full list by default, and the prompt is how they find the way to the chooser. (David, 20 Nov 2026.)
 - D3. **One satellite at a time**: nothing about how passes are calculated, stored, selected or shown changes.
 - D4. **No large-font handling** (large font sizes are not supported).
 
 ## Assumptions (please confirm or change)
 - A0. **Nobody is migrated.** A user who has never chosen a list, new or existing, has the ISS as the list. For an existing user the picker therefore offers the ISS and the satellite they have selected (A6) until they choose their own list; their selected satellite is not lost and nothing else about the app changes. (An earlier draft wrote the ISS plus the selected satellite into the list on the first start after an update; David's rule of 20 Nov 2026 is simpler: no list chosen, so the ISS.)
+- A0a. **The prompt is a banner** on the passes screen, under the Satellite picker, while no list has been chosen: "Only the ISS is offered. Choose your favourite satellites." with a **Choose satellites** button, in the style of the existing "location not set" banner. It goes away for good when the user presses Done in the chooser (even with an empty list). It has no "dismiss" button: it is one short line, and it disappears the first time the user chooses. (If you want a Not now button, say so; it needs one more saved flag.)
 - A1. The list is chosen from **Settings** (a "Choose satellites" row showing how many are chosen) and from the **end of the Satellite picker menu** ("Choose satellites…"). On the overview and the planner a line says "Showing your N satellites" with a **Change** link to the same screen.
 - A2. The chooser is a **full screen** on every device (a route like the setup guide), not a dialog: text fields in dialogs are awkward with the keyboard open.
 - A3. On the planner the scope choice **Selected satellite / All satellites** keeps its two buttons. The second is labelled **My satellites** and searches only the list.
@@ -51,6 +53,8 @@ The user picks the satellites once, in a list with search. Three places then off
 3. Choosing a satellite in the picker SHALL work exactly as now (selects it, shows its passes).
 4. The first-run setup guide's satellite step SHALL keep offering every satellite.
 5. A new install SHALL start with the ISS selected (A8).
+6. WHILE no list has been chosen THE passes screen SHALL show the prompt of A0a under the picker, with a button that opens the chooser. Once the user has saved a list, even an empty one, the prompt SHALL not appear again.
+7. The prompt SHALL be text, readable and labelled for a screen reader, and SHALL use the existing banner styling in every theme, including red night.
 
 ## Requirement 4: The All satellites overview
 1. "Up now" and the upcoming passes SHALL use only the chosen satellites that are in the current elements, and a line SHALL say "Showing your N satellites" with a Change link.
