@@ -4,7 +4,7 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
-## [2.3.0] - 2026-11-20 (versionCode 2104)
+## [2.3.0] - 2026-11-20 (versionCode 2300)
 ### Added
 - Passes: a Minimum elevation picker hides low passes, and Next pass only finds the next one that reaches it within 24 hours. Shared with All satellites.
 - Sky view button: opens the sky chart and Doppler frequencies of the selected satellite, even one with no passes, such as QO-100.
