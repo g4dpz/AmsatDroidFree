@@ -193,7 +193,19 @@ class SettingsRepository(private val store: KeyValueStore) {
     val mySatellites = Setting(
         if (store.getString(MY_SATELLITES, ABSENT) == ABSENT) setOf(CatnumList.ISS)
         else CatnumList.parse(store.getString(MY_SATELLITES, ""))
-    ) { store.putString(MY_SATELLITES, CatnumList.format(it)) }
+    ) {
+        store.putString(MY_SATELLITES, CatnumList.format(it))
+        mySatellitesChosen.value = true
+    }
+    /**
+     * Whether the user has ever saved a list (pressed Done in the chooser), even an empty one. Read from the store, set
+     * by saving [mySatellites]; do not set it directly. Once true it stays true.
+     */
+    val mySatellitesChosen = Setting(store.getString(MY_SATELLITES, ABSENT) != ABSENT) { }
+    /** Whether the user pressed "Not now" on the choose-your-satellites banner on the passes screen. */
+    val choosePromptDismissed = Setting(store.getBoolean(CHOOSE_PROMPT_DISMISSED, false)) {
+        store.putBoolean(CHOOSE_PROMPT_DISMISSED, it)
+    }
 
     private inline fun <reified E : Enum<E>> enumOrDefault(name: String, default: E): E =
         enumValues<E>().firstOrNull { it.name == name } ?: default
@@ -227,6 +239,7 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val PLANNER_HOURS = "plannerHours"
         const val PLANNER_ALL_SATELLITES = "plannerAllSatellites"
         const val MY_SATELLITES = "mySatellites"
+        const val CHOOSE_PROMPT_DISMISSED = "choosePromptDismissed"
         // A value no saved list can equal (a saved list holds digits and commas only).
         private const val ABSENT = "\u0000absent"
 

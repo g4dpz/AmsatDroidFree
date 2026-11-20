@@ -37,6 +37,14 @@ object SatelliteChooser {
     fun clearAll(draft: Set<Int>, shown: List<SatelliteItem>, shownAbsent: List<Int>): Set<Int> =
         draft - shown.map { it.catnum }.toSet() - shownAbsent.toSet()
 
+    /**
+     * The ticks the chooser opens with. Once a list has been saved ([chosen]) that list exactly. Before that the list is
+     * only the ISS by default, so the satellite on screen ([selectedCatnum]) is ticked as well: the user sees what the
+     * picker offers. This is a draft; nothing is saved until Done.
+     */
+    fun opening(saved: Set<Int>, chosen: Boolean, selectedCatnum: Int?): Set<Int> =
+        if (chosen || selectedCatnum == null) saved else saved + selectedCatnum
+
     /** [draft] with [catnum] ticked or unticked. */
     fun toggle(draft: Set<Int>, catnum: Int): Set<Int> = if (catnum in draft) draft - catnum else draft + catnum
 }

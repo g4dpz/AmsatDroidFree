@@ -27,6 +27,14 @@ class SatelliteChooserTest {
     }
     @Test fun aRepeatedCatalogueNumberIsListedOnce() =
         assertEquals(listOf(ao7, iss), SatelliteChooser.shown(listOf(ao7, iss, ao7), emptySet(), ""))
+    @Test fun beforeAListIsSavedTheSelectedSatelliteIsTickedToo() =
+        assertEquals(setOf(25544, 44909), SatelliteChooser.opening(setOf(25544), chosen = false, selectedCatnum = 44909))
+    @Test fun beforeAListIsSavedWithNoSelectionItIsJustTheDefault() =
+        assertEquals(setOf(25544), SatelliteChooser.opening(setOf(25544), chosen = false, selectedCatnum = null))
+    @Test fun aSavedListIsShownExactlyEvenWhenTheSelectedSatelliteIsNotInIt() =
+        assertEquals(setOf(7530), SatelliteChooser.opening(setOf(7530), chosen = true, selectedCatnum = 44909))
+    @Test fun aSavedEmptyListStaysEmpty() =
+        assertEquals(emptySet<Int>(), SatelliteChooser.opening(emptySet(), chosen = true, selectedCatnum = 44909))
     @Test fun aSecondNameForTheSameNumberIsStillSearchable() {
         val twin = SatelliteItem(7530, "OSCAR 7")
         assertEquals(listOf(twin), SatelliteChooser.shown(listOf(ao7, twin), emptySet(), "OSCAR"))

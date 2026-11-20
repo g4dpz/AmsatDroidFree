@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -34,6 +35,9 @@ fun <T> DropdownField(
     onSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    /** An extra last entry that does not select anything (for example "Choose satellites…"); needs [onFooter]. */
+    footerLabel: String? = null,
+    onFooter: (() -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { if (enabled) expanded = it }, modifier = modifier) {
@@ -59,6 +63,16 @@ fun <T> DropdownField(
                     onClick = {
                         expanded = false
                         onSelected(option)
+                    },
+                )
+            }
+            if (footerLabel != null && onFooter != null) {
+                HorizontalDivider()
+                DropdownMenuItem(
+                    text = { Text(footerLabel, color = MaterialTheme.colorScheme.primary) },
+                    onClick = {
+                        expanded = false
+                        onFooter()
                     },
                 )
             }

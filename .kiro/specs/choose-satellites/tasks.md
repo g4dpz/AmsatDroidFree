@@ -15,10 +15,10 @@ Branch per task group, one PR at a time; merge only when CI is green and Copilot
     - _Requirements: 2_
   - [x] 2.2 The Settings row ("N chosen" or "None chosen")
     - _Requirements: 2_
-- [ ] 3. The picker
-  - [ ] 3.1 `DropdownField` footer entry; the passes screen offers `SatelliteChoice.offered`; "Choose satellites…" opens the chooser
+- [x] 3. The picker
+  - [x] 3.1 `DropdownField` footer entry; the passes screen offers `SatelliteChoice.offered`; "Choose satellites…" opens the chooser
     - _Requirements: 3_
-  - [ ] 3.2 `ChooseSatellitesBanner` on the passes screen while no list has been chosen, with `mySatellitesChosen` (key absent) in the settings a Not now button (`choosePromptDismissed`), and a test that the banner goes away on the first Done or on Not now and stays away, even for an empty list
+  - [x] 3.2 `ChooseSatellitesBanner` on the passes screen while no list has been chosen, with `mySatellitesChosen` (key absent) in the settings a Not now button (`choosePromptDismissed`), and a test that the banner goes away on the first Done or on Not now and stays away, even for an empty list
     - _Requirements: 3.6, 3.7_
 - [ ] 4. The overview
   - [ ] 4.1 `OverviewViewModel` uses the chosen satellites; the "Showing your N satellites" line with Change; the "No satellites chosen" and none-present messages; tests
