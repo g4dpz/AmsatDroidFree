@@ -39,7 +39,7 @@ This spec adds an option to **centre the same picture on the home longitude**, w
 
 ## Requirement 4: Looks and accessibility
 1. In Red night mode the picture, icons, track and footprint SHALL keep their current red treatment.
-2. The map's spoken description SHALL not change, and the new switch SHALL have a visible label, readable at 200 percent font.
+2. The map's spoken description SHALL not change, and the new switch SHALL have a visible label.
 
 ## Requirement 5: Quality
 1. The shift SHALL be a pure function with unit tests, including home longitudes 0, 151.2 (Sydney), -122 (San Francisco), 180 and -180.
