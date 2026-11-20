@@ -58,7 +58,9 @@ private val CATNUM_SET_SAVER = listSaver<Set<Int>, Int>(save = { listOf(0) + it.
 fun ChooseSatellitesScreen(viewModel: AppViewModel, settings: SettingsRepository, onLeave: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val initial = rememberSaveable(saver = CATNUM_SET_SAVER) {
-        SatelliteChooser.opening(settings.mySatellites.value, settings.mySatellitesChosen.value, state.selectedCatnum)
+        // Before the elements have loaded the state has no selection yet, so fall back to the saved one.
+        val selected = state.selectedCatnum ?: settings.selectedCatnum.value.takeIf { it > 0 }
+        SatelliteChooser.opening(settings.mySatellites.value, settings.mySatellitesChosen.value, selected)
     }
     var draft by rememberSaveable(stateSaver = CATNUM_SET_SAVER) { mutableStateOf(initial) }
     var query by rememberSaveable { mutableStateOf("") }
