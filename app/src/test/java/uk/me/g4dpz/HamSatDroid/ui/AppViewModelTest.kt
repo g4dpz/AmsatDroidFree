@@ -384,6 +384,94 @@ class AppViewModelTest {
         assertNull(vm.state.value.selectedPassId)
     }
 
+    // ---- the minimum elevation filter ----
+
+    @Test
+    fun theMinimumElevationIsTheOverviewsSavedValue() {
+        val vm = viewModel()
+        assertEquals(0, vm.minElevation.value)
+        vm.setMinElevation(20)
+        assertEquals(20, settings.overviewMinElevation.value) // the same setting the All satellites screen reads
+        assertEquals(20, vm.minElevation.value)
+        settings.overviewMinElevation.value = 10 // a change made on the overview screen
+        assertEquals(10, vm.minElevation.value)
+    }
+
+    @Test
+    fun aMinimumThatIsNotOneOfTheChoicesIsRejected() {
+        val vm = viewModel()
+        try {
+            vm.setMinElevation(15)
+            org.junit.Assert.fail("15 is not one of 0, 10, 20 or 30")
+        } catch (e: IllegalArgumentException) {
+            assertEquals(0, vm.minElevation.value)
+        }
+    }
+
+    @Test
+    fun changingTheMinimumForAFixedRangeDoesNotCalculateAgain() {
+        val vm = viewModel()
+        vm.selectSatellite(7530)
+        vm.setHoursAhead(24)
+        vm.calculate()
+        val before = vm.state.value.passes
+        vm.setMinElevation(20)
+        assertEquals(before, vm.state.value.passes) // all passes stay in the state; the screen filters what it shows
+        assertEquals(PassHeader.Predictions::class, vm.state.value.header!!::class)
+    }
+
+    @Test
+    fun nextPassOnlyWithAMinimumFindsThePassThatReachesIt() {
+        val vm = viewModel()
+        vm.selectSatellite(7530)
+        vm.setHoursAhead(24)
+        vm.calculate()
+        val all = vm.state.value.passes
+        val minimum = kotlin.math.ceil(all.first().maxElevationDeg + 0.5).toInt().let { m -> listOf(10, 20, 30).first { it >= m } }
+        val reaching = all.firstOrNull { it.maxElevationDeg >= minimum } ?: return // no such pass in this window: nothing to check
+        vm.setHoursAhead(0)
+        vm.calculate()
+        vm.setMinElevation(minimum) // recalculates, because a next-pass result is already on screen
+        val shown = vm.state.value.passes
+        assertEquals(1, shown.size)
+        assertTrue(shown.single().maxElevationDeg >= minimum)
+        assertTrue(kotlin.math.abs(shown.single().start.epochSecond - reaching.start.epochSecond) <= 30)
+    }
+
+    @Test
+    fun nextPassOnlyWithAMinimumNoPassReachesSaysSo() {
+        val vm = viewModel()
+        vm.selectSatellite(7530)
+        vm.setHoursAhead(0)
+        settings.overviewMinElevation.value = 30
+        vm.calculate()
+        val s = vm.state.value
+        // AO-7 from London has no pass of 30 degrees or more in 24 hours on this date, or it has: both are valid, but a
+        // result must be one or the other and must never be a pass below the minimum
+        val header = s.header
+        if (header is PassHeader.NoPassReaches) {
+            assertEquals(30, header.minElevationDeg)
+            assertEquals(24, header.searchedHours) // AppViewModel.NO_PASS_SEARCH_HOURS
+            assertTrue(s.passes.isEmpty())
+        } else {
+            assertTrue(s.passes.all { it.maxElevationDeg >= 30 })
+        }
+    }
+
+    @Test
+    fun changingTheMinimumForNextPassOnlyKeepsTheSelectedPass() {
+        val vm = viewModel()
+        vm.selectSatellite(7530)
+        vm.setHoursAhead(0)
+        vm.calculate()
+        val pass = vm.state.value.passes.single()
+        vm.selectPass(pass.id)
+        vm.setMinElevation(10)
+        // the recalculation keeps a selected pass (or the calculated pass that is the same one), so the sky view has one
+        assertTrue(vm.state.value.selectedPass != null)
+        assertEquals(7530, vm.state.value.selectedCatnum)
+    }
+
     // ---- restoring the previous session ----
 
     @Test

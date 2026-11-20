@@ -80,4 +80,86 @@ class PassCalculatorTest {
         assertEquals(a.passes.map { it.startTime }, b.passes.map { it.startTime })
         assertEquals(a.passes.map { it.maxEl }, b.passes.map { it.maxEl })
     }
+
+    // ---- the next pass that reaches a minimum elevation ----
+
+    private fun passesIn24Hours(name: String) =
+        (PassCalculator().calculate(sat(name), 51.5, -0.1, start, 24) as CalcResult.Passes).passes
+
+    @Test
+    fun withAMinimumOfZeroTheNextPassIsJustTheNextPass() {
+        val expected = (PassCalculator().calculate(sat("AO-07"), 51.5, -0.1, start, 0) as CalcResult.Passes).passes.first()
+        val result = PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, start, 0, 24) as CalcResult.Passes
+        assertEquals(expected.startTime, result.passes.single().startTime)
+    }
+
+    /** The same pass found from a different start time can begin a few seconds earlier or later. */
+    private fun assertSamePass(expected: uk.me.g4dpz.satellite.SatPassTime, actual: uk.me.g4dpz.satellite.SatPassTime) {
+        val seconds = kotlin.math.abs(expected.startTime.time - actual.startTime.time) / 1000
+        assertTrue("start times differ by $seconds s: ${expected.startTime} and ${actual.startTime}", seconds <= 30)
+    }
+
+    @Test
+    fun skipsLowPassesToTheFirstOneThatReachesTheMinimum() {
+        val all = passesIn24Hours("AO-07")
+        // a minimum that the first pass misses
+        val minimum = kotlin.math.ceil(all.first().maxEl + 0.5).toInt()
+        val expected = all.firstOrNull { it.maxEl >= minimum }
+        assertTrue("the test needs a later pass above $minimum", expected != null)
+        val result = PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, start, minimum, 24)
+        assertTrue("got $result", result is CalcResult.Passes)
+        val found = (result as CalcResult.Passes).passes.single()
+        assertTrue(found.maxEl >= minimum)
+        assertSamePass(expected!!, found)
+        assertTrue("it must be a later pass than the first", found.startTime.time > all.first().startTime.time + 60_000)
+    }
+
+    @Test
+    fun rejectingAPassMovesOnToADistinctLaterPass() {
+        val all = passesIn24Hours("AO-07")
+        val best = all.maxByOrNull { it.maxEl }!!
+        val others = all.filter { it !== best }
+        val minimum = kotlin.math.floor(best.maxEl).toInt()
+        assertTrue("only the best pass may reach $minimum", others.none { it.maxEl >= minimum })
+        val found = (PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, start, minimum, 24) as CalcResult.Passes).passes.single()
+        assertSamePass(best, found)
+        // a minimum of 0 finds the very first pass, the one that was rejected above
+        val first = (PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, start, 0, 24) as CalcResult.Passes).passes.single()
+        assertSamePass(all.first(), first)
+    }
+
+    @Test
+    fun saysSoWhenNoPassInTheLimitReachesTheMinimum() {
+        // no pass is ever above 89 degrees in 24 hours of AO-07 from London
+        val result = PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, start, 89, 24)
+        assertEquals(CalcResult.NoPassReaches(89, 24), result)
+    }
+
+    @Test
+    fun aShortLimitStopsTheSearchEarly() {
+        val all = passesIn24Hours("AO-07")
+        val last = all.maxByOrNull { it.maxEl }!!
+        val hoursToBest = ((last.startTime.time - start.time) / 3_600_000L).toInt()
+        // a limit shorter than the wait for the best pass cannot find it
+        if (hoursToBest >= 2) {
+            val minimum = kotlin.math.floor(last.maxEl).toInt()
+            val earlier = all.filter { it.startTime.time < start.time + 3_600_000L }
+            if (earlier.none { it.maxEl >= minimum }) {
+                assertEquals(CalcResult.NoPassReaches(minimum, 1), PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, start, minimum, 1))
+            }
+        }
+    }
+
+    @Test
+    fun stopsWhenAskedNotToKeepGoing() {
+        var asked = 0
+        val result = PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, start, 89, 24, keepGoing = { asked++ < 1 })
+        assertEquals(CalcResult.NoPasses, result)
+        assertTrue(asked >= 2)
+    }
+
+    @Test
+    fun aStationarySatelliteIsReportedAsStationary() {
+        assertTrue(PassCalculator().nextPassReaching(qo100, 51.5, -0.1, nov2026, 30, 24) is CalcResult.Stationary)
+    }
 }

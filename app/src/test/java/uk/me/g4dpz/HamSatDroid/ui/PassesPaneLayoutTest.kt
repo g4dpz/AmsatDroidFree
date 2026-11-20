@@ -23,15 +23,17 @@ class PassesPaneLayoutTest {
     }
 
     @Test
-    fun aWideSingleWindowKeepsThePickersSideBySide() {
-        // a small tablet or an unfolded foldable below the 600 dp two-pane threshold
-        assertFalse(PassesPaneLayout.stackPickers(560f - 32f))
+    fun aWideSingleWindowStillStacksThreePickers() {
+        // a small tablet or an unfolded foldable below the 600 dp two-pane threshold: 528 dp would give each of three
+        // pickers 168 dp
+        assertTrue(PassesPaneLayout.stackPickers(560f - 32f))
     }
 
     @Test
-    fun theStackingBoundaryIs480() {
-        assertTrue(PassesPaneLayout.stackPickers(479.9f))
-        assertFalse(PassesPaneLayout.stackPickers(480f))
+    fun theStackingBoundaryIs700() {
+        assertTrue(PassesPaneLayout.stackPickers(699.9f))
+        assertFalse(PassesPaneLayout.stackPickers(700f))
+        assertFalse(PassesPaneLayout.stackPickers(975f)) // the SM-T225 landscape single pane
     }
 
     // ---- scrolling the whole pane ----

@@ -185,6 +185,13 @@
         <item quantity="one">No passes found for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next %5$d hour.</item>
         <item quantity="other">No passes found for satellite %1$s, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, for the next %5$d hours.</item>
     </plurals>
+    <plurals name="header_no_pass_reaches">
+        <item quantity="one">No pass of satellite %1$s reaches %5$d°, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, in the next %6$d hour.</item>
+        <item quantity="other">No pass of satellite %1$s reaches %5$d°, for home coordinates (lat/lon/gridsquare) %2$s/%3$s/%4$s, in the next %6$d hours.</item>
+    </plurals>
+    <string name="passes_min_elevation_filter">Passes reaching at least %1$d°</string>
+    <string name="passes_none_reach_minimum">No pass in this range reaches %1$d°. Choose a lower minimum elevation to see them.</string>
+    <string name="pass_below_minimum">Below the %1$d° minimum (shown because it is selected)</string>
     <string name="header_stationary_up">%1$s is stationary in the sky (geostationary), so it has no passes. From your location it is always up, at azimuth %2$s°, elevation %3$s°. The sky view shows where to point.</string>
     <string name="header_stationary_down">%1$s is stationary in the sky (geostationary) and below the horizon at your location, so it can never be seen from here.</string>
     <string name="header_bad_elements">The orbital elements for this satellite could not be used.</string>

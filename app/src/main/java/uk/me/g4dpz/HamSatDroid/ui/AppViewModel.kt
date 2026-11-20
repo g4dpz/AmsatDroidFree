@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -89,6 +90,26 @@ class AppViewModel(
             viewModelScope, SharingStarted.Eagerly,
             MapCentre.longitude(settings.centreMapOnHome.value, settings.homeLat.value, settings.homeLon.value),
         )
+
+    /**
+     * The minimum elevation, in degrees, a pass must reach to be listed: 0, 10, 20 or 30. It is the same saved value as
+     * the All satellites screen's, so a change on either screen shows on the other.
+     */
+    val minElevation: StateFlow<Int> = settings.overviewMinElevation.state
+
+    /**
+     * Sets the minimum elevation. For the 6, 12 and 24 hour ranges the list only needs filtering again; for "next pass
+     * only" the next pass that reaches the new minimum has to be found, so a result already on screen is recalculated,
+     * keeping the selected pass.
+     */
+    fun setMinElevation(degrees: Int) {
+        if (degrees == settings.overviewMinElevation.value) return
+        settings.overviewMinElevation.value = degrees // rejects values other than 0, 10, 20 or 30
+        val current = _state.value
+        if (current.hoursAhead == 0 && current.header != null && current.selectedCatnum != null) {
+            calculate(keepSelected = current.selectedPass)
+        }
+    }
 
     private val _events = Channel<UiEvent>(Channel.BUFFERED)
 
@@ -198,7 +219,15 @@ class AppViewModel(
         _state.update { it.copy(calculating = true) }
         calcJob = viewModelScope.launch(workDispatcher) {
             try {
-                val result = calculator.calculate(tle, lat, lon, Date.from(start), hours)
+                val minElevation = settings.overviewMinElevation.value
+                val result = if (hours == 0 && minElevation > 0) {
+                    // Next pass only, but only a pass that reaches the minimum: the search may go on past lower ones.
+                    calculator.nextPassReaching(
+                        tle, lat, lon, Date.from(start), minElevation, NO_PASS_SEARCH_HOURS, keepGoing = { isActive },
+                    )
+                } else {
+                    calculator.calculate(tle, lat, lon, Date.from(start), hours)
+                }
                 ensureActive() // a newer calculation has replaced this one
                 if (generation != calcGeneration) return@launch // or the location was unset meanwhile
                 val locator = IaruLocator(lat, lon).toMaidenhead()
@@ -214,6 +243,18 @@ class AppViewModel(
                                 // while the calculation ran, and its sky view must not show this pass.
                                 selectedPassId = selected.takeIf { _ -> it.selectedCatnum == tle.catnum },
                                 header = PassHeader.Predictions(tle.name, lat, lon, locator, hours, start),
+                            )
+                        }
+                    }
+                    is CalcResult.NoPassReaches -> {
+                        rawPasses = emptyList()
+                        _state.update {
+                            it.copy(
+                                passes = listOfNotNull(keepSelected),
+                                selectedPassId = keepSelected?.id.takeIf { _ -> it.selectedCatnum == tle.catnum },
+                                header = PassHeader.NoPassReaches(
+                                    tle.name, lat, lon, locator, result.minElevationDeg, result.searchedHours,
+                                ),
                             )
                         }
                     }
