@@ -142,6 +142,19 @@ class PassCalculatorTest {
     }
 
     @Test
+    fun aPassInProgressAtTheStartTimeIsStillTheNextPass() {
+        // start in the middle of each pass (its closest approach): that pass is under way, so it counts, whether the
+        // minimum is 1 degree or exactly its own maximum elevation
+        for (inProgress in passesIn24Hours("AO-07").take(6)) {
+            for (minimum in listOf(1, kotlin.math.floor(inProgress.maxEl).toInt())) {
+                val result = PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, inProgress.tca, minimum, 24)
+                assertTrue("start ${inProgress.tca}, minimum $minimum: got $result", result is CalcResult.Passes)
+                assertSamePass(inProgress, (result as CalcResult.Passes).passes.single())
+            }
+        }
+    }
+
+    @Test
     fun saysSoWhenNoPassInTheLimitReachesTheMinimum() {
         // no pass is ever above 89 degrees in 24 hours of AO-07 from London
         val result = PassCalculator().nextPassReaching(sat("AO-07"), 51.5, -0.1, start, 89, 24)
