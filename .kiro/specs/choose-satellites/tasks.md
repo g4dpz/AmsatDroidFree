@@ -10,10 +10,10 @@ Branch per task group, one PR at a time; merge only when CI is green and Copilot
     - _Requirements: 1.1, 1.2, 1.3_
   - [x] 1.3 `SatelliteChoice.offered` and `forSearch` with `SatelliteChoiceTest` (empty, ISS only, some missing, none present, selected outside the list); a new install selects the ISS in `AppViewModel.initialLoad` (A8) with a test
     - _Requirements: 3.1, 3.5, 4, 5_
-- [ ] 2. The chooser
-  - [ ] 2.1 `ChooseSatellitesScreen` and `Routes.CHOOSE_SATELLITES`: search, count, Select all, Clear all, chosen first, not-in-current-elements group, Done and Cancel; draft kept with `rememberSaveable`; Done with nothing ticked saves an empty list
+- [x] 2. The chooser
+  - [x] 2.1 `ChooseSatellitesScreen` and `Routes.CHOOSE_SATELLITES`: search, count, Select all, Clear all, chosen first, not-in-current-elements group, Done and Cancel; draft kept with `rememberSaveable`; Done with nothing ticked saves an empty list
     - _Requirements: 2_
-  - [ ] 2.2 The Settings row ("N chosen" or "None chosen")
+  - [x] 2.2 The Settings row ("N chosen" or "None chosen")
     - _Requirements: 2_
 - [ ] 3. The picker
   - [ ] 3.1 `DropdownField` footer entry; the passes screen offers `SatelliteChoice.offered`; "Choose satellites…" opens the chooser
