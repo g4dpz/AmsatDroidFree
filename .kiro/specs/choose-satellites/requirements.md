@@ -53,7 +53,7 @@ The user picks the satellites once, in a list with search. Three places then off
 3. Choosing a satellite in the picker SHALL work exactly as now (selects it, shows its passes).
 4. The first-run setup guide's satellite step SHALL keep offering every satellite.
 5. A new install SHALL start with the ISS selected (A8).
-6. WHILE no list has been chosen THE passes screen SHALL show the prompt of A0a under the picker, with a button that opens the chooser. Once the user has saved a list, even an empty one, the prompt SHALL not appear again.
+6. WHILE no list has been chosen THE passes screen SHALL show the prompt of A0a under the picker, with a button that opens the chooser and a Not now button. Once the user has saved a list, even an empty one, or has pressed Not now, the prompt SHALL not appear again.
 7. The prompt SHALL be text, readable and labelled for a screen reader, and SHALL use the existing banner styling in every theme, including red night.
 
 ## Requirement 4: The All satellites overview
