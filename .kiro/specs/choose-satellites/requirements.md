@@ -12,25 +12,25 @@ The user picks the satellites once, in a list with search. Three places then off
 
 ## Decisions made (David, 20 Nov 2026)
 - D1. **One saved list** serves the picker, the All satellites overview and the Contact planner.
-- D2. **The list starts as the ISS** the first time the app starts, and **the user can empty it completely**. An empty list means nothing is offered (see requirements 3 to 5 for what each screen then says). There is no "empty means everything".
+- D2. **If the user has chosen a list, the app uses it; otherwise it uses the ISS.** The user can empty a chosen list completely, and an empty chosen list means nothing is offered (see requirements 3 to 5 for what each screen then says). There is no "empty means everything".
 - D3. **One satellite at a time**: nothing about how passes are calculated, stored, selected or shown changes.
 - D4. **No large-font handling** (large font sizes are not supported).
 
 ## Assumptions (please confirm or change)
-- A0. **People who update keep their current satellite.** A user who updates has no saved list, so the list starts as the ISS plus the satellite they have selected now, not the ISS alone. Without this, every existing tester would find the picker cut down to the ISS the moment they update. The list is written once, on that first start, and never again by the app. (If you would rather everyone start with the ISS alone, say so; the selected satellite still stays visible in the picker, see A6.)
+- A0. **Nobody is migrated.** A user who has never chosen a list, new or existing, has the ISS as the list. For an existing user the picker therefore offers the ISS and the satellite they have selected (A6) until they choose their own list; their selected satellite is not lost and nothing else about the app changes. (An earlier draft wrote the ISS plus the selected satellite into the list on the first start after an update; David's rule of 20 Nov 2026 is simpler: no list chosen, so the ISS.)
 - A1. The list is chosen from **Settings** (a "Choose satellites" row showing how many are chosen) and from the **end of the Satellite picker menu** ("Choose satellites…"). On the overview and the planner a line says "Showing your N satellites" with a **Change** link to the same screen.
 - A2. The chooser is a **full screen** on every device (a route like the setup guide), not a dialog: text fields in dialogs are awkward with the keyboard open.
 - A3. On the planner the scope choice **Selected satellite / All satellites** keeps its two buttons. The second is labelled **My satellites** and searches only the list.
 - A4. The overview has no separate All / My switch: it shows the list. To see everything, press "Select all" in the chooser.
 - A5. A satellite in the saved list that is **not in the current orbital elements** (another keps source, or a satellite that has dropped out) is skipped everywhere, and shown in a separate group in the chooser so it can be removed.
 - A6. The satellite **currently selected** stays in the picker even if it is not in the list, until another is picked, so the picker never shows something different from the screen and is never blank.
-- A7. The saved list is stored as comma-separated catalogue numbers in the preferences (key `mySatellites`). A missing key means "first start" (new install: the ISS; update: A0). A present but empty value means the user emptied the list.
+- A7. The saved list is stored as comma-separated catalogue numbers in the preferences (key `mySatellites`). A missing key means no list has been chosen, which reads as the ISS alone. A present value, including an empty one, is exactly the list the user chose.
 - A8. A new install **selects the ISS**: it is both the list and the selected satellite, so the first satellite a new user sees is the ISS, not the first satellite in the download. The setup guide's satellite step keeps offering every satellite.
 
 ## Requirement 1: The saved list
 **User story:** As an operator, I want to say once which satellites I use.
 1. The app SHALL keep one list of chosen satellites, by catalogue number, in the settings.
-2. On the first start of a new install the list SHALL be the ISS (catalogue number 25544). On the first start after an update it SHALL be the ISS and the selected satellite (A0). From then on the list SHALL be exactly what the user saved, and SHALL be allowed to be empty.
+2. WHEN the user has not chosen a list THEN the list SHALL be the ISS (catalogue number 25544), for a new install and for an update alike (A0). WHEN the user has saved a list THEN the list SHALL be exactly what was saved, and SHALL be allowed to be empty. The app SHALL never write a list the user did not choose.
 3. The list SHALL survive a restart and an app update; unknown or junk entries SHALL be ignored and never crash the app.
 4. Duplicates SHALL be removed and the order SHALL not matter (satellites are always shown in the app's usual order).
 5. The list SHALL stay on the device; no network request and no new permission is added.

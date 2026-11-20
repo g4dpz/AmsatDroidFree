@@ -9,7 +9,7 @@
 ### The list
 - `CatnumList` (pure, `domain`): `parse(text): Set<Int>` (comma separated, trims, drops junk and duplicates), `format(set): String` (sorted, comma separated), and `ISS = 25544`.
 - `mySatellites` in `SettingsRepository`: `Setting<Set<Int>>` stored as one string under the key `mySatellites`; it may be empty.
-- **First start.** When the key is absent the repository decides once and writes it: a new install (no `selectedCatnum` saved) gets `{ISS}`; an update (a `selectedCatnum` is saved) gets `{ISS, selectedCatnum}` (A0). From then on the stored value is exactly what the user chose, so an empty string is a deliberately empty list, and the app never overwrites it.
+- **No chosen list.** While the key is absent the setting reads as `{ISS}` (`CatnumList.ISS`); nothing is written. The key is written only when the user presses Done in the chooser, and from then on the stored value is exactly what the user chose, so an empty string is a deliberately empty list and the app never overwrites it.
 - **Selected satellite on a new install:** `AppViewModel.initialLoad` falls back to the ISS, then to the first satellite, when no satellite has been selected yet (A8).
 
 ### One rule, used three times
@@ -31,6 +31,6 @@
 Prediction code, `PassStore` and `passes.json`, the selected satellite and its passes, the sky view, the map, alerts, the widget, the setup guide's satellite step (it uses the full list).
 
 ## Risks
-- **An update must not strip the picker.** Without the one-off `{ISS, selectedCatnum}` write (A0) every existing tester would see the ISS alone after updating. The write happens only when the key is absent, so it cannot overwrite a choice, including an empty one.
+- **An update changes the picker for existing testers.** With no saved list they get `{ISS}`, so the picker offers the ISS and the satellite they have selected (A6), not the 99 it offers now. That is David's rule (20 Nov 2026) and A6 keeps their current satellite visible and selected; the chooser, one tap from the picker, restores the rest.
 - A chosen satellite missing from another keps source disappears when the source is switched; the "not in current elements" group in the chooser makes that visible (A5).
 - An emptied list leaves the picker with only the selected satellite and "Choose satellites…"; the messages on the overview and planner explain it and link to the chooser. The passes screen stays usable because the selected satellite is always offered (A6).

@@ -1,7 +1,7 @@
 # Manual test checklist: Choose satellites
 
 - [ ] A new install: the ISS is selected, the picker offers the ISS, and the chooser shows the ISS ticked
-- [ ] An update over a build with a selected satellite and no saved list: the picker offers the ISS and that satellite, nothing else changes
+- [ ] An update over a build with a selected satellite and no saved list: the picker offers the ISS and that satellite, the passes screen still shows that satellite, and nothing else changes
 - [ ] Settings shows "Choose satellites" with the count; the end of the Satellite picker menu has "Choose satellites…"; both open the chooser
 - [ ] The chooser lists every satellite with a checkbox, in the picker's order; the search matches names and catalogue numbers, ignoring case
 - [ ] The count is right; Select all and Clear all work (and only on the satellites the search shows, when one is typed)
