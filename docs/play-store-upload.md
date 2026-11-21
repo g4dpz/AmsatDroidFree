@@ -28,7 +28,17 @@ Every new release needs a higher `versionCode` in `app/build.gradle.kts`. Play r
 
 Bump the name once per **release**, not once per feature. A release can carry several features under one number, and the release notes list them. Version numbers that climb with every small change stop telling users anything.
 
-**versionCode** goes up by at least 1 on **every** upload to Play, including a fix and including a test-track upload. It never goes down and is never reused. Add 1 each time. Releases up to 2.0.8 used codes 20 to 28; from 2.1.0 the code is 2100 (David's choice, 15 Nov 2026), and every later upload is that plus 1 (2101, 2102 and so on), whatever the name. Do not derive the code from the name: several test uploads can share one `versionName`, and they would then need the same code, which Play rejects.
+**versionCode** must be higher on **every** upload to Play, including a fix and including a test-track upload. It never goes down and is never reused. From 2.3.0 (David's choice, 21 Nov 2026) it is the version's digits followed by an upload digit: MAJOR, MINOR, PATCH, then 0 for the first upload of that version and 1 to 9 for re-uploads of the same `versionName`.
+
+| Version | First upload | Re-upload |
+|---|---|---|
+| 2.3.0 | 2300 | 2301 |
+| 2.3.1 | 2310 | 2311 |
+| 2.4.0 | 2400 | |
+| 3.0.0 | 3000 | |
+
+- **More than ten uploads of one version.** The upload digit runs out at 9 (2309), and the next code (2310) belongs to 2.3.1. Before a tenth re-upload, raise PATCH instead (2.3.0 becomes 2.3.1, code 2310) and carry on from there.
+- **A MINOR or PATCH above 9.** The four-digit code cannot hold it. Switch once, for good, to a fixed-width code: MAJOR, then MINOR and PATCH as two digits each, then the upload digit (2.10.0 = 210000, 2.10.1 = 210010, 3.0.0 = 300000). Every later release keeps that width, so codes stay in order and no two versions share one. Do not use a variable width: 2.1.10 and 2.11.0 would collide. Earlier codes: 20 to 28 for 2.0.0 to 2.0.8, then 2100 to 2103 (+1 per upload) for 2.1.0 to 2.2.1.
 
 While testing, several uploads may share one `versionName` (for example 2.0.0) with rising codes. Move the name up when a release goes to production.
 
@@ -127,7 +137,7 @@ For later production updates you can use a staged rollout (for example 20 percen
 
 ## 9. Releasing updates
 
-1. Raise `versionCode` by at least 1 in `app/build.gradle.kts` for every upload, and raise `versionName` when the release changes what users see (see "Version numbering" in section 1: fixes bump PATCH, new functionality bumps MINOR).
+1. Set `versionCode` in `app/build.gradle.kts` for every upload from the version (2.3.0 is 2300, a re-upload of it 2301; see "Version numbering" in section 1), and raise `versionName` when the release changes what users see (see "Version numbering" in section 1: fixes bump PATCH, new functionality bumps MINOR).
 2. Merge through a pull request as usual and wait for CI to pass.
 3. Build the bundle from the merged `master` (section 2).
 4. Create a new release on the track and upload it.
