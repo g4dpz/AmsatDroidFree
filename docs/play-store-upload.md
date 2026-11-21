@@ -37,7 +37,8 @@ Bump the name once per **release**, not once per feature. A release can carry se
 | 2.4.0 | 2400 | |
 | 3.0.0 | 3000 | |
 
-This works while MINOR and PATCH stay at 9 or below. A 2.10 would need a wider code (for example 21000), which is safe because it is higher than anything above. Earlier codes: 20 to 28 for 2.0.0 to 2.0.8, then 2100 to 2103 (+1 per upload) for 2.1.0 to 2.2.1.
+- **More than ten uploads of one version.** The upload digit runs out at 9 (2309), and the next code (2310) belongs to 2.3.1. Before a tenth re-upload, raise PATCH instead (2.3.0 becomes 2.3.1, code 2310) and carry on from there.
+- **A MINOR or PATCH above 9.** The four-digit code cannot hold it. Switch once, for good, to a fixed-width code: MAJOR, then MINOR and PATCH as two digits each, then the upload digit (2.10.0 = 210000, 2.10.1 = 210010, 3.0.0 = 300000). Every later release keeps that width, so codes stay in order and no two versions share one. Do not use a variable width: 2.1.10 and 2.11.0 would collide. Earlier codes: 20 to 28 for 2.0.0 to 2.0.8, then 2100 to 2103 (+1 per upload) for 2.1.0 to 2.2.1.
 
 While testing, several uploads may share one `versionName` (for example 2.0.0) with rising codes. Move the name up when a release goes to production.
 

@@ -6,7 +6,7 @@ The bullet points of the newest entry are also what goes into the Play Console r
 
 ## [2.3.0] - 2026-11-20 (versionCode 2300)
 ### Added
-- Passes: a Minimum elevation picker hides low passes, and Next pass only finds the next one that reaches it within 24 hours. Shared with All satellites.
+- Passes: a Minimum elevation picker hides low passes. With a minimum set, Next pass only looks 24 hours ahead for one that reaches it. Shared with All satellites.
 - Sky view button: opens the sky chart and Doppler frequencies of the selected satellite, even one with no passes, such as QO-100.
 ### Changed
 - AmsatDroid now runs on Android 10.
