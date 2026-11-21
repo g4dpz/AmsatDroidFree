@@ -338,6 +338,21 @@ class ContactPlannerViewModelTest {
         assertEquals(setOf(7530), vm.state.value.windows.map { it.catnum }.toSet())
     }
     @Test
+    fun `a list with none of its satellites in the elements searches nothing and counts them all left out`() {
+        settings.plannerAllSatellites.value = true
+        settings.mySatellites.value = setOf(99998, 99999)
+        val vm = viewModel()
+        vm.onStart()
+        val s = vm.state.value
+        assertEquals(0, checkpoints)
+        assertEquals(2, s.myCount)
+        assertEquals(s.myCount, s.myMissing)
+        assertTrue(s.windows.isEmpty())
+        assertTrue(s.usableNow.isEmpty())
+        assertTrue(s.done)
+        assertFalse(s.searching)
+    }
+    @Test
     fun `a change of the list during a my satellites search never shows old results under the new list`() {
         settings.plannerAllSatellites.value = true
         settings.plannerStationId.value = "par"
