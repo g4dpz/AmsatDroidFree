@@ -363,7 +363,7 @@
         <item quantity="other">%1$d not in the current orbital elements, left out</item>
     </plurals>
     <string name="planner_selected_is">Satellite: %1$s</string>
-    <string name="planner_no_satellite">No satellite is selected. Choose one on the passes screen, or search all satellites.</string>
+    <string name="planner_no_satellite">No satellite is selected. Choose one on the passes screen, or search My satellites.</string>
     <string name="planner_window">Time window</string>
     <string name="planner_searching">Searching…</string>
     <plurals name="planner_progress">
