@@ -20,8 +20,8 @@ Branch per task group, one PR at a time; merge only when CI is green and Copilot
     - _Requirements: 3_
   - [x] 3.2 `ChooseSatellitesBanner` on the passes screen while no list has been chosen, with `mySatellitesChosen` (key absent) in the settings a Not now button (`choosePromptDismissed`), and a test that the banner goes away on the first Done or on Not now and stays away, even for an empty list
     - _Requirements: 3.6, 3.7_
-- [ ] 4. The overview
-  - [ ] 4.1 `OverviewViewModel` uses the chosen satellites; the "Showing your N satellites" line with Change; the "No satellites chosen" and none-present messages; tests
+- [x] 4. The overview
+  - [x] 4.1 `OverviewViewModel` uses the chosen satellites; the "Showing your N satellites" line with Change; the "No satellites chosen" and none-present messages; tests
     - _Requirements: 4_
 - [ ] 5. The Contact planner
   - [ ] 5.1 The all-satellites search uses the chosen satellites, restarts on a change, counts the left-out ones, says "No satellites chosen" for an empty list; the scope button label; tests

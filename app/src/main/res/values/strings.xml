@@ -77,6 +77,13 @@
     <string name="banner_choose_button">Choose satellites</string>
     <string name="banner_choose_not_now">Not now</string>
     <string name="picker_choose_satellites">Choose satellites…</string>
+    <string name="scope_none_chosen">No satellites chosen.</string>
+    <string name="scope_none_present">None of your satellites is in the current orbital elements.</string>
+    <string name="scope_change">Change</string>
+    <plurals name="scope_showing">
+        <item quantity="one">Showing your %1$d satellite</item>
+        <item quantity="other">Showing your %1$d satellites</item>
+    </plurals>
     <string name="choose_title">Choose satellites</string>
     <string name="choose_done">Done</string>
     <string name="choose_search">Search by name or number</string>

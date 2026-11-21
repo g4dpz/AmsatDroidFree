@@ -150,6 +150,7 @@ fun AppNavHost(
                 },
                 onBack = { navController.popBackStack() },
                 onOpenSetup = { navController.navigate(Routes.SETUP) },
+                onChooseSatellites = { navController.navigate(Routes.CHOOSE_SATELLITES) },
             )
         }
         composable(Routes.PLANNER) {

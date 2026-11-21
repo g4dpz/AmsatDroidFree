@@ -39,6 +39,7 @@ class OverviewViewModelTest {
         Dispatchers.setMain(dispatcher)
         settings.homeLat.value = "51.5"
         settings.homeLon.value = "-0.1"
+        settings.mySatellites.value = all.map { it.catnum }.toSet() // everything, as the older tests expect
     }
 
     @After
@@ -60,6 +61,47 @@ class OverviewViewModelTest {
         assertEquals(1, completed.size)
     }
 
+    @Test
+    fun `with no list chosen only the ISS is calculated`() {
+        val fresh = SettingsRepository(MemoryStore()).apply { homeLat.value = "51.5"; homeLon.value = "-0.1" }
+        val vm = OverviewViewModel(tles, fresh, OverviewCalculator(dispatcher), { now }, dispatcher, log = { completed += it })
+        val s = vm.state.value
+        assertEquals(1, s.total)
+        assertEquals(1, s.chosenCount)
+        assertEquals(1, s.foundCount)
+        assertEquals(setOf(25544), s.results.keys)
+    }
+    @Test
+    fun `only the chosen satellites are calculated and a change of the list recalculates`() {
+        settings.mySatellites.value = setOf(7530, 27607, 99999)
+        val vm = viewModel()
+        assertEquals(2, vm.state.value.total)
+        assertEquals(3, vm.state.value.chosenCount)
+        assertEquals(2, vm.state.value.foundCount)
+        assertEquals(1, completed.size)
+        settings.mySatellites.value = setOf(7530)
+        assertEquals(1, vm.state.value.total)
+        assertEquals(2, completed.size)
+    }
+    @Test
+    fun `an empty list calculates nothing`() {
+        settings.mySatellites.value = emptySet()
+        val vm = viewModel()
+        val s = vm.state.value
+        assertEquals(0, s.chosenCount)
+        assertEquals(0, s.foundCount)
+        assertEquals(0, s.total)
+        assertTrue(s.results.isEmpty())
+        assertFalse(s.calculating)
+    }
+    @Test
+    fun `none of the chosen satellites present calculates nothing`() {
+        settings.mySatellites.value = setOf(99998, 99999)
+        val vm = viewModel()
+        assertEquals(2, vm.state.value.chosenCount)
+        assertEquals(0, vm.state.value.foundCount)
+        assertEquals(0, vm.state.value.total)
+    }
     @Test
     fun `changing the window recalculates and is remembered`() {
         val vm = viewModel()
