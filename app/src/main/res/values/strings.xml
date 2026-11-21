@@ -353,9 +353,17 @@
     <string name="planner_distance">Distance between the stations: %1$s km</string>
     <string name="planner_section_search">Search</string>
     <string name="planner_scope_selected">Selected satellite</string>
-    <string name="planner_scope_all">All satellites</string>
+    <string name="planner_scope_all">My satellites</string>
+    <plurals name="planner_searching_mine">
+        <item quantity="one">Searching your %1$d satellite</item>
+        <item quantity="other">Searching your %1$d satellites</item>
+    </plurals>
+    <plurals name="planner_left_out">
+        <item quantity="one">%1$d not in the current orbital elements, left out</item>
+        <item quantity="other">%1$d not in the current orbital elements, left out</item>
+    </plurals>
     <string name="planner_selected_is">Satellite: %1$s</string>
-    <string name="planner_no_satellite">No satellite is selected. Choose one on the passes screen, or search all satellites.</string>
+    <string name="planner_no_satellite">No satellite is selected. Choose one on the passes screen, or search My satellites.</string>
     <string name="planner_window">Time window</string>
     <string name="planner_searching">Searching…</string>
     <plurals name="planner_progress">

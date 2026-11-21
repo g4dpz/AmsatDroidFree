@@ -70,6 +70,7 @@ class ContactPlannerViewModelTest {
         settings.homeLocator.value = "IO82xk"
         settings.plannerStations.value = listOf(kansas, paris)
         settings.plannerStationId.value = "kc"
+        settings.mySatellites.value = setOf(44909, 25544, 7530) // all three, as the older tests expect
     }
 
     @After
@@ -303,6 +304,92 @@ class ContactPlannerViewModelTest {
         assertNull(vm.state.value.progress)
     }
 
+    @Test
+    fun `my satellites searches only the chosen ones and counts those left out`() {
+        settings.plannerAllSatellites.value = true
+        settings.plannerStationId.value = "par"
+        settings.mySatellites.value = setOf(25544, 99999)
+        val vm = viewModel()
+        vm.onStart()
+        val s = vm.state.value
+        assertEquals(setOf(25544), s.windows.map { it.catnum }.toSet())
+        assertEquals(2, s.myCount)
+        assertEquals(1, s.myMissing)
+    }
+    @Test
+    fun `an empty list searches nothing`() {
+        settings.plannerAllSatellites.value = true
+        settings.mySatellites.value = emptySet()
+        val vm = viewModel()
+        vm.onStart()
+        assertEquals(0, checkpoints)
+        assertTrue(vm.state.value.windows.isEmpty())
+        assertEquals(0, vm.state.value.myCount)
+        assertTrue(vm.state.value.done)
+    }
+    @Test
+    fun `a change of the list restarts a my satellites search and drops the old results`() {
+        settings.plannerAllSatellites.value = true
+        settings.plannerStationId.value = "par"
+        val vm = viewModel()
+        vm.onStart()
+        assertTrue(vm.state.value.windows.any { it.catnum == 44909 })
+        settings.mySatellites.value = setOf(7530)
+        assertEquals(setOf(7530), vm.state.value.windows.map { it.catnum }.toSet())
+    }
+    @Test
+    fun `a list with none of its satellites in the elements searches nothing and counts them all left out`() {
+        settings.plannerAllSatellites.value = true
+        settings.mySatellites.value = setOf(99998, 99999)
+        val vm = viewModel()
+        vm.onStart()
+        val s = vm.state.value
+        assertEquals(0, checkpoints)
+        assertEquals(2, s.myCount)
+        assertEquals(s.myCount, s.myMissing)
+        assertTrue(s.windows.isEmpty())
+        assertTrue(s.usableNow.isEmpty())
+        assertTrue(s.done)
+        assertFalse(s.searching)
+    }
+    @Test
+    fun `a change of the list during a my satellites search never shows old results under the new list`() {
+        settings.plannerAllSatellites.value = true
+        settings.plannerStationId.value = "par"
+        var changed = false
+        val leaked = mutableListOf<Set<Int>>()
+        lateinit var vm: ContactPlannerViewModel
+        // Change the list at the first checkpoint, while the search over all three satellites is running; at every later
+        // checkpoint, a state for the new list must hold no window of the old one.
+        onCheckpoint = {
+            if (!changed) {
+                changed = true
+                settings.mySatellites.value = setOf(7530)
+            }
+            val st = vm.state.value
+            if (st.myCount == 1 && st.windows.any { it.catnum != 7530 }) leaked += st.windows.map { it.catnum }.toSet()
+        }
+        vm = viewModel()
+        vm.onStart()
+        assertTrue(changed)
+        assertTrue("old results shown under the new list: $leaked", leaked.isEmpty())
+        val s = vm.state.value
+        assertTrue("windows for AO-7", s.windows.isNotEmpty())
+        assertEquals(setOf(7530), s.windows.map { it.catnum }.toSet())
+        assertTrue(s.done)
+        assertFalse(s.searching)
+    }
+    @Test
+    fun `a change of the list does not touch a selected satellite search`() {
+        val vm = viewModel()
+        vm.onStart()
+        val windows = vm.state.value.windows
+        val before = checkpoints
+        settings.mySatellites.value = setOf(7530)
+        assertEquals(before, checkpoints)
+        assertEquals(windows, vm.state.value.windows)
+        assertEquals(1, vm.state.value.myCount) // the count shown is up to date
+    }
     // ---- warnings ----
 
     @Test

@@ -23,8 +23,8 @@ Branch per task group, one PR at a time; merge only when CI is green and Copilot
 - [x] 4. The overview
   - [x] 4.1 `OverviewViewModel` uses the chosen satellites; the "Showing your N satellites" line with Change; the "No satellites chosen" and none-present messages; tests
     - _Requirements: 4_
-- [ ] 5. The Contact planner
-  - [ ] 5.1 The all-satellites search uses the chosen satellites, restarts on a change, counts the left-out ones, says "No satellites chosen" for an empty list; the scope button label; tests
+- [x] 5. The Contact planner
+  - [x] 5.1 The all-satellites search uses the chosen satellites, restarts on a change, counts the left-out ones, says "No satellites chosen" for an empty list; the scope button label; tests
     - _Requirements: 5_
 - [ ] 6. Quality
   - [ ] 6.1 Layouts on the A6, the SM-T225 and the emulator, portrait and landscape, red night; timing of the chooser with 99 satellites
