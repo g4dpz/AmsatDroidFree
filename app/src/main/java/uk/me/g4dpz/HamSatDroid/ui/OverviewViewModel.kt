@@ -155,7 +155,8 @@ class OverviewViewModel(
         val current = _state.value
         val lat = LocationText.toDegrees(settings.homeLat.value) ?: return emptyList()
         val lon = LocationText.toDegrees(settings.homeLon.value) ?: return emptyList()
-        val byCatnum = tles.value.associateBy { it.catnum }
+        // The same record per catalogue number as the calculation used (the first), so passes and positions agree
+        val byCatnum = SatelliteChoice.forSearch(tles.value, settings.mySatellites.value).tles.associateBy { it.catnum }
         val candidates = OverviewRows.upNowCandidates(current.results.values, now)
         val positions = candidates.associate { r ->
             r.catnum to byCatnum[r.catnum]?.let { tle -> position(tle, lat, lon, now) }
