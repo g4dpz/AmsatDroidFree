@@ -1,0 +1,38 @@
+# Implementation Plan: Choose satellites
+
+Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after each task. The golden regression test must stay green. Every task must leave the app building and runnable, and a user who updates must keep the satellite they have selected at every step.
+Branch per task group, one PR at a time; merge only when CI is green and Copilot has approved (merge commit). Order agreed by David on 20 Nov 2026: this feature first, then the pass card.
+
+- [x] 1. The list
+  - [x] 1.1 `CatnumList` (parse, format, junk and duplicates, `ISS`) with `CatnumListTest`
+    - _Requirements: 1.3, 1.4_
+  - [x] 1.2 `mySatellites` in `SettingsRepository`: an absent key reads as `{ISS}` and nothing is written; a saved value, including an empty one, is read back exactly; junk entries ignored; tests for each case
+    - _Requirements: 1.1, 1.2, 1.3_
+  - [x] 1.3 `SatelliteChoice.offered` and `forSearch` with `SatelliteChoiceTest` (empty, ISS only, some missing, none present, selected outside the list); a new install selects the ISS in `AppViewModel.initialLoad` (A8) with a test
+    - _Requirements: 3.1, 3.5, 4, 5_
+- [x] 2. The chooser
+  - [x] 2.1 `ChooseSatellitesScreen` and `Routes.CHOOSE_SATELLITES`: search, count, Select all, Clear all, chosen first, not-in-current-elements group, Done and Cancel; draft kept with `rememberSaveable`; Done with nothing ticked saves an empty list
+    - _Requirements: 2_
+  - [x] 2.2 The Settings row ("N chosen" or "None chosen")
+    - _Requirements: 2_
+- [x] 3. The picker
+  - [x] 3.1 `DropdownField` footer entry; the passes screen offers `SatelliteChoice.offered`; "Choose satellites…" opens the chooser
+    - _Requirements: 3_
+  - [x] 3.2 `ChooseSatellitesBanner` on the passes screen while no list has been chosen, with `mySatellitesChosen` (key absent) in the settings a Not now button (`choosePromptDismissed`), and a test that the banner goes away on the first Done or on Not now and stays away, even for an empty list
+    - _Requirements: 3.6, 3.7_
+- [x] 4. The overview
+  - [x] 4.1 `OverviewViewModel` uses the chosen satellites; the "Showing your N satellites" line with Change; the "No satellites chosen" and none-present messages; tests
+    - _Requirements: 4_
+- [x] 5. The Contact planner
+  - [x] 5.1 The all-satellites search uses the chosen satellites, restarts on a change, counts the left-out ones, says "No satellites chosen" for an empty list; the scope button label; tests
+    - _Requirements: 5_
+- [ ] 6. Quality
+  - [x] 6.1 Layouts on the A6, the SM-T225 and the emulator, portrait and landscape, red night; timing of the chooser with 99 satellites
+    - _Requirements: 6, 7_
+    - Done 22 Nov 2026 on the Galaxy A6 (360 dp, Android 10) and the TabA11 emulator (the SM-T225's screen; the tablet itself runs the Play build). Banner, picker and chooser in portrait, landscape and red night: nothing clipped; in A6 landscape the pane scrolls to the banner buttons; the search field and list work with the keyboard open. Typing a search with 99 satellites updated the list at once (about 1.4 s for the whole adb round trip, most of it adb). Found and fixed: Not now was hard to read in the light theme (now the banner's text colour).
+  - [x] 6.2 Upgrade check: install over a build with a selected satellite and no list; the picker offers the ISS and that satellite, and nothing else changes
+    - _Requirements: 1.2_
+    - Done 22 Nov 2026 on the emulator: v2.2.1 built from its tag with RS-44 selected (picker offered every satellite), then this build installed over it. RS-44 stayed selected with its passes, the picker offered ISS, RS-44 and "Choose satellites…", the banner showed, and the preferences file was byte for byte the same before and after.
+  - [ ] 6.3 Manual checklist (David; `manual-test-checklist.md`, three items added 22 Nov 2026)
+- [ ] 7. Documentation and release
+  - [ ] 7.1 CHANGELOG, version bump, wiki Help (Settings and Passes sections) and README feature line; reply to Peter

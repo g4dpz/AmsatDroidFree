@@ -28,6 +28,7 @@ import uk.me.g4dpz.HamSatDroid.domain.MutualMoment
 import uk.me.g4dpz.HamSatDroid.domain.MutualWindow
 import uk.me.g4dpz.HamSatDroid.domain.PlannerItem
 import uk.me.g4dpz.HamSatDroid.domain.PlannerStation
+import uk.me.g4dpz.HamSatDroid.domain.SatelliteChoice
 import uk.me.g4dpz.satellite.TLE
 import java.time.Instant
 
@@ -70,6 +71,9 @@ data class PlannerUiState(
     val expanded: Pair<Int, Instant>?,
     /** The rows of the open window's detail; empty until they are worked out. */
     val timeline: List<MutualMoment>,
+    /** How many satellites the user has chosen, and how many of them are not in the current elements (left out). */
+    val myCount: Int = 0,
+    val myMissing: Int = 0,
 )
 
 /**
@@ -107,6 +111,8 @@ class ContactPlannerViewModel(
         val minElevation: Int,
         val hours: Int,
         val all: Boolean,
+        /** The user's chosen satellites when searching them ("My satellites"), else null so a change does not matter. */
+        val mine: Set<Int>?,
     )
 
     private var lastKey: Key = currentKey()
@@ -128,7 +134,7 @@ class ContactPlannerViewModel(
                 tles, selectedCatnum, settings.homeLat.state, settings.homeLon.state, settings.homeLocator.state,
                 settings.plannerStations.state,
                 settings.plannerStationId.state, settings.plannerMinElevation.state, settings.plannerHours.state,
-                settings.plannerAllSatellites.state,
+                settings.plannerAllSatellites.state, settings.mySatellites.state,
             ).collect { onInputsChanged() }
         }
     }
@@ -223,6 +229,7 @@ class ContactPlannerViewModel(
             minElevation = settings.plannerMinElevation.value,
             hours = settings.plannerHours.value,
             all = all,
+            mine = if (all) settings.mySatellites.value else null,
         )
     }
 
@@ -237,6 +244,8 @@ class ContactPlannerViewModel(
                     stations = settings.plannerStations.value,
                     selectedCatnum = selectedCatnum.value ?: 0,
                     selectedName = tles.value.firstOrNull { t -> t.catnum == selectedCatnum.value }?.name,
+                    myCount = settings.mySatellites.value.size,
+                    myMissing = SatelliteChoice.forSearch(tles.value, settings.mySatellites.value).missing,
                 )
             }
             return
@@ -276,6 +285,8 @@ class ContactPlannerViewModel(
             staleElements = null,
             expanded = null,
             timeline = emptyList(),
+            myCount = settings.mySatellites.value.size,
+            myMissing = SatelliteChoice.forSearch(key.tles, settings.mySatellites.value).missing,
         )
     }
 
@@ -329,6 +340,8 @@ class ContactPlannerViewModel(
                         )
                     }
                 }
+            // A search that was stopped or replaced during its last result must not mark the new one as done
+            ensureActive()
             finished = true
             _state.update { it.copy(searching = false, done = true, progress = null) }
             dropEnded()
@@ -339,7 +352,7 @@ class ContactPlannerViewModel(
     }
 
     private fun satellitesFor(key: Key): List<TLE> =
-        if (key.all) key.tles else listOfNotNull(key.tles.firstOrNull { it.catnum == key.satellite })
+        if (key.all) SatelliteChoice.forSearch(key.tles, key.mine.orEmpty()).tles else listOfNotNull(key.tles.firstOrNull { it.catnum == key.satellite })
 
     /** Whether there is anything to search: a location, a station and a satellite. */
     private fun canSearch(key: Key): Boolean =

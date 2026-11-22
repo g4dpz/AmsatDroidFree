@@ -38,6 +38,7 @@ object Routes {
     const val OVERVIEW = "overview"
     const val SETUP = "setup"
     const val PLANNER = "planner"
+    const val CHOOSE_SATELLITES = "choose-satellites"
 
     /** The station editor; the optional id names the station to edit, none adds a new one. */
     const val PLANNER_STATION = "planner/station"
@@ -99,6 +100,9 @@ fun AppNavHost(
             val keepScreenOn by settings.keepScreenOn.state.collectAsStateWithLifecycle()
             val homeLat by settings.homeLat.state.collectAsStateWithLifecycle()
             val homeLon by settings.homeLon.state.collectAsStateWithLifecycle()
+            val mySatellites by settings.mySatellites.state.collectAsStateWithLifecycle()
+            val satellitesChosen by settings.mySatellitesChosen.state.collectAsStateWithLifecycle()
+            val promptDismissed by settings.choosePromptDismissed.state.collectAsStateWithLifecycle()
             HomeScreen(
                 viewModel = viewModel,
                 layout = layout,
@@ -110,6 +114,12 @@ fun AppNavHost(
                 onOpenPlanner = { navController.navigate(Routes.PLANNER) },
                 locationSet = HomeLocation.isSet(homeLat, homeLon),
                 onOpenSetup = { navController.navigate(Routes.SETUP) },
+                choice = SatelliteChoiceUi(
+                    chosen = mySatellites,
+                    showPrompt = !satellitesChosen && !promptDismissed,
+                    onChoose = { navController.navigate(Routes.CHOOSE_SATELLITES) },
+                    onNotNow = { settings.choosePromptDismissed.value = true },
+                ),
             )
         }
         composable(Routes.SKY) {
@@ -140,6 +150,7 @@ fun AppNavHost(
                 },
                 onBack = { navController.popBackStack() },
                 onOpenSetup = { navController.navigate(Routes.SETUP) },
+                onChooseSatellites = { navController.navigate(Routes.CHOOSE_SATELLITES) },
             )
         }
         composable(Routes.PLANNER) {
@@ -151,6 +162,7 @@ fun AppNavHost(
                 onOpenSetup = { navController.navigate(Routes.SETUP) },
                 onAddStation = { navController.navigate(Routes.plannerStation(null)) },
                 onEditStation = { id -> navController.navigate(Routes.plannerStation(id)) },
+                onChooseSatellites = { navController.navigate(Routes.CHOOSE_SATELLITES) },
             )
         }
         composable(
@@ -187,8 +199,12 @@ fun AppNavHost(
                     val app = context.applicationContext as HamSatDroidApp
                     PassAlertScheduler(context, app.passAlertStore, app.settings).rescheduleAll()
                 },
+                onChooseSatellites = { navController.navigate(Routes.CHOOSE_SATELLITES) },
                 onBack = { navController.popBackStack() },
             )
+        }
+        composable(Routes.CHOOSE_SATELLITES) {
+            ChooseSatellitesScreen(viewModel, settings, onLeave = { navController.popBackStack() })
         }
     }
 }

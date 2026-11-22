@@ -85,9 +85,18 @@ class AppViewModelTest {
         assertFalse(s.loading)
         assertEquals(60, s.satellites.size)
         assertTrue(s.keps!!.isBundled)
-        assertEquals(s.satellites.first().catnum, s.selectedCatnum) // nothing stored: first satellite
+        assertEquals(25544, s.selectedCatnum) // nothing stored: the ISS
     }
 
+    @Test
+    fun withNothingStoredAndNoIssTheFirstSatelliteIsSelected() {
+        val noIss = bundledTle.lines().chunked(3).filterNot { it.getOrNull(1)?.startsWith("1 25544") == true }.flatten().joinToString("\n")
+        val vm = AppViewModel(
+            KepsRepository(files(), downloader, { noIss }, { now }, { settings.kepsSource.value }),
+            passStore(), settings, PassCalculator(), { now }, dispatcher, ioDispatcher = dispatcher,
+        )
+        assertEquals(vm.state.value.satellites.first().catnum, vm.state.value.selectedCatnum)
+    }
     @Test
     fun startsFromTheBundledKepsThenDownloadsOnceAndKeepsTheSelection() = runTest {
         // SO-50 is in both the bundled list and the download, but is not first in either, so keeping the selection
@@ -690,6 +699,16 @@ class AppViewModelTest {
         assertEquals("AMATEUR_CELESTRAK", s.keps!!.source)
     }
 
+    @Test
+    fun onStartKeepsTheIssWhenNothingWasSaved() {
+        val vm = viewModel() // nothing saved: the ISS is selected from the bundled elements
+        assertEquals(25544, vm.state.value.selectedCatnum)
+        val worker = FakeDownloader().apply { next = { DownloadResponse(200, celestrakJson) } }
+        KepsRepository(files(), worker, { bundledTle }, { now }).refresh(KepsSource.AMATEUR_CELESTRAK)
+        vm.onStart()
+        assertEquals(8, vm.state.value.satellites.size)
+        assertEquals(25544, vm.state.value.selectedCatnum)
+    }
     @Test
     fun onStartDoesNothingWhenTheElementsHaveNotChanged() {
         val vm = viewModel()

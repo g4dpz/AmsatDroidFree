@@ -73,6 +73,29 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_red_night">Red night</string>
+    <string name="banner_choose_text">Only the ISS is offered. Choose your favourite satellites.</string>
+    <string name="banner_choose_button">Choose satellites</string>
+    <string name="banner_choose_not_now">Not now</string>
+    <string name="picker_choose_satellites">Choose satellites…</string>
+    <string name="scope_none_chosen">No satellites chosen.</string>
+    <string name="scope_none_present">None of your satellites is in the current orbital elements.</string>
+    <string name="scope_change">Change</string>
+    <plurals name="scope_showing">
+        <item quantity="one">Showing your %1$d satellite</item>
+        <item quantity="other">Showing your %1$d satellites</item>
+    </plurals>
+    <string name="choose_title">Choose satellites</string>
+    <string name="choose_done">Done</string>
+    <string name="choose_search">Search by name or number</string>
+    <string name="choose_count">%1$d chosen</string>
+    <string name="choose_select_all">Select all</string>
+    <string name="choose_clear_all">Clear all</string>
+    <string name="choose_none_found">No satellite matches the search.</string>
+    <string name="choose_not_in_elements">Not in the current elements</string>
+    <string name="choose_absent_row">Catalogue number %1$d</string>
+    <string name="settings_choose_satellites">Choose satellites</string>
+    <string name="settings_chosen_count">%1$d chosen</string>
+    <string name="settings_chosen_none">None chosen</string>
     <string name="settings_centre_map">Centre the map on my location</string>
     <string name="settings_keep_screen_on">Keep the screen on while tracking</string>
     <string name="settings_section_background">Background activity</string>
@@ -330,9 +353,17 @@
     <string name="planner_distance">Distance between the stations: %1$s km</string>
     <string name="planner_section_search">Search</string>
     <string name="planner_scope_selected">Selected satellite</string>
-    <string name="planner_scope_all">All satellites</string>
+    <string name="planner_scope_all">My satellites</string>
+    <plurals name="planner_searching_mine">
+        <item quantity="one">Searching your %1$d satellite</item>
+        <item quantity="other">Searching your %1$d satellites</item>
+    </plurals>
+    <plurals name="planner_left_out">
+        <item quantity="one">%1$d not in the current orbital elements, left out</item>
+        <item quantity="other">%1$d not in the current orbital elements, left out</item>
+    </plurals>
     <string name="planner_selected_is">Satellite: %1$s</string>
-    <string name="planner_no_satellite">No satellite is selected. Choose one on the passes screen, or search all satellites.</string>
+    <string name="planner_no_satellite">No satellite is selected. Choose one on the passes screen, or search My satellites.</string>
     <string name="planner_window">Time window</string>
     <string name="planner_searching">Searching…</string>
     <plurals name="planner_progress">
