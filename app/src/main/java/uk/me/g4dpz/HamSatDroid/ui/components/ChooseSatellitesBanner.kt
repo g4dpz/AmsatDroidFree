@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +38,11 @@ fun ChooseSatellitesBanner(onChoose: () -> Unit, onNotNow: () -> Unit, modifier:
             Text(stringResource(R.string.banner_choose_text), style = MaterialTheme.typography.bodyMedium)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = onChoose) { Text(stringResource(R.string.banner_choose_button)) }
-                TextButton(onClick = onNotNow) { Text(stringResource(R.string.banner_choose_not_now)) }
+                // The banner's own text colour: the theme's primary is too dark on this background in the light theme
+                TextButton(
+                    onClick = onNotNow,
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSecondaryContainer),
+                ) { Text(stringResource(R.string.banner_choose_not_now)) }
             }
         }
     }
