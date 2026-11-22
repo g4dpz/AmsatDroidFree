@@ -9,13 +9,13 @@ Flow (closed testing with the Google Group as the tester list):
      no list of addresses.
 
 Fill in before posting:
-  [TEST_LINK]   the closed-test opt-in link from Play Console (Copy link on the track)
+  Closed-test opt-in link (filled in below): https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
 
 Internal-test link (only in the closed-test opt-in email, step 1, where
 existing testers leave the internal test):
   https://play.google.com/apps/internaltest/4701559935413793333
 New testers go to the closed test from 22 Nov 2026, so every other email,
-including the welcome and "Item not found" emails, uses [TEST_LINK].
+including the welcome and "Item not found" emails, uses the closed link.
   [YOUR_EMAIL]  dave@g4dpz.me.uk, or a dedicated address, for people who cannot use the group
 
 Group:     https://groups.google.com/g/amsatdroid
@@ -64,7 +64,7 @@ How to join:
 
   2. Open this link on your device, signed in with that same account, and
      tap "Become a tester":
-     [TEST_LINK]
+     https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
 
   3. Install AmsatDroid from the Play Store as normal.
 
@@ -125,7 +125,7 @@ You'll need an Android 10+ phone or tablet and a Google account. To join:
 1) Join the AmsatDroid group with that Google account:
    https://groups.google.com/g/amsatdroid
 2) Open this link on your device, signed in with the same account, and tap
-   Become a tester: [TEST_LINK]
+   Become a tester: https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
 3) Install it from the Play Store
 
 ⚠️ IMPORTANT: use the Google account that is signed in to the Play Store on your
@@ -146,9 +146,9 @@ Source: https://github.com/g4dpz/AmsatDroidFree
 X (under 280 characters)
 ======================================================================
 
-Testers wanted: AmsatDroid, my Android amateur satellite tracker, is heading to Google Play. Needs Android 10+ and a Google account. Join the group https://groups.google.com/g/amsatdroid then the test link [TEST_LINK]. Free, open source. 73 de G4DPZ #hamradio
+Testers wanted: AmsatDroid, my Android amateur satellite tracker, is heading to Google Play. Needs Android 10+ and a Google account. Join the group https://groups.google.com/g/amsatdroid then the test link https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid. Free, open source. 73 de G4DPZ #hamradio
 
-(Replace [TEST_LINK] with the real link, then check the count. X counts every link as 23 characters.)
+(X counts every link as 23 characters.)
 
 ======================================================================
 EMAIL TO EXISTING TESTERS (send with everyone in Bcc)
@@ -220,7 +220,7 @@ To install:
 
 1. Paste this link into Chrome on your Android device and tap "Become a tester":
 
-[TEST_LINK]
+https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
 
 2. Tap "Download it on Google Play" on that page and install as normal.
 
@@ -263,8 +263,7 @@ EMAIL ASKING TESTERS TO OPT IN TO THE CLOSED TEST (send with everyone in Bcc)
 
 Before sending: the closed track is approved (22 Nov 2026). Make sure it
 serves 2.3.0 (2300) and keeps the existing email list ticked alongside the
-Google Group, so existing testers need not join the group. Copy the opt-in
-link from the closed track into [CLOSED_TEST_LINK], and set the number of
+Google Group, so existing testers need not join the group. Set the number of
 testers in the first line. The internal-test link is already filled in.
 
 Google Play does not let anyone opted in to the internal test join a closed
@@ -296,7 +295,7 @@ before, for both:
 2. Join the closed test. Paste this link into Chrome and tap "Become a
    tester":
 
-   [CLOSED_TEST_LINK]
+   https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
 
 Please do both, in that order. Step 2 on its own won't work.
 
@@ -366,7 +365,7 @@ phone or tablet running Android 10 or later, please help:
 
 2. Copy this link into Chrome, signed in with the same account, and tap
    "Become a tester":
-   [TEST_LINK]
+   https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
 
 3. Install AmsatDroid from the Play Store.
 
