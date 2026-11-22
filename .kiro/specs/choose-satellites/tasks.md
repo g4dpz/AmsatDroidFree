@@ -27,10 +27,12 @@ Branch per task group, one PR at a time; merge only when CI is green and Copilot
   - [x] 5.1 The all-satellites search uses the chosen satellites, restarts on a change, counts the left-out ones, says "No satellites chosen" for an empty list; the scope button label; tests
     - _Requirements: 5_
 - [ ] 6. Quality
-  - [ ] 6.1 Layouts on the A6, the SM-T225 and the emulator, portrait and landscape, red night; timing of the chooser with 99 satellites
+  - [x] 6.1 Layouts on the A6, the SM-T225 and the emulator, portrait and landscape, red night; timing of the chooser with 99 satellites
     - _Requirements: 6, 7_
-  - [ ] 6.2 Upgrade check: install over a build with a selected satellite and no list; the picker offers the ISS and that satellite, and nothing else changes
+    - Done 22 Nov 2026 on the Galaxy A6 (360 dp, Android 10) and the TabA11 emulator (the SM-T225's screen; the tablet itself runs the Play build). Banner, picker and chooser in portrait, landscape and red night: nothing clipped; in A6 landscape the pane scrolls to the banner buttons; the search field and list work with the keyboard open. Typing a search with 99 satellites updated the list at once (about 1.4 s for the whole adb round trip, most of it adb). Found and fixed: Not now was hard to read in the light theme (now the banner's text colour).
+  - [x] 6.2 Upgrade check: install over a build with a selected satellite and no list; the picker offers the ISS and that satellite, and nothing else changes
     - _Requirements: 1.2_
-  - [ ] 6.3 Manual checklist
+    - Done 22 Nov 2026 on the emulator: v2.2.1 built from its tag with RS-44 selected (picker offered every satellite), then this build installed over it. RS-44 stayed selected with its passes, the picker offered ISS, RS-44 and "Choose satellites…", the banner showed, and the preferences file was byte for byte the same before and after.
+  - [ ] 6.3 Manual checklist (David; `manual-test-checklist.md`, three items added 22 Nov 2026)
 - [ ] 7. Documentation and release
   - [ ] 7.1 CHANGELOG, version bump, wiki Help (Settings and Passes sections) and README feature line; reply to Peter
