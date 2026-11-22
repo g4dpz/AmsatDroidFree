@@ -60,13 +60,14 @@ The menu is the three dots at the top right of the main screen.
      or say when they can be downloaded again.
 
 3.2  Open the menu again and, under Update keps, tap
-     "New launches (celestrak.org)". The Satellite box should now show a
-     newly launched satellite.
+     "New launches (celestrak.org)". Menu, About should now name New
+     launches as the keps source.
 
 3.3  Now both sources are stored. In Settings, under Orbital elements (keps),
      change Keps source back to "Amateur (celestrak.org)", then to
-     "New launches (celestrak.org)" again. The satellite shown should change
-     straight away each time, with no download or wait.
+     "New launches (celestrak.org)" again. Each time, menu, About should
+     name the source you chose straight away, with no download or wait. The
+     selected satellite may stay the same if both sources have it.
 
 3.4  Finally, set Keps source back to "Amateur (celestrak.org)". New
      launches only lists satellites launched in the last 30 days, so the
@@ -76,7 +77,8 @@ The menu is the three dots at the top right of the main screen.
 4. Your satellites and passes
 -----------------------------
 
-4.1  Until you choose your satellites, only the ISS is offered. The main
+4.1  Until you choose your satellites, the Satellite list offers the ISS,
+     plus the satellite you have selected if that is another one. The main
      screen should say "Only the ISS is offered. Choose your favourite
      satellites." Press Choose satellites.
 
@@ -94,7 +96,8 @@ The menu is the three dots at the top right of the main screen.
      website). Note any that differ by more than a minute.
 
 4.6  Set Minimum elevation to 20 degrees. Only passes that reach 20 degrees
-     should be listed. Set it back to 0 degrees.
+     should be listed; a pass you have tapped stays, marked "Below the 20°
+     minimum". Set it back to 0 degrees.
 
 4.7  Press Change start time, pick tomorrow, and calculate again. Then press
      Use current time and press Calculate pass once more, so the list shows
@@ -144,9 +147,9 @@ The menu is the three dots at the top right of the main screen.
      satellites you ticked, and "Up now" and the coming passes should fill
      in after a few seconds.
 
-7.3  Menu, Contact planner. Press Add station and enter a friend's locator.
-     Choose My satellites. The Mutual windows list should show when you can
-     both use one of your satellites.
+7.3  Menu, Contact planner. Press Add station, enter a friend's locator
+     and press Save. Back on the planner, choose My satellites. The Mutual
+     windows list should show when you can both use one of your satellites.
 
 7.4  Add the AmsatDroid widget to your home screen. It should show the next
      pass of your selected satellite.
