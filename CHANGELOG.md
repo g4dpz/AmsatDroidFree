@@ -4,6 +4,13 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
+## [2.3.0] - 2026-11-22 (versionCode 2300)
+### Added
+- Choose satellites (Settings, or the end of the Satellite list): the picker, All satellites and the Contact planner then offer only those. Until you choose, only the ISS is offered.
+- Minimum elevation picker on the passes screen; with a minimum set, Next pass only looks 24 hours ahead.
+- Sky view button for the selected satellite, even one with no passes, such as QO-100.
+### Changed
+- Runs on Android 10. The large-font layouts from 2.2.1 are removed.
 ## [2.2.1] - 2026-11-19 (versionCode 2103)
 ### Fixed
 - Long satellite names in the drop-downs wrap onto a second line instead of being cut off.
