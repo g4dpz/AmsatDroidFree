@@ -263,8 +263,7 @@ EMAIL ASKING TESTERS TO OPT IN TO THE CLOSED TEST (send with everyone in Bcc)
 
 Before sending: the closed track is approved (22 Nov 2026). Make sure it
 serves 2.3.0 (2300) and keeps the existing email list ticked alongside the
-Google Group, so existing testers need not join the group. Set the number of
-testers in the first line. The internal-test link is already filled in.
+Google Group, so existing testers need not join the group. The internal-test link is already filled in.
 
 Google Play does not let anyone opted in to the internal test join a closed
 test: they must leave the internal test first. Copying the email list to the
@@ -277,7 +276,7 @@ Subject: AmsatDroid test: one more tap, please
 
 Hi
 
-Thank you for testing AmsatDroid. [22 of you have signed up, which is
+Thank you for testing AmsatDroid. 22 of you have signed up, which is
 more than I hoped for.
 
 To publish the app on Google Play, Google needs at least 12 testers to stay
