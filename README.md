@@ -70,8 +70,9 @@ warning. (The exact coordinates are redacted.)*
 - **Setup guide** on first start: set your home location, then choose a first
   satellite. It can be skipped, and reopened from the menu at any time.
 - **Choose satellites**: pick the satellites you use; the satellite picker, the
-  overview and the contact planner then offer only those. Until a list is
-  chosen, only the ISS is offered.
+  overview and the contact planner's "My satellites" search then use only
+  those. Until a list is chosen the list is just the ISS. The picker always
+  keeps the satellite currently selected.
 - **Pass prediction** for your location, with a selectable time window, start
   time and minimum elevation.
 - **Sky view** of the selected pass, with the live satellite position.
