@@ -69,7 +69,11 @@ warning. (The exact coordinates are redacted.)*
 
 - **Setup guide** on first start: set your home location, then choose a first
   satellite. It can be skipped, and reopened from the menu at any time.
-- **Pass prediction** for your location, with a selectable time window and start time.
+- **Choose satellites**: pick the satellites you use; the satellite picker, the
+  overview and the contact planner then offer only those. Until a list is
+  chosen, only the ISS is offered.
+- **Pass prediction** for your location, with a selectable time window, start
+  time and minimum elevation.
 - **Sky view** of the selected pass, with the live satellite position.
 - **Ground-track map** with footprint, updated each second, optionally centred on your home longitude.
 - **Doppler-corrected frequencies** from the OscarWatch transponder database
@@ -81,8 +85,8 @@ warning. (The exact coordinates are redacted.)*
 - **Compass-oriented sky chart** and an **aiming aid** that tells you which way
   to turn and tilt the device, using the rotation-vector / geomagnetic sensors
   (works without a gyroscope).
-- **All-satellite overview**: what is up now and what is coming across every
-  satellite in the current elements.
+- **All-satellite overview**: what is up now and what is coming across your
+  chosen satellites.
 - **Contact planner**: find when a satellite is above the horizon at both your
   station and another one (saved by name and locator, up to 10), with the best
   moment, the total path and the look angles at both ends through each window.
