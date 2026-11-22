@@ -277,7 +277,7 @@ Subject: AmsatDroid test: one more tap, please
 
 Hi
 
-Thank you for testing AmsatDroid. [NUMBER] of you have signed up, which is
+Thank you for testing AmsatDroid. [22 of you have signed up, which is
 more than I hoped for.
 
 To publish the app on Google Play, Google needs at least 12 testers to stay
