@@ -23,8 +23,8 @@ The menu is the three dots at the top right of the main screen.
 
 1.1  The first time you open the app, a Setup guide asks for your location
      and then a first satellite. Enter your locator (or press Use GPS or Use
-     network location), choose a satellite, and press Done. Passes for that
-     satellite should appear.
+     network location) and press Next. Choose a satellite and press Done.
+     Passes for that satellite should appear.
 
 1.2  Was it clear what to do next? Tell me either way.
 
@@ -149,7 +149,9 @@ The menu is the three dots at the top right of the main screen.
 
 7.3  Menu, Contact planner. Press Add station, enter a friend's locator
      and press Save. Back on the planner, choose My satellites. The Mutual
-     windows list should show when you can both use one of your satellites.
+     windows list should show when you can both use one of your satellites,
+     or say "No window in the next 24 hours" if there is none (likely for a
+     station far away); both are correct.
 
 7.4  Add the AmsatDroid widget to your home screen. It should show the next
      pass of your selected satellite.
