@@ -1,4 +1,4 @@
-Tester invitation drafts: AMSAT-BB, Facebook, X, and an email to existing testers
+Tester invitation drafts: AMSAT-BB, Facebook, X, AMSAT-UK members, and emails to testers
 
 Flow (closed testing with the Google Group as the tester list):
   1. In Play Console, Test and release, Testing, Closed testing: on the Testers tab choose
@@ -11,11 +11,11 @@ Flow (closed testing with the Google Group as the tester list):
 Fill in before posting:
   [TEST_LINK]   the closed-test opt-in link from Play Console (Copy link on the track)
 
-Internal-test link (already filled in below, in the welcome email, the
-"Item not found" email and the closed-test opt-in email):
+Internal-test link (only in the closed-test opt-in email, step 1, where
+existing testers leave the internal test):
   https://play.google.com/apps/internaltest/4701559935413793333
-Once testers have moved to the closed test, replace it in the welcome and
-"Item not found" emails with the closed-test link; keep it in the opt-in email.
+New testers go to the closed test from 22 Nov 2026, so every other email,
+including the welcome and "Item not found" emails, uses [TEST_LINK].
   [YOUR_EMAIL]  dave@g4dpz.me.uk, or a dedicated address, for people who cannot use the group
 
 Group:     https://groups.google.com/g/amsatdroid
@@ -220,7 +220,7 @@ To install:
 
 1. Paste this link into Chrome on your Android device and tap "Become a tester":
 
-https://play.google.com/apps/internaltest/4701559935413793333
+[TEST_LINK]
 
 2. Tap "Download it on Google Play" on that page and install as normal.
 
@@ -261,12 +261,11 @@ Dave, G4DPZ
 EMAIL ASKING TESTERS TO OPT IN TO THE CLOSED TEST (send with everyone in Bcc)
 ======================================================================
 
-Before sending: create the closed track, add the testers (the same email
-list as the internal track), promote 2.0.3 (23) and wait until it has passed
-review. Then copy the opt-in link from the closed track into [CLOSED_TEST_LINK].
-The internal-test link is already filled in.
-If you use the Google Group as the tester list instead, add a step asking
-people to join the group first, with the same account.
+Before sending: the closed track is approved (22 Nov 2026). Make sure it
+serves 2.3.0 (2300) and keeps the existing email list ticked alongside the
+Google Group, so existing testers need not join the group. Copy the opt-in
+link from the closed track into [CLOSED_TEST_LINK], and set the number of
+testers in the first line. The internal-test link is already filled in.
 
 Google Play does not let anyone opted in to the internal test join a closed
 test: they must leave the internal test first. Copying the email list to the
@@ -279,7 +278,7 @@ Subject: AmsatDroid test: one more tap, please
 
 Hi
 
-Thank you for testing AmsatDroid. Nineteen of you have signed up, which is
+Thank you for testing AmsatDroid. [NUMBER] of you have signed up, which is
 more than I hoped for.
 
 To publish the app on Google Play, Google needs at least 12 testers to stay
@@ -319,3 +318,64 @@ Thanks again
 
 73
 Dave, G4DPZ
+
+
+======================================================================
+AMSAT-UK MEMBERS: COVERING NOTE TO THE MEMBERSHIP SECRETARY
+======================================================================
+
+Subject: Request: email to members about testing AmsatDroid
+
+Hello,
+
+Would you be willing to send the message below to the AMSAT-UK membership?
+I'm looking for Android users to test AmsatDroid, my free satellite pass
+predictor, before it goes on general release on Google Play. Google needs at
+least 12 testers for 14 days before it will publish the app.
+
+Members reply to me directly and I never see the mailing list. Thank you.
+
+73
+David Johnson, G4DPZ
+
+
+======================================================================
+AMSAT-UK MEMBERS: THE EMAIL (sent by the membership secretary)
+======================================================================
+
+Send to all members, not only Gmail addresses: what matters is the Google
+account on the member's phone, not the address AMSAT-UK holds.
+
+Subject: Help test AmsatDroid, a free satellite tracker for Android
+
+Dear member,
+
+AmsatDroid is a free, open source amateur satellite pass predictor for
+Android, written by David Johnson, G4DPZ. It shows passes for your location,
+a sky view with the live satellite position and Doppler-corrected
+frequencies, pass alerts, a world map, and a contact planner for working
+another station. You choose the satellites you are interested in. There are
+no adverts and no accounts.
+
+Before Google will publish it, it needs testers. If you have an Android
+phone or tablet running Android 10 or later, please help:
+
+1. Join the AmsatDroid group, using the Google account you use in the Play
+   Store on that phone (often a Gmail address, but it does not have to be):
+   https://groups.google.com/g/amsatdroid
+
+2. Copy this link into Chrome, signed in with the same account, and tap
+   "Become a tester":
+   [TEST_LINK]
+
+3. Install AmsatDroid from the Play Store.
+
+Please stay signed up for at least 14 days; Google counts testers only while
+they remain in the test. If you see "Item not found", a different Google
+account is usually signed in to Chrome or the Play Store.
+
+Questions, ideas and problems are welcome in the group, or email me at
+dave@g4dpz.me.uk.
+
+Thank you, and 73
+David Johnson, G4DPZ

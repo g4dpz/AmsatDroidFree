@@ -1,4 +1,4 @@
-AmsatDroid test script (version 2.0.3)
+AmsatDroid test script (version 2.3.0)
 ======================================
 
 This takes about 20 minutes, plus one real satellite pass for part 5. You don't
@@ -21,11 +21,16 @@ The menu is the three dots at the top right of the main screen.
 1. First start (new installs only)
 ----------------------------------
 
-1.1  Open the app before setting your location. Choose a satellite and press
-     Calculate pass. It should ask you to set your home location, and show no
-     passes.
+1.1  The first time you open the app, a Setup guide asks for your location
+     and then a first satellite. Enter your locator (or press Use GPS or Use
+     network location), choose a satellite, and press Done. Passes for that
+     satellite should appear.
 
 1.2  Was it clear what to do next? Tell me either way.
+
+1.3  Optional, if you install again: press Skip instead. The main screen
+     should say your home location is not set, with a Set up button, and
+     show no passes.
 
 
 2. Home location
@@ -55,12 +60,12 @@ The menu is the three dots at the top right of the main screen.
      or say when they can be downloaded again.
 
 3.2  Open the menu again and, under Update keps, tap
-     "New launches (celestrak.org)". The satellite list should change to the
-     new launches.
+     "New launches (celestrak.org)". The Satellite box should now show a
+     newly launched satellite.
 
 3.3  Now both sources are stored. In Settings, under Orbital elements (keps),
      change Keps source back to "Amateur (celestrak.org)", then to
-     "New launches (celestrak.org)" again. The satellite list should change
+     "New launches (celestrak.org)" again. The satellite shown should change
      straight away each time, with no download or wait.
 
 3.4  Finally, set Keps source back to "Amateur (celestrak.org)". New
@@ -68,20 +73,34 @@ The menu is the three dots at the top right of the main screen.
      rest of this script needs Amateur.
 
 
-4. Passes
----------
+4. Your satellites and passes
+-----------------------------
 
-4.1  Choose a satellite you know, such as ISS or SO-50, set "Calculate passes
+4.1  Until you choose your satellites, only the ISS is offered. The main
+     screen should say "Only the ISS is offered. Choose your favourite
+     satellites." Press Choose satellites.
+
+4.2  Tick a few satellites you know, such as SO-50 and RS-44. Try the search
+     with a name and with a catalogue number (SO-50 is 27607). Press Done.
+     The message on the main screen should go away.
+
+4.3  Open the Satellite list. It should offer the satellites you ticked,
+     plus "Choose satellites..." at the end to change them.
+
+4.4  Choose a satellite you know, such as ISS or SO-50, set "Calculate passes
      for the next" to 24 hours, and press Calculate pass.
 
-4.2  Compare a few pass times with a tracker you trust (another app or a
+4.5  Compare a few pass times with a tracker you trust (another app or a
      website). Note any that differ by more than a minute.
 
-4.3  Press Change start time, pick tomorrow, and calculate again. Then press
+4.6  Set Minimum elevation to 20 degrees. Only passes that reach 20 degrees
+     should be listed. Set it back to 0 degrees.
+
+4.7  Press Change start time, pick tomorrow, and calculate again. Then press
      Use current time and press Calculate pass once more, so the list shows
      passes from now again.
 
-4.4  Rotate the device. The list and your choices should stay.
+4.8  Rotate the device. The list and your choices should stay.
 
 
 5. Sky view, Doppler and Aim (best during a real pass)
@@ -121,13 +140,18 @@ The menu is the three dots at the top right of the main screen.
      tablets held sideways), Map view isn't in the menu; check that map
      instead.
 
-7.2  Menu, All satellites. "Up now" and the coming passes should fill in
-     after a few seconds.
+7.2  Menu, All satellites. It should say "Showing your N satellites" for the
+     satellites you ticked, and "Up now" and the coming passes should fill
+     in after a few seconds.
 
-7.3  Add the AmsatDroid widget to your home screen. It should show the next
+7.3  Menu, Contact planner. Press Add station and enter a friend's locator.
+     Choose My satellites. The Mutual windows list should show when you can
+     both use one of your satellites.
+
+7.4  Add the AmsatDroid widget to your home screen. It should show the next
      pass of your selected satellite.
 
-7.4  In Settings, set Theme to Red night. Everything should be readable in red.
+7.5  In Settings, set Theme to Red night. Everything should be readable in red.
 
 
 8. Anything else
