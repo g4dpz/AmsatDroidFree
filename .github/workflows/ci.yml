@@ -35,6 +35,15 @@ jobs:
           # (which carries separate Gradle Terms of Use).
           cache-provider: basic
 
+      # Robolectric downloads its Android framework jar (android-all) from Maven Central while the tests run, into
+      # ~/.m2, which the Gradle cache above does not cover. Keep it between runs so each run does not fetch it again;
+      # the jars are versioned, so an older cache is safe to restore.
+      - name: Cache Robolectric's Android jars
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository/org/robolectric
+          key: robolectric-${{ runner.os }}-${{ hashFiles('app/build.gradle.kts') }}
+          restore-keys: robolectric-${{ runner.os }}-
       # The wrapper downloads the Gradle distribution from GitHub, which occasionally answers 504 and fails the
       # whole run before any code is built. Fetch it on its own with a few retries; only this download is retried,
       # so a genuine build, test or lint failure still fails straight away.
@@ -50,11 +59,12 @@ jobs:
       # Dependencies such as the Kotlin compiler jar are also fetched from GitHub-hosted downloads, which time out
       # during GitHub incidents and fail the build before any code is compiled. Retry the build, but only when the log
       # shows a network failure; a compile error, test failure or lint finding fails at once, without a retry.
+      # MavenArtifactFetcher is Robolectric's downloader: its failure shows only as an IOException in failed tests.
       - name: Assemble, unit test, lint and cover (retries only on network errors)
         run: |
           set +e  # a failed build must not end the script before the status is checked
           log="$RUNNER_TEMP/gradle-build.log"
-          network_error='Could not (download|GET)|Read timed out|Connect timed out|Connection reset|HTTP response code: 5|status code 5'
+          network_error='Could not (download|GET)|Read timed out|Connect timed out|Connection reset|HTTP response code: 5|status code 5|MavenArtifactFetcher'
           attempts=3
           for attempt in $(seq 1 "$attempts"); do
             ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug \
