@@ -48,9 +48,17 @@ to stay in that test for 14 days before it will publish the app. A few
 more testers would make sure we get there, so if you have an Android
 phone or tablet, I'd be grateful for your help.
 
-Since the first announcement, version 2.3.0 lets you choose the
-satellites you work, adds a minimum elevation filter and a Sky view
-button, and runs on Android 10 or later.
+A lot has been added since that first announcement. Version 2.3.0 now
+has:
+  - A short setup guide on first start: your location, then a satellite
+  - Choose your satellites: the app then offers only the ones you work
+  - A Contact planner: when a satellite is above the horizon at both your
+    station and another one, with the best moment and the look angles at
+    both ends
+  - A minimum elevation filter for passes, and a Sky view button for a
+    satellite with no passes, such as QO-100
+  - An option to centre the world map on your location
+  - Support for Android 10 or later
 
 How to join:
   1. Join the AmsatDroid group, using the Google account you use in the
