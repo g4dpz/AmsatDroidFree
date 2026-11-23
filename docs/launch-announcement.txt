@@ -122,8 +122,11 @@ You have a choice about what happens next:
   in Chrome and tap "Leave the program". You keep the app and get the
   public releases instead. Testers can't leave public reviews, so once
   you've left, a review on the Play listing would help other operators
-  find it. If you'd like me to remove your email address from the test
-  list, just reply and say so.
+  find it.
+
+Would you like me to remove your email address from the test list? I
+only keep it for the test, so if you'd rather I didn't, just reply
+"remove me" and I'll delete it, whether you stay in the test or not.
 
 Please keep the reports coming: in the AmsatDroid group
 (https://groups.google.com/g/amsatdroid), on the GitHub form
