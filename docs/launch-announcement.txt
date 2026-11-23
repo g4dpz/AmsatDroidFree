@@ -1,0 +1,89 @@
+Launch announcement drafts: AMSAT-BB, Facebook, X
+Post these only once AmsatDroid is live on Google Play. Check the listing link opens
+the app from a browser that is NOT signed in as a tester before posting.
+
+Play listing: https://play.google.com/store/apps/details?id=uk.me.g4dpz.amsatdroid
+Group:        https://groups.google.com/g/amsatdroid
+Wiki:         https://github.com/g4dpz/AmsatDroidFree/wiki
+
+======================================================================
+AMSAT-BB (plain text email)
+======================================================================
+
+Subject: AmsatDroid is now on Google Play
+
+Hi all,
+
+When I first wrote about AmsatDroid here, I promised to follow up with
+the Google Play link once it was live. It is now available to everyone:
+
+https://play.google.com/store/apps/details?id=uk.me.g4dpz.amsatdroid
+
+AmsatDroid is a free, open source amateur satellite pass predictor for
+Android 10 or later, on phones and tablets. It has:
+  - Pass predictions for your location, with a minimum elevation filter
+  - A sky chart with the live position, compass-oriented, and an Aim mode
+    that tells you which way to turn and tilt the phone
+  - Doppler-corrected uplink and downlink frequencies for each
+    transponder mode, from Peter Goodhall's (MM9SQL) OscarWatch database
+  - Choose your satellites: the app then offers only the ones you work
+  - A Contact planner: when a satellite is above the horizon at both your
+    station and another one, with the best moment and the look angles at
+    both ends
+  - A ground-track map, an overview of what is up now, pass alerts
+    (spoken if you like), a next-pass widget and a red night mode
+
+There are no ads, no accounts and no tracking, and it collects no data.
+
+Thank you to everyone who tested it over the last few weeks. Your
+reports shaped the setup guide, the satellite chooser and much more.
+If you'd like to try new versions before they reach everyone, join the
+AmsatDroid group:
+https://groups.google.com/g/amsatdroid
+
+The user guide, privacy policy and source code (GPL-3.0) are on the
+project wiki:
+https://github.com/g4dpz/AmsatDroidFree/wiki
+
+Bugs and feature requests:
+https://github.com/g4dpz/AmsatDroidFree/issues/new/choose
+or email me at dave@g4dpz.me.uk (not a reply to the list).
+
+73,
+Dave, G4DPZ
+
+
+======================================================================
+FACEBOOK
+======================================================================
+
+AmsatDroid is now on Google Play!
+
+My free, open source amateur satellite pass predictor for Android is
+available to everyone:
+https://play.google.com/store/apps/details?id=uk.me.g4dpz.amsatdroid
+
+- Passes for your location, with a sky chart, live position and world map
+- Doppler-corrected frequencies for each transponder mode, from Peter
+  Goodhall's (MM9SQL) OscarWatch database
+- Choose the satellites you work
+- A Contact planner for working another station
+- Pass alerts, Aim mode, a next-pass widget and a red night mode
+
+Android 10 or later, phones and tablets. No ads, no accounts, no
+tracking.
+
+Thank you to all the testers who helped get it here. Want to try new
+versions first? Join the AmsatDroid group:
+https://groups.google.com/g/amsatdroid
+
+User guide and source code: https://github.com/g4dpz/AmsatDroidFree/wiki
+
+73 de G4DPZ
+
+
+======================================================================
+X (under 280 characters)
+======================================================================
+
+AmsatDroid is now on Google Play: a free, open source amateur satellite pass predictor for Android. Doppler from the OscarWatch database, Aim mode, a contact planner, pass alerts and a widget. No ads, no tracking. https://play.google.com/store/apps/details?id=uk.me.g4dpz.amsatdroid 73 de G4DPZ #hamradio
