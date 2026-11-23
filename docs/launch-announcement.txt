@@ -87,3 +87,48 @@ X (under 280 characters)
 ======================================================================
 
 AmsatDroid is now on Google Play: a free, open source amateur satellite pass predictor for Android. Doppler from the OscarWatch database, Aim mode, a contact planner, pass alerts and a widget. No ads, no tracking. https://play.google.com/store/apps/details?id=uk.me.g4dpz.amsatdroid 73 de G4DPZ #hamradio
+
+
+======================================================================
+EMAIL TO TESTERS: THANK YOU, WE ARE LIVE (send with everyone in Bcc)
+======================================================================
+
+Send only once the app is live on Google Play.
+
+Subject: AmsatDroid is live on Google Play - thank you
+
+Hi
+
+AmsatDroid is now live on Google Play, open to everyone:
+https://play.google.com/store/apps/details?id=uk.me.g4dpz.amsatdroid
+
+Thank you. You installed a test version, tried it against real passes
+and told me what didn't work or didn't make sense. Your reports led to
+the setup guide, choosing your own satellites, the minimum elevation
+filter, Android 10 support and a long list of fixes. It is a much better
+app than the one you first installed.
+
+You don't need to do anything. The app on your device keeps working and
+keeps getting updates from the Play Store.
+
+You have a choice about what happens next:
+
+- Stay in the test. You'll get each new version a little before
+  everyone else, which helps me catch problems before they reach all
+  users. The next big change is a new layout for the pass list.
+
+- Or leave the test. Open
+  https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
+  in Chrome and tap "Leave the program". You keep the app and get the
+  public releases instead. Testers can't leave public reviews, so once
+  you've left, a review on the Play listing would help other operators
+  find it. If you'd like me to remove your email address from the test
+  list, just reply and say so.
+
+Please keep the reports coming: in the AmsatDroid group
+(https://groups.google.com/g/amsatdroid), on the GitHub form
+(https://github.com/g4dpz/AmsatDroidFree/issues/new/choose), or by
+replying to this email.
+
+Thanks again, and 73
+Dave, G4DPZ
