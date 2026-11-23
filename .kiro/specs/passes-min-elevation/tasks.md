@@ -21,6 +21,7 @@ Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after e
   - [ ] 3.2 Checkpoint: the manual checklist on the SM-T225, the A6 and the emulators, portrait and landscape, and red night mode
     - _Requirements: all_
     - 20 Nov 2026: checked on the SM-T225 (Next pass only and 24 hours, 0 and 30 degrees, shared with the All satellites screen, red night mode) and a 411 dp window. Also checked on the Galaxy A6 (Android 10, 360 dp) later the same day: three stacked pickers, Sky view button, 24 hours at 30 degrees showing only the 57 degree pass, Next pass only at 30 degrees, and the shared value seen on the All satellites screen; no crash in logcat. The same run confirmed the Android 10 location fallback with a real fix (Use network location set the home location in under 4 seconds with 12 m accuracy). Still to do: a hand-run of the manual checklist by David.
-- [ ] 4. Release
-  - [ ] 4.1 CHANGELOG, version bump, wiki Help (Passes section) and README line; reply to the tester
+- [x] 4. Release
+  - [x] 4.1 CHANGELOG, version bump, wiki Help (Passes section) and README line; reply to the tester
+    - Done 22 Nov 2026: shipped in 2.3.0 (#76: CHANGELOG and version bump), wiki Help Passes section, README line in #84. The reply to the tester was folded into David's reply to Peter.
     - _Requirements: 1.1_

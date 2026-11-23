@@ -2,6 +2,8 @@
 
 ## Introduction
 
+> Note (22 Nov 2026): the minimum is now Android 10 (API 29), since PR #65. The Android 11 references below are kept as written at the time.
+
 AmsatDroid Free (HamSatDroid) is now a Kotlin app targeting Android 16 (API 36) with a minimum of Android 11 (API 30). The orbit-prediction library is covered by a golden regression test. This spec modernises the app and adds features that use current Android capabilities and build on the existing pass-prediction code:
 
 1. **Pass alerts**: notify the user before a chosen pass, with a live countdown.

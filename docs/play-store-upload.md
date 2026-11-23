@@ -7,8 +7,8 @@ How to build the Android App Bundle (AAB) and upload it in the Play Console. Pla
 | Item | Value |
 |---|---|
 | Package name | `uk.me.g4dpz.amsatdroid` (fixed for the life of the listing) |
-| versionName | `2.0.0` (shown to users) |
-| versionCode | `20` (must be higher than every earlier upload of this package) |
+| versionName | `2.3.0` at the last upload (shown to users) |
+| versionCode | `2300` at the last upload (must be higher than every earlier upload of this package; see "Version numbering") |
 | minSdk / targetSdk | 29 / 36 |
 | File to upload | `app-release.aab` (an App Bundle, not an APK) |
 
@@ -40,16 +40,16 @@ Bump the name once per **release**, not once per feature. A release can carry se
 - **More than ten uploads of one version.** The upload digit runs out at 9 (2309), and the next code (2310) belongs to 2.3.1. Before a tenth re-upload, raise PATCH instead (2.3.0 becomes 2.3.1, code 2310) and carry on from there.
 - **A MINOR or PATCH above 9.** The four-digit code cannot hold it. Switch once, for good, to a fixed-width code: MAJOR, then MINOR and PATCH as two digits each, then the upload digit (2.10.0 = 210000, 2.10.1 = 210010, 3.0.0 = 300000). Every later release keeps that width, so codes stay in order and no two versions share one. Do not use a variable width: 2.1.10 and 2.11.0 would collide. Earlier codes: 20 to 28 for 2.0.0 to 2.0.8, then 2100 to 2103 (+1 per upload) for 2.1.0 to 2.2.1.
 
-While testing, several uploads may share one `versionName` (for example 2.0.0) with rising codes. Move the name up when a release goes to production.
+While testing, several uploads may share one `versionName` (for example 2.3.0 as 2300, then 2301) with rising codes. Testers get an update at most every two days, so merged work waits on `master` for the next release.
 
-Current plan, as an example:
+Releases so far (the full list is in `CHANGELOG.md`):
 
-| Release | Contents | versionName |
+| Release | Contents | versionCode |
 |---|---|---|
-| Test track now | features as built | 2.0.0 |
-| Fixes from tester reports and the new launcher icon | no new features | 2.0.1 |
-| First-run setup and pass-card layout | new functionality | 2.1.0 |
-| My satellites | new functionality | 2.2.0 |
+| 2.0.0 to 2.0.8 | first test-track builds, fixes, the setup guide | 20 to 28 |
+| 2.2.0 and 2.2.1 | Contact planner, map centred on your location, drop-down fixes | 2102, 2103 |
+| 2.3.0 | choose satellites, minimum elevation, Sky view button, Android 10; first closed-track release | 2300 |
+| next (planned) | pass-card layout | 2400 |
 
 ## 2. Build the signed bundle
 
@@ -62,7 +62,7 @@ git checkout master && git pull
 ./gradlew :app:bundleRelease
 ```
 
-The output is `app/build/outputs/bundle/release/app-release.aab`. Copy it somewhere outside the repo (for example `~/Downloads/AmsatDroid-2.0.0-code20.aab`). Do not commit binaries.
+The output is `app/build/outputs/bundle/release/app-release.aab`. Copy it somewhere outside the repo (for example `~/Downloads/AmsatDroid-2.3.0-code2300.aab`). Do not commit binaries.
 
 Optional checks:
 
