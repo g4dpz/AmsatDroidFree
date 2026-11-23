@@ -21,7 +21,9 @@ To try new versions before they reach everyone, join the
 [AmsatDroid group](https://groups.google.com/g/amsatdroid) with the Google
 account you use in the Play Store, then open the
 [test link](https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid) in
-Chrome, signed in with the same account, and tap **Become a tester**.
+Chrome, signed in with the same account, and tap **Become a tester**. If it
+says **Item not found**, a different Google account is signed in to the browser
+or the Play Store.
 
 The [wiki](https://github.com/g4dpz/AmsatDroidFree/wiki) has the user guide,
 a guided [test script](https://github.com/g4dpz/AmsatDroidFree/wiki/Test-Script)

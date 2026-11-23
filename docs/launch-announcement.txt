@@ -1,6 +1,7 @@
 Launch announcement drafts: AMSAT-BB, Facebook, X
 Post these only once AmsatDroid is live on Google Play. Check the listing link opens
-the app from a browser that is NOT signed in as a tester before posting.
+the app from a private window that is NOT signed in to Google before posting (David
+checked this on 23 Nov 2026). Post the AMSAT-BB text to the AmsatDroid group too.
 
 Play listing: https://play.google.com/store/apps/details?id=uk.me.g4dpz.amsatdroid
 Group:        https://groups.google.com/g/amsatdroid
@@ -38,12 +39,16 @@ There are no ads, no accounts and no tracking, and it collects no data.
 Thank you to everyone who tested it over the last few weeks. Your
 reports shaped the setup guide, the satellite chooser and much more.
 If you'd like to try new versions before they reach everyone, join the
-AmsatDroid group:
+AmsatDroid group with the Google account you use in the Play Store:
 https://groups.google.com/g/amsatdroid
+then copy this link into Chrome, signed in with the same account, and
+tap "Become a tester":
+https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
 
-The user guide, privacy policy and source code (GPL-3.0) are on the
-project wiki:
+The user guide and privacy policy are on the project wiki:
 https://github.com/g4dpz/AmsatDroidFree/wiki
+The source code (GPL-3.0-or-later) is at
+https://github.com/g4dpz/AmsatDroidFree
 
 Bugs and feature requests:
 https://github.com/g4dpz/AmsatDroidFree/issues/new/choose
@@ -74,16 +79,19 @@ Android 10 or later, phones and tablets. No ads, no accounts, no
 tracking.
 
 Thank you to all the testers who helped get it here. Want to try new
-versions first? Join the AmsatDroid group:
+versions first? Join the AmsatDroid group with your Play Store account,
 https://groups.google.com/g/amsatdroid
+then open https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
+in Chrome with the same account and tap "Become a tester".
 
-User guide and source code: https://github.com/g4dpz/AmsatDroidFree/wiki
+User guide: https://github.com/g4dpz/AmsatDroidFree/wiki
+Source code: https://github.com/g4dpz/AmsatDroidFree
 
 73 de G4DPZ
 
 
 ======================================================================
-X (under 280 characters)
+X (259 characters as X counts them, with the link as 23; 304 raw)
 ======================================================================
 
 AmsatDroid is now on Google Play: a free, open source amateur satellite pass predictor for Android. Doppler from the OscarWatch database, Aim mode, a contact planner, pass alerts and a widget. No ads, no tracking. https://play.google.com/store/apps/details?id=uk.me.g4dpz.amsatdroid 73 de G4DPZ #hamradio
@@ -124,8 +132,9 @@ You have a choice about what happens next:
   you've left, a review on the Play listing would help other operators
   find it.
 
-Would you like me to remove your email address from the test list? I
-only keep it for the test. Just reply "remove me" and I'll delete it.
+Would you like me to remove your email address from the tester list in
+Google Play? I keep it only while you're in the test. Just reply
+"remove me" and I'll delete it.
 Removing it also takes you out of the test, but you keep the app and
 get the public releases from the Play Store.
 
