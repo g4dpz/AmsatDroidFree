@@ -23,6 +23,11 @@ for Android 10 or later. To become a tester:
    in Chrome, signed in with the same account, and tap **Become a tester**.
 3. Install AmsatDroid from the Play Store.
 
+Please stay in the test for at least 14 days: Google counts only testers who
+stay opted in that long. If the link says **Item not found**, a different
+Google account is signed in to the browser or the Play Store; paste the link
+into Chrome rather than tapping it in another app.
+
 The [wiki](https://github.com/g4dpz/AmsatDroidFree/wiki) has the user guide,
 a guided [test script](https://github.com/g4dpz/AmsatDroidFree/wiki/Test-Script)
 and the privacy policy. You can also [build it from source](#building).

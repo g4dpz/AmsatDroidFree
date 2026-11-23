@@ -150,6 +150,8 @@ Release notes are typed in the Play Console for each release, not built into the
 2. On the release page in the Play Console, paste the **bullet points only** into the release notes box for English, not the version heading line and not the markdown headings such as `### Fixed`: Play shows plain text, so those symbols would appear literally and the heading would use up characters. The limit is 500 characters per language. Play offers to copy the previous release's notes, so replace them, or the new release will repeat the old text.
 3. The wiki Home page and the tester emails can reuse the same wording.
 
+When the app reaches production, replace the closed-test instructions with the Play listing link: the README "Get the app" section, the wiki Home "Get the app" bullet, and the drafts in `docs/tester-invitation.txt`.
+
 ## 10. Common rejections
 
 | Message | Cause and fix |

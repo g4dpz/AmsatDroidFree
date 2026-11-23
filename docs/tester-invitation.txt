@@ -29,10 +29,12 @@ Wiki:      https://github.com/g4dpz/AmsatDroidFree/wiki
 *** Tell people to copy the link into Chrome, signed in with the tester account.
 *** Gmail is the usual case; a work or custom-domain address only works if it is a Google account.
 
-Group settings to check: member list hidden, posting limited to members, joining open or by
-request. Google counts only testers who have opted in with the link, so remind people to open it.
-
-Privacy: no test link or addresses in public posts. Do not post anyone's address anywhere.
+Group settings (set 22 Nov 2026): anyone can join, only managers see the member list,
+posting by members (held for moderation). Google counts only testers who have opted in
+with the link, so remind people to open it.
+Privacy: the test link may appear in public posts, the README and the wiki, because the
+group membership and a Google account gate it. Never post a tester's address, and keep the
+member list hidden.
 
 ======================================================================
 AMSAT-BB (plain text email)
@@ -42,11 +44,14 @@ Subject: AmsatDroid: more testers wanted for the Google Play closed test
 
 Hi all,
 
-Thanks to everyone who replied to my earlier post about AmsatDroid. It is
-now in a closed test on Google Play, and Google needs at least 12 testers
-to stay in that test for 14 days before it will publish the app. A few
-more testers would make sure we get there, so if you have an Android
-phone or tablet, I'd be grateful for your help.
+Thanks to everyone who replied to my earlier post about AmsatDroid, my
+free, open source amateur satellite pass predictor for Android: passes
+with a sky chart and map, Doppler-corrected frequencies from the
+OscarWatch database, pass alerts, an aiming aid and a next-pass widget.
+It is now in a closed test on Google Play. Google needs at least 12
+testers to stay in that test for 14 days before I can apply for
+production access. A few more testers would make sure we get there, so
+if you have an Android phone or tablet, I'd be grateful for your help.
 
 A lot has been added since that first announcement. Version 2.3.0 now
 has:
@@ -58,7 +63,10 @@ has:
   - A minimum elevation filter for passes, and a Sky view button for a
     satellite with no passes, such as QO-100
   - An option to centre the world map on your location
-  - Support for Android 10 or later
+    - Support for Android 10 (it needed Android 11 before)
+
+To test you need an Android phone or tablet running Android 10 or later,
+and a Google account (Google requires one to join a Play test).
 
 How to join:
   1. Join the AmsatDroid group, using the Google account you use in the
@@ -75,11 +83,20 @@ How to join:
   >>> email or social media app; copy it into Chrome.
 
 Please stay in the test for at least 14 days. A 20-minute guided test
-script is on the wiki, along with the help and privacy policy:
-https://github.com/g4dpz/AmsatDroidFree/wiki
+script is on the wiki:
+https://github.com/g4dpz/AmsatDroidFree/wiki/Test-Script
+The help and privacy policy are on the wiki too. The app has no ads, no
+accounts and no tracking.
 
-Questions and ideas are welcome in the group. If you can't use the group,
-email me directly (not a reply to the list) at dave@g4dpz.me.uk.
+Questions and ideas are welcome in the group. Bugs and feature requests
+go on the GitHub form (needs a free GitHub account):
+https://github.com/g4dpz/AmsatDroidFree/issues/new/choose
+With any report please give your device, Android version and the app
+version (menu, then About). Please don't post your exact home
+coordinates; a four-character locator such as IO91 is enough.
+
+If you can't use the group, email me directly (not a reply to the list)
+at dave@g4dpz.me.uk.
 
 Thanks, and 73,
 Dave, G4DPZ
@@ -87,6 +104,10 @@ Dave, G4DPZ
 ======================================================================
 FACEBOOK
 ======================================================================
+
+(Written as a first announcement, before the closed test. Rewrite it as a
+call for more testers, like the AMSAT-BB section above, before posting.)
+
 
 Testers wanted for AmsatDroid! 🛰️
 
@@ -121,6 +142,10 @@ Source: https://github.com/g4dpz/AmsatDroidFree
 ======================================================================
 X (under 280 characters)
 ======================================================================
+
+(Written before the closed test; say "is in a closed test on Google Play"
+instead of "is heading to Google Play" before posting.)
+
 
 Testers wanted: AmsatDroid, my Android amateur satellite tracker, is heading to Google Play. Needs Android 10+ and a Google account. Join the group https://groups.google.com/g/amsatdroid then the test link https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid. Free, open source. 73 de G4DPZ #hamradio
 
@@ -305,7 +330,7 @@ Hello,
 Would you be willing to send the message below to the AMSAT-UK membership?
 I'm looking for Android users to test AmsatDroid, my free satellite pass
 predictor, before it goes on general release on Google Play. Google needs at
-least 12 testers for 14 days before it will publish the app.
+least 12 testers for 14 days before I can apply to publish it.
 
 Members reply to me directly and I never see the mailing list. Thank you.
 
