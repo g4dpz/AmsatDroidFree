@@ -125,8 +125,9 @@ You have a choice about what happens next:
   find it.
 
 Would you like me to remove your email address from the test list? I
-only keep it for the test, so if you'd rather I didn't, just reply
-"remove me" and I'll delete it, whether you stay in the test or not.
+only keep it for the test. Just reply "remove me" and I'll delete it.
+Removing it also takes you out of the test, but you keep the app and
+get the public releases from the Play Store.
 
 Please keep the reports coming: in the AmsatDroid group
 (https://groups.google.com/g/amsatdroid), on the GitHub form
