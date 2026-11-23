@@ -38,76 +38,40 @@ Privacy: no test link or addresses in public posts. Do not post anyone's address
 AMSAT-BB (plain text email)
 ======================================================================
 
-Subject: Testers wanted: AmsatDroid satellite tracker for Android
+Subject: AmsatDroid: more testers wanted for the Google Play closed test
 
 Hi all,
 
-AmsatDroid is a free, open source satellite pass predictor for Android,
-which I've rebuilt from the ground up. It's in a closed test on Google Play
-before general release, and Google needs at least 12 testers to stay in
-the test for 14 days before it will publish the app. I'd be grateful for
-your help.
+Thanks to everyone who replied to my earlier post about AmsatDroid. It is
+now in a closed test on Google Play, and Google needs at least 12 testers
+to stay in that test for 14 days before it will publish the app. A few
+more testers would make sure we get there, so if you have an Android
+phone or tablet, I'd be grateful for your help.
 
-What it does:
-  - Pass predictions for your location, with a minimum elevation filter
-  - Choose your satellites: the app then offers only the ones you work
-  - Sky chart with the live position, compass-oriented, and an Aim mode
-    that tells you which way to turn and tilt the phone
-  - Doppler-corrected uplink and downlink frequencies for each transponder
-    mode, from Peter Goodhall's (MM9SQL) OscarWatch database
-  - Contact planner: when a satellite is above the horizon at both your
-    station and another one, with the best moment and the look angles at
-    both ends
-  - Ground-track map, an overview of what is up now, pass alerts (spoken
-    if you like), a next-pass widget and a red night mode
-
-To test you need:
-  - An Android phone or tablet running Android 10 or later
-  - A Google account (Google requires one to join a Play test)
+Since the first announcement, version 2.3.0 lets you choose the
+satellites you work, adds a minimum elevation filter and a Sky view
+button, and runs on Android 10 or later.
 
 How to join:
   1. Join the AmsatDroid group, using the Google account you use in the
-     Play Store on that device:
+     Play Store on your device:
      https://groups.google.com/g/amsatdroid
   2. Copy this link into Chrome, signed in with the same account, and tap
      "Become a tester":
      https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
-  3. Install AmsatDroid from the Play Store as normal.
+  3. Install AmsatDroid from the Play Store.
 
-  >>> IMPORTANT: USE THE SAME GOOGLE ACCOUNT IN ALL THREE PLACES: THE
-  >>> GROUP, CHROME AND THE PLAY STORE. If you have more than one account
-  >>> on the device, check the profile picture at the top right of Chrome
-  >>> and of the Play Store. If the link says "Item not found", this is
-  >>> almost always why. Don't tap the link inside an email or social media
-  >>> app; they often open it with a different account.
+  >>> USE THE SAME GOOGLE ACCOUNT IN THE GROUP, CHROME AND THE PLAY
+  >>> STORE. If the link says "Item not found", a different account is
+  >>> almost always signed in somewhere. Don't tap the link inside an
+  >>> email or social media app; copy it into Chrome.
 
-If you can't use the group, email me directly (not a reply to the list) at
-dave@g4dpz.me.uk with the address of your Google account, and I'll add you
-another way.
-
-Please keep it installed and stay in the test for at least 14 days; Google
-counts testers only while they remain in.
-
-What to try: there is a 20-minute guided test script on the wiki,
-https://github.com/g4dpz/AmsatDroidFree/wiki/Test-Script
-I'd most like to hear about pass times against another tracker you trust,
-the Doppler card during a real pass, Aim mode, the Contact planner, and
-how it looks on your device.
-
-How to send feedback:
-  - Questions, ideas and chat: the AmsatDroid group,
-    https://groups.google.com/g/amsatdroid
-  - Bugs and feature requests: the GitHub form (needs a free GitHub
-    account): https://github.com/g4dpz/AmsatDroidFree/issues/new/choose
-  - Or email me at dave@g4dpz.me.uk
-
-With any report please say which device and Android version you have, and
-the app version (menu, then About). Please don't post your exact home
-coordinates; a four-character locator such as IO91 is enough.
-
-The app has no ads, no accounts and no tracking, and collects no data.
-The source (GPL-3.0), help and privacy policy are on the project wiki:
+Please stay in the test for at least 14 days. A 20-minute guided test
+script is on the wiki, along with the help and privacy policy:
 https://github.com/g4dpz/AmsatDroidFree/wiki
+
+Questions and ideas are welcome in the group. If you can't use the group,
+email me directly (not a reply to the list) at dave@g4dpz.me.uk.
 
 Thanks, and 73,
 Dave, G4DPZ
