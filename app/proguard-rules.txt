@@ -1,0 +1,8 @@
+# R8 keep rules for the release build (see `buildTypes.release` in build.gradle.kts).
+#
+# None are needed so far. The libraries the app uses (Compose, WorkManager, Glance, coroutines,
+# kotlinx) ship their own consumer rules. The one reflective call, NotificationManager's
+# canPostPromotedNotifications, is on an Android framework class, which R8 does not touch.
+#
+# If a release build misbehaves where the debug build works, look for code reached only by
+# reflection or by name (for example from the manifest or a JSON field name) and keep it here.

@@ -59,8 +59,12 @@ android {
             isPseudoLocalesEnabled = true
         }
         release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.txt")
+            // R8 shrinks, optimises and obfuscates the release build. Play checks this (DEX code optimisation, at
+            // least 25% in each category) and the bundle then carries a mapping file, so crash traces are readable.
+            // CI and the unit tests do not run R8: check the signed release build on a device after changing this.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.txt")
             // Use the release signing config when keystore.properties is present; otherwise leave the build unsigned.
             if (hasReleaseSigning) {
                 signingConfig = signingConfigs.getByName("release")
