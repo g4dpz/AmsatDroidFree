@@ -2,7 +2,7 @@
 
 ## Introduction
 
-> Note (22 Nov 2026): the minimum is now Android 10 (API 29), since PR #65. The Android 11 references below are kept as written at the time.
+> Note (22 Nov 2026): the minimum is now Android 10 (API 29), since PR #65. This applies to the whole spec, including `design.md` and `manual-test-checklist.md`; the live requirement below is corrected, and other Android 11 / API 30 references are kept as written at the time.
 
 AmsatDroid Free (HamSatDroid) is now a Kotlin app targeting Android 16 (API 36) with a minimum of Android 11 (API 30). The orbit-prediction library is covered by a golden regression test. This spec modernises the app and adds features that use current Android capabilities and build on the existing pass-prediction code:
 
@@ -33,7 +33,7 @@ Primary target: **Samsung Galaxy Tab A7 Lite 8.7", model SM-T225 (LTE)**, the ta
 - MediaTek Helio P35 (mt6765); One UI split-screen and pop-up windows; Samsung battery management can restrict background work.
 - Likely used outdoors for portable operation, possibly with no data connection.
 
-The spec's original stated target was the Galaxy Tab A11 (SM-X130); it was changed to the SM-T225 actually used. The app must work well on this device, and still run on any Android 11+ phone or tablet.
+The spec's original stated target was the Galaxy Tab A11 (SM-X130); it was changed to the SM-T225 actually used. The app must work well on this device, and still run on any Android 10+ phone or tablet (Android 11+ until PR #65).
 
 Secondary target (phone sizes): **Samsung Galaxy A16**, checked on an emulator only (AVD `GalaxyA16_API35`: 1080 x 2340 px at 420 dpi, which is 411 x 891 dp, 4 GB RAM, Android 15). Processor speed is deliberately not simulated; only screen size, density and memory are matched. Phone portrait (411 dp) and phone landscape (891 x 411 dp) must show every screen without clipped labels, truncated names or unreachable content. The phone-specific thresholds are `PassesPaneLayout` in `LayoutThresholds.kt`: pickers stack below 480 dp width, and controls scroll with the pass list in panes shorter than 520 dp.
 

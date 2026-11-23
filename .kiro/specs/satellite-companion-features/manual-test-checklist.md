@@ -56,6 +56,7 @@ These need a device or emulator. Mark an item `[1]` when it passes (or `[x]`), l
 - [x] At LOS the notification disappears
 - [x] Android 16: notification appears as a Live Update (chip, lock screen); disabling promoted notifications in settings falls back to a normal notification
 - [x] Android 11 to 15: same flow with a standard ongoing notification
+- [ ] Android 10 (added 22 Nov 2026, the new minimum): same flow with a standard ongoing notification, on the Galaxy A6
 - [x] Exact alarm opt-in dialog appears once; "No" is remembered; alert still fires (possibly late)
 - [x] Reboot with a future alert set: alert still fires
 - [x] Change time zone or clock: alert still fires at the right absolute time
