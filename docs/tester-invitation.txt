@@ -1,12 +1,18 @@
 Tester invitation drafts: AMSAT-BB, Facebook, X, AMSAT-UK members, and emails to testers
 
+*** AmsatDroid went to production on 23 Nov 2026 (David's developer account predates the
+*** 12-testers rule, so it was never needed). The closed test now carries on as a pre-release
+*** channel. Every draft below that says Google needs 12 testers for 14 days is out of date:
+*** reword it as an invitation to try new versions first before using it. The launch posts and
+*** the thank-you email to testers are in docs/launch-announcement.txt.
+
 Flow (closed testing with the Google Group as the tester list):
   1. In Play Console, Test and release, Testing, Closed testing: on the Testers tab choose
      Google Groups and enter amsatdroid@googlegroups.com. Promote or upload a release.
   2. Copy the closed-test opt-in link from that track.
   3. People join the group, then open the opt-in link signed in with the SAME Google account,
-     and install from the Play Store. Nobody has to send you an email address, and you keep
-     no list of addresses.
+     and install from the Play Store. Nobody joining this way sends you an email address. Testers who joined by email are
+     in the email list on the Play Console Testers tab.
 
 Fill in before posting:
   Closed-test opt-in link (filled in below): https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid
@@ -39,6 +45,8 @@ member list hidden.
 ======================================================================
 AMSAT-BB (plain text email)
 ======================================================================
+
+*** OUT OF DATE since 23 Nov 2026 (the app is in production): see the note at the top.
 
 Subject: AmsatDroid: more testers wanted for the Google Play closed test
 
@@ -105,6 +113,8 @@ Dave, G4DPZ
 FACEBOOK
 ======================================================================
 
+*** OUT OF DATE since 23 Nov 2026 (the app is in production): see the note at the top.
+
 (Written as a first announcement, before the closed test. Rewrite it as a
 call for more testers, like the AMSAT-BB section above, before posting.)
 
@@ -142,6 +152,8 @@ Source: https://github.com/g4dpz/AmsatDroidFree
 ======================================================================
 X (under 280 characters)
 ======================================================================
+
+*** OUT OF DATE since 23 Nov 2026 (the app is in production): see the note at the top.
 
 (Written before the closed test; say "is in a closed test on Google Play"
 instead of "is heading to Google Play" before posting.)
@@ -262,6 +274,8 @@ Dave, G4DPZ
 EMAIL ASKING TESTERS TO OPT IN TO THE CLOSED TEST (send with everyone in Bcc)
 ======================================================================
 
+*** OUT OF DATE since 23 Nov 2026 (the app is in production): see the note at the top.
+
 Before sending: the closed track is approved (22 Nov 2026). Make sure it
 serves 2.3.0 (2300) and keeps the existing email list ticked alongside the
 Google Group, so existing testers need not join the group. The internal-test link is already filled in.
@@ -323,6 +337,8 @@ Dave, G4DPZ
 AMSAT-UK MEMBERS: COVERING NOTE TO THE MEMBERSHIP SECRETARY
 ======================================================================
 
+*** OUT OF DATE since 23 Nov 2026 (the app is in production): see the note at the top.
+
 Subject: Request: email to members about testing AmsatDroid
 
 Hello,
@@ -341,6 +357,8 @@ David Johnson, G4DPZ
 ======================================================================
 AMSAT-UK MEMBERS: THE EMAIL (sent by the membership secretary)
 ======================================================================
+
+*** OUT OF DATE since 23 Nov 2026 (the app is in production): see the note at the top.
 
 Send to all members, not only Gmail addresses: what matters is the Google
 account on the member's phone, not the address AMSAT-UK holds.

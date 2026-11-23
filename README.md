@@ -14,23 +14,20 @@ chart, an aiming aid, an all-satellite overview, and a home-screen widget.
 
 ## Get the app
 
-AmsatDroid is in a **closed test on Google Play** before general release,
-for Android 10 or later. To become a tester:
+**[Get AmsatDroid on Google Play](https://play.google.com/store/apps/details?id=uk.me.g4dpz.amsatdroid)**,
+free, for Android 10 or later.
 
-1. Join the [AmsatDroid group](https://groups.google.com/g/amsatdroid) with
-   the Google account you use in the Play Store.
-2. Open the [test link](https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid)
-   in Chrome, signed in with the same account, and tap **Become a tester**.
-3. Install AmsatDroid from the Play Store.
-
-Please stay in the test for at least 14 days: Google counts only testers who
-stay opted in that long. If the link says **Item not found**, a different
-Google account is signed in to the browser or the Play Store; paste the link
-into Chrome rather than tapping it in another app.
+To try new versions before they reach everyone, join the
+[AmsatDroid group](https://groups.google.com/g/amsatdroid) with the Google
+account you use in the Play Store, then open the
+[test link](https://play.google.com/apps/testing/uk.me.g4dpz.amsatdroid) in
+Chrome, signed in with the same account, and tap **Become a tester**. If it
+says **Item not found**, a different Google account is signed in to the browser
+or the Play Store.
 
 The [wiki](https://github.com/g4dpz/AmsatDroidFree/wiki) has the user guide,
 a guided [test script](https://github.com/g4dpz/AmsatDroidFree/wiki/Test-Script)
-and the privacy policy. You can also [build it from source](#building).
+for testers, and the privacy policy. You can also [build it from source](#building).
 
 ## About
 
