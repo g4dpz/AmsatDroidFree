@@ -35,4 +35,6 @@ Branch per task group, one PR at a time; merge only when CI is green and Copilot
     - Done 22 Nov 2026 on the emulator: v2.2.1 built from its tag with RS-44 selected (picker offered every satellite), then this build installed over it. RS-44 stayed selected with its passes, the picker offered ISS, RS-44 and "Choose satellites…", the banner showed, and the preferences file was byte for byte the same before and after.
   - [ ] 6.3 Manual checklist (David; `manual-test-checklist.md`, three items added 22 Nov 2026)
 - [ ] 7. Documentation and release
-  - [ ] 7.1 CHANGELOG, version bump, wiki Help (Settings and Passes sections) and README feature line; reply to Peter
+  - [x] 7.1 CHANGELOG, version bump, wiki Help (Settings and Passes sections) and README feature line; reply to Peter
+    - Done 22 Nov 2026: CHANGELOG and version bump in #76 (2.3.0, versionCode 2300), README in #84, wiki Help, Home and Test Script pushed when 2.3.0 went to the closed track. The reply to Peter was drafted for David to send (7.2).
+  - [ ] 7.2 David sends the reply to Peter (drafted 22 Nov 2026)

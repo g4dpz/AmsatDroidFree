@@ -99,7 +99,7 @@ Build warnings stay at zero; lint findings introduced by the migration are fixed
 
 Location actions are feature-gated: "Use GPS" is shown only when `PackageManager.FEATURE_LOCATION_GPS` is present , otherwise an explanatory line suggests the locator. If the network provider is disabled or returns no fix, a message says so. The locator field is placed first in the form. A "Background activity" card carries the Samsung/battery note and a button opening `Settings.ACTION_APPLICATION_DETAILS_SETTINGS`.
 
-Location uses `LocationManager.getCurrentLocation(provider, cancellationSignal, executor, consumer)` (API 30), replacing the update-listener and progress dialog. A progress indicator and Cancel button are shown in Compose; cancel triggers the `CancellationSignal`.
+Location uses `LocationManager.getCurrentLocation(provider, cancellationSignal, executor, consumer)` (API 30), replacing the update-listener and progress dialog. A progress indicator and Cancel button are shown in Compose; cancel triggers the `CancellationSignal`. On Android 10 (API 29), where `getCurrentLocation` does not exist, `LocationFetcher` asks for one update with `requestSingleUpdate`, gives up after a timeout, and calls `removeUpdates` when it has an answer or is cancelled (PR #65).
 
 ## Compose architecture (Requirement 8)
 
