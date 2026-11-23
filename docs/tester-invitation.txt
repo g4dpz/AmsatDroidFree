@@ -1,5 +1,11 @@
 Tester invitation drafts: AMSAT-BB, Facebook, X, AMSAT-UK members, and emails to testers
 
+*** AmsatDroid went to production on 23 Nov 2026 (David's developer account predates the
+*** 12-testers rule, so it was never needed). The closed test now carries on as a pre-release
+*** channel. Every draft below that says Google needs 12 testers for 14 days is out of date:
+*** reword it as an invitation to try new versions first before using it. The launch posts and
+*** the thank-you email to testers are in docs/launch-announcement.txt.
+
 Flow (closed testing with the Google Group as the tester list):
   1. In Play Console, Test and release, Testing, Closed testing: on the Testers tab choose
      Google Groups and enter amsatdroid@googlegroups.com. Promote or upload a release.
