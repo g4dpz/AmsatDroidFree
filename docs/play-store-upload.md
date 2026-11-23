@@ -72,6 +72,8 @@ Optional checks:
 
 If `keystore.properties` is missing, the release build is left unsigned and Play will reject it.
 
+The release build is shrunk, optimised and obfuscated by R8 (`isMinifyEnabled` in `app/build.gradle.kts`, keep rules in `app/proguard-rules.txt`). The build should finish with no R8 warnings; "an error occurred when parsing kotlin metadata" means the Kotlin version has moved ahead of the R8 that the Android Gradle Plugin bundles, so update the plugin. R8 writes `app/build/outputs/mapping/release/mapping.txt`, which the next build overwrites: keep a copy beside each uploaded bundle (for example `~/Downloads/AmsatDroid-2.3.1-code2310-mapping.txt`) so a crash trace from that build can still be read.
+
 ## 3. Play App Signing
 
 Play holds the key that signs the APKs users install. Your keystore is only the upload key.
@@ -123,7 +125,7 @@ Steps:
 
 1. Testing or Production, then Create new release.
 2. Upload `app-release.aab` (drag and drop). Wait for processing.
-3. Check the warnings. Missing deobfuscation file is expected: the build has minification off, so there is no mapping file to upload.
+3. Check the warnings. From 2.3.1 the release build uses R8 and the bundle carries its own mapping file, so there should be no "missing deobfuscation file" warning; if it comes back, minification or the mapping file has been lost. A "native code without debug symbols" warning for an AndroidX library is harmless.
 4. Release name defaults to the version; leave it.
 5. Release notes, per language: paste the bullet points of the release's section in `CHANGELOG.md` (see section 9).
 6. Save, Review release, fix any errors, then Start rollout.
@@ -141,7 +143,9 @@ For later production updates you can use a staged rollout (for example 20 percen
 1. Set `versionCode` in `app/build.gradle.kts` for every upload from the version (2.3.0 is 2300, a re-upload of it 2301; see "Version numbering" in section 1), and raise `versionName` when the release changes what users see (see "Version numbering" in section 1: fixes bump PATCH, new functionality bumps MINOR).
 2. Merge through a pull request as usual and wait for CI to pass.
 3. Build the bundle from the merged `master` (section 2).
-4. Create a new release on the track and upload it.
+4. Create a new release on the internal track and upload it.
+5. Check the release build on a device before promoting it. CI and the unit tests do not run R8, so a missing keep rule shows only here. Update the Play copy already on the phone or tablet from the internal track, which is the path every user takes, then check that your settings (theme, pointing axis, chosen satellites) and a pass alert you set before the update are still there, let one pass alert fire, and place the next-pass widget from the launcher.
+6. Promote the release to closed testing, then to production.
 
 ### Release notes
 
