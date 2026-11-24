@@ -4,21 +4,23 @@
 
 Operators report on AMSAT's Live OSCAR Satellite Status board whether they heard a satellite on a pass. AmsatDroid shows when a satellite passes but not whether anyone has heard it lately, so an operator can plan a pass on a satellite that is switched off or silent. OrbitDeck and Ham Satting already show these reports (see `docs/feature-matrix.md`); AmsatDroid does not.
 
-This spec adds the board's recent reports to the app. It follows the approach of Paul Stoetzer's (N8HM) OrbitDeck for iOS (github.com/prstoetzer/OrbitDeckiOS, MIT licence), rewritten for AmsatDroid: a status board screen, "heard" marks beside satellites, and a line for the selected satellite. It is **read-only (stage 1)**. Posting your own reports from the app is stage 2, a separate spec (see "Later" below).
+This spec adds the board's recent reports to the app. It follows the approach of Paul Stoetzer's (N8HM) OrbitDeck for iOS (github.com/prstoetzer/OrbitDeckiOS, MIT licence), rewritten for AmsatDroid: a status board screen, "heard" marks beside satellites, and a line for the selected satellite. It covers both sides, as OrbitDeck does: **reading** the board (stage 1) and **posting your own reports** (stage 2). Stage 1 is built and released first; stage 2 follows it.
 
 The source is AMSAT's public status API, `https://status.amsat.org/api/v1/` (version 1.5 when checked on 24 November 2026; no key):
 
 - `summary.php?hours=N` lists, for the last N hours (1 to 720, default 24), one row per board entry and report kind, with a count and the latest time. The kinds are Heard, Not Heard, Telemetry Only and Crew Active. On 24 November 2026 the 24-hour summary had 32 rows (about 6 KB) covering 23 entries.
 - `catalog.php` lists every entry on the board: 97 on 24 November 2026, one per satellite and mode (such as `ISS_[FM]`, `ISS_[SSTV]` and `ISS_[Crew]`), with a display name (`ISS [SSTV]`) and, for about half of them, the satellite's NORAD number.
 - `reports.php?hours=N&limit=500` lists the individual reports, newest first, each with the reporter's callsign and grid square. The 24-hour page on 24 November 2026 held 170 reports (about 80 KB); the 72-hour window had more than 500, so a second page existed.
-- The API's usage guidelines (`https://status.amsat.org/api/v1/overview.php`) ask clients to send a User-Agent naming the application, its version and a way to reach the developer, to poll no more often than every 5 minutes, and to fetch in one request rather than one per satellite; clients that ignore them may be rate-limited or blocked. Report data is published under CC BY 4.0, credited as "Satellite status data: AMSAT, https://status.amsat.org".
+- `POST reports.php` accepts a report as JSON: `name` (the board name), `report` (Heard, Telemetry Only, Not Heard or Crew Active), `callsign` (required), `grid_square` (optional, 4 or 6 characters) and `observation_time` (when the satellite was heard, ISO 8601 with an explicit offset, not in the future). It answers 201 with the stored report and `correction: true` when the same callsign already reported that entry in the same 15-minute UTC period (the earlier one is kept but no longer counted), or 422 with a code (`unknown_satellite`, `invalid_callsign`, `invalid_grid_square`, `future_observation_time` and others).
+- The API's usage guidelines (`https://status.amsat.org/api/v1/overview.php`) ask clients to send a User-Agent naming the application, its version and a way to reach the developer, to poll no more often than every 5 minutes, and to fetch in one request rather than one per satellite; clients that ignore them may be rate-limited or blocked. Report data is published under CC BY 4.0, credited as "Satellite status data: AMSAT, https://status.amsat.org". For submissions they say: each report must describe a real observation by the operator whose callsign it carries; it must be sent because the operator chose to send it, never in the background; `observation_time` is the time of the observation, in UTC; and data must not be used to track, profile or contact operators, or to locate them more precisely than the grid they chose to share.
+- AMSAT offers no test server. Its source (github.com/AMSAT-NA/satellite-status, Apache-2.0) runs locally with `docker compose up`, which serves the v1 API at http://localhost:8081; that is where the app's posting is tested. A version 2 of the API is in development; v1 stays the stable one.
 
 ## Decisions made
 
 - D1 (S1). **Off by default, with a switch** (David, 24 Nov 2026). A Settings row, "Show AMSAT status reports", off until the user turns it on. Until then the app makes no request to the status API and the status screen offers to turn it on. No build with the feature reaches a Play track before the privacy policy and data safety answers name the new server (Requirement 5.2).
-- D2. **Follow OrbitDeck's functionality, read side first** (David, 24 Nov 2026: "can we copy the functionality?"). Stage 1 is the board screen, the heard marks and the selected-satellite line; reporting is stage 2. David will tell Paul.
+- D2. **Follow OrbitDeck's functionality, read and write** (David, 24 Nov 2026: "can we copy the functionality?", then "lets spec it out with similar read and write functionality"). Stage 1 is the board screen, the heard marks and the selected-satellite line; stage 2 is posting reports. David will tell Paul.
 
-S2 to S8 below must be confirmed or changed by David before task 2 starts.
+S2 to S8 must be confirmed or changed by David before task 2 starts, and W1 to W7 before task 6 starts.
 
 ## Assumptions (please confirm or change)
 
@@ -30,9 +32,20 @@ S2 to S8 below must be confirmed or changed by David before task 2 starts.
 - S7. **Not in the Contact planner, for now.** Ranking the planner's My satellites search by recent reports is a possible later step.
 - S8. **Order.** This is built after the pass-card layout, unless David says otherwise.
 
+Reporting (stage 2):
+
+- W1. **A callsign in Settings.** A new "Your callsign" field, empty by default, stored on the device only, checked as a plausible amateur callsign (letters and digits, with an optional `/` suffix, at most 14 characters, as AMSAT truncates). Reporting is offered only when it is set and the status switch (D1) is on.
+- W2. **Grid square from the home location, 4 characters.** The report carries the first four characters of the home locator (IO82, about 100 by 200 km), not six (IO82xl, about 5 km), to share as little as needed. A Settings choice "Send 6-character grid in reports", off by default, allows six.
+- W3. **Where to report.** A "Report" button on the passes-screen block for the selected satellite and on each matched row of the status screen. Not from notifications or the widget, and never automatically.
+- W4. **What you choose.** The satellite's board entry (its mode, such as ISS FM or ISS SSTV, from the catalogue), the kind (Heard, Telemetry only, Not heard, Crew active; Crew active only for entries whose mode is Crew), and the observation time.
+- W5. **Observation time.** Defaults to the time of the satellite's most recent pass that has ended within the last hour (its time of greatest elevation), else to now; it can be changed, but not to the future or more than 24 hours back. Shown and sent in UTC.
+- W6. **Confirm every time.** Before sending, a confirmation shows exactly what will be published under the callsign: satellite and mode, kind, time (UTC), callsign and grid, and says it is public. No "don't ask again".
+- W7. **No offline queue.** If sending fails, the form stays filled in with the reason and a Try again button; nothing is sent later on its own.
+
 ## Later (not in this spec)
 
-- Stage 2, reporting: post Heard, Telemetry Only, Not Heard or Crew Active from the app, as OrbitDeck does. It needs a callsign setting, a confirmation that the report is public under that callsign, AMSAT's rule that only real observations by that operator are posted, and a privacy policy change (the app would then send the callsign and grid). Until then, the screen's link to status.amsat.org lets operators post there.
+- SatNOGS transmitter status, ranking in the Contact planner (S6, S7), an offline queue for reports (W7), and showing the individual reports for an entry.
+
 
 ## Requirement 1: Getting the reports
 
@@ -45,8 +58,8 @@ S2 to S8 below must be confirmed or changed by David before task 2 starts.
 5. WHEN a request fails or the response cannot be read THEN the app SHALL keep the stored copy and SHALL NOT show an error dialog or block any screen; the status screen SHALL say the reports could not be updated. WHEN the server refuses permanently (a redirect, 403, 404 or 429, as `KepsDownloadPolicy.classify` already decides) THEN the app SHALL NOT ask that address again for 24 hours.
 6. A response that is valid and lists no reports SHALL replace the stored copy (a quiet day is real data); a response that cannot be read SHALL NOT.
 7. The reports SHALL be fetched in one request per window (`limit=500`). WHEN more reports exist than one page holds THEN the app SHALL use the first page only and say the grid count is at least the number shown ("40+ grids").
-8. WHEN the switch is off THEN the app SHALL make no request to the status API and SHALL show no reports, on every screen, at once.
-9. The app SHALL NOT submit reports, and SHALL send nothing to the API except the requests themselves.
+8. WHEN the switch is off THEN the app SHALL make no request to the status API and SHALL show no reports and offer no reporting, on every screen, at once.
+9. The app SHALL send nothing to the API except these requests and the reports the operator submits under Requirement 9.
 
 ## Requirement 2: Matching reports to satellites
 
@@ -85,7 +98,8 @@ S2 to S8 below must be confirmed or changed by David before task 2 starts.
 ## Requirement 5: Attribution and privacy
 
 1. The About dialog, the status screen and the wiki Help SHALL credit the reports as AMSAT asks: "Satellite status data: AMSAT, https://status.amsat.org" (CC BY 4.0).
-2. The privacy policy and the Play data safety answers SHALL name `status.amsat.org` as a server the app contacts and what it sends (the IP address and the user agent, nothing else), and SHALL be published before any build with the feature reaches a Play track.
+2. For stage 1, the privacy policy and the Play data safety answers SHALL name `status.amsat.org` as a server the app contacts and what it sends (the IP address and the user agent, nothing else), and SHALL be published before any build with stage 1 reaches a Play track.
+3. For stage 2, they SHALL also say that when the operator submits a report, the app sends the callsign, the grid square (4 characters unless the operator chose 6), the satellite, the kind and the observation time to AMSAT, which publishes them on its status board; that nothing is sent without the operator pressing Send; and that the callsign is kept on the device. They SHALL be published before any build with stage 2 reaches a Play track. How Play's data safety form classifies a transfer the user starts and expects SHALL be checked against Play's current guidance when the answers are written.
 
 ## Requirement 6: Robustness
 
@@ -97,3 +111,30 @@ S2 to S8 below must be confirmed or changed by David before task 2 starts.
 
 1. The block, the marks and the status screen SHALL be text from the app's string resources, readable by a screen reader, in every theme including red night.
 2. The passes-screen block and the status screen SHALL fit without clipping on a 360 dp phone (the Galaxy A6), wrapping as needed, and the window choice SHALL stay usable at that width.
+
+## Requirement 8: Callsign and grid (stage 2)
+
+**User story:** As an operator, I want my reports to carry my callsign and roughly where I am, and nothing more.
+
+1. Settings SHALL have "Your callsign" (W1): empty by default, upper-cased, letters, digits and at most one `/`, at most 14 characters, checked as the user types with the reason shown, as the locator field does. It SHALL be stored only on the device and SHALL be sent only in a report the operator submits.
+2. The grid square sent SHALL be the first 4 characters of the home locator, or all 6 when "Send 6-character grid in reports" (W2) is on. WHEN the home location is not set THEN reporting SHALL NOT be offered, with a line saying why.
+3. Neither the callsign nor the grid SHALL appear in any log, crash trace or other request.
+
+## Requirement 9: Posting a report (stage 2)
+
+**User story:** As an operator who has just worked or listened to a pass, I want to tell other operators what I heard, in a few taps.
+
+1. WHEN the status switch is on, a callsign is set and the home location is set THEN the passes-screen block and each matched status-screen row SHALL offer "Report" (W3). Otherwise "Report" SHALL be shown disabled with the reason ("Set your callsign in Settings to report").
+2. "Report" SHALL open a form for that satellite with: the board entry, chosen from the satellite's entries in the catalogue (preselected when only one, or the one tapped on the status screen); the kind (W4); and the observation time (W5), in UTC.
+3. WHEN the operator presses Send THEN the app SHALL show a confirmation with everything that will be published (W6) and SHALL send only after the operator confirms. No report SHALL ever be sent without that confirmation, in the background or on a schedule.
+4. The report SHALL be sent as `POST https://status.amsat.org/api/v1/reports.php` with JSON `name` (the entry's board name), `report`, `callsign`, `grid_square` and `observation_time` (UTC with `Z`), using the same safeguards and User-Agent as Requirement 1.4. One tap of Send SHALL make at most one request.
+5. WHEN AMSAT answers 201 THEN the app SHALL say the report was posted; WHEN the answer has `correction: true` THEN it SHALL say it replaced the operator's earlier report for that 15-minute period. The app SHALL then refresh the summary for the next screen view, within the 5-minute rule.
+6. WHEN AMSAT answers 422 THEN the app SHALL show the reason in plain words for the known codes (unknown satellite, callsign not accepted, grid square not accepted, time in the future) and the server's message otherwise, keeping the form filled in. WHEN the request fails for another reason THEN the form SHALL stay filled in with a Try again button (W7).
+7. The app MAY remember the operator's own last report per entry on the device ("You reported Heard at 20:22 UTC") and SHALL NOT keep any other operator's data.
+
+## Requirement 10: Testing the posting (stage 2)
+
+1. Posting SHALL be unit tested with a fake transport: the request body for each kind, the 4- and 6-character grids, UTC times, 201 with and without `correction`, each 422 code, a network failure, and one request per Send.
+2. No test, check or demonstration SHALL post to the production board. End-to-end checks SHALL run against AMSAT's local stack (`docker compose up` from github.com/AMSAT-NA/satellite-status, API at http://localhost:8081), reached from the emulator through a base address that only debug builds can change; release builds SHALL always use `https://status.amsat.org/api/v1/`.
+3. The first real report from a release build SHALL be made by David, from his own callsign, after a real pass.
+

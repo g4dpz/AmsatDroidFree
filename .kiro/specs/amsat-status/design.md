@@ -9,7 +9,7 @@
 - Routes are in `Routes` (`ui/AppNavHost.kt`); the overflow menu is in `HomeScreen` (`ui/PassesScreen.kt`). `AppNavHost` builds `OverviewViewModel(viewModel.tles, settings)` for the overview and `ChooseSatellitesScreen(viewModel, settings, ...)` for the chooser.
 - Times go through `DisplayFormats` (`ui/PassFormatting.kt`), which has `utcTime(instant)`; counts use `pluralStringResource`.
 
-OrbitDeck for iOS does the same job in `AmsatStatusService` and `AmsatHeardStore` (`OrbitDeckIOS/Engine/FeatureEngine.swift`) and `AmsatStatusInteractiveView` (`OrbitDeckIOS/Views/FeatureViews.swift`): a board with a 3 to 72 hour window, heard/total and grid counts, "Heard N h ago" marks in its satellite list from a 24-hour summary refreshed at most every 10 minutes, and name matching with an alias table. This design follows that behaviour in Kotlin, with two differences: an app-named User-Agent as AMSAT asks (OrbitDeck sends a browser one), and no automatic retries beyond the 5-minute rule.
+OrbitDeck for iOS does the same job in `AmsatStatusService` and `AmsatHeardStore` (`OrbitDeckIOS/Engine/FeatureEngine.swift`) and `AmsatStatusInteractiveView` (`OrbitDeckIOS/Views/FeatureViews.swift`): a board with a 3 to 72 hour window, heard/total and grid counts, "Heard N h ago" marks in its satellite list from a 24-hour summary refreshed at most every 10 minutes, and name matching with an alias table. OrbitDeck also posts reports (`AmsatStatusService.submitReport`, with a Report Status tab and a quick report on its Home screen, each with a confirmation that the post is public). This design follows that behaviour in Kotlin, with two differences: an app-named User-Agent as AMSAT asks (OrbitDeck sends a browser one), and no automatic retries beyond the 5-minute rule.
 
 ## The change
 
@@ -63,6 +63,38 @@ A 72-hour reports page measured 237 KB on 24 November 2026, within the 1 MB limi
 - **All satellites and chooser:** "Heard 3 h ago" on rows whose satellite has a Heard report in the last 24 hours.
 - **About:** "Satellite status data: AMSAT, https://status.amsat.org" beside the OscarWatch credit.
 
+## Stage 2: posting reports
+
+### Model (pure, `domain`)
+
+    data class ReportDraft(val entry: BoardEntry, val kind: ReportKind, val observedAt: Instant)
+    data class ReportSubmission(val boardName: String, val report: String, val callsign: String, val grid: String, val observationTime: String)
+    sealed interface PostResult { data class Posted(val correction: Boolean); data class Rejected(val code: String, val message: String); data class Failed(val reason: String) }
+
+- `CallsignCheck.problem(text): CallsignProblem?` (W1, Requirement 8.1): letters and digits, at most one `/`, 3 to 14 characters, at least one digit; returns the reason for the first fault, like `LocatorProblem`.
+- `ReportSubmission.from(draft, callsign, homeLocator, sixCharacterGrid)` builds what is sent: `report` is `Heard`, `Telemetry Only`, `Not Heard` or `Crew Active`; `grid` is the first 4 (or 6) characters of the home locator in AMSAT's form (`IO82`, `IO82xl`); `observationTime` is UTC with `Z`, whole seconds. Pure and tested.
+- `ReportTime.default(passes, now)` (W5): the time of greatest elevation of the latest pass whose LOS is within the last hour, else `now`. `ReportTime.allowed(t, now)`: not after `now`, not more than 24 hours before.
+- `ReportKinds.offered(entry)` (W4): the four kinds, with Crew active only when the entry's mode is `Crew`.
+- `AmsatPostParsing.result(status, body): PostResult`: 201 with `data.correction`; 422 with `error.code` and `error.message`; anything else `Failed`.
+
+### Sending (`data`)
+
+- `KepsDownloader` is GET-only. A sibling `HttpsJsonPoster` (`fun post(url, json): DownloadResponse`) gets the same safeguards as `HttpsKepsDownloader` (https only except the debug address below, no redirects, size limit, timeouts, the User-Agent) and sends `Content-Type: application/json`. It never retries.
+- `AmsatStatusRepository.submit(submission): PostResult` posts to `reports.php`, outside the refresh lock (posting is a user action, not polling), and on `Posted` marks the 24-hour summary as due so the next screen view refreshes it within the 5-minute rule. It records the operator's own last report per board name in `amsat_status_own.json` (Requirement 9.7). The callsign and grid are never logged (Requirement 8.3).
+- Base address: `BuildConfig.AMSAT_STATUS_BASE_URL`, `https://status.amsat.org/api/v1/` in release. Debug builds read an override from a debug-only setting (Settings, a "Developer" section present only in debug builds) so the emulator can reach AMSAT's local stack at `http://10.0.2.2:8081/api/v1/`; a debug-only `src/debug/res/xml/network_security_config.xml` allows cleartext to `10.0.2.2` alone. Release builds have neither (Requirement 10.2).
+
+### Settings
+
+- `SettingsRepository.reportCallsign` (`Setting<String>`, key `reportCallsign`, empty) and `reportSixCharacterGrid` (`Setting<Boolean>`, key `reportSixCharacterGrid`, false). A Settings section "AMSAT status reports" holds the existing switch, the callsign field (a `CommitField` checked with `CallsignCheck`, as the locator field is) and the 6-character choice, with one line explaining that the callsign is sent only with a report you submit.
+
+### Screens
+
+- **Report button:** on the passes-screen block and on each matched status-screen row. Enabled when the switch is on, a valid callsign is set and the home location is set; otherwise disabled with the reason (Requirement 9.1).
+- **Report form** (`ui/AmsatReportScreen.kt`, `Routes.AMSAT_REPORT` with the satellite's catalogue number and an optional board name): a full screen, like the station editor, so it works on a 360 dp phone. Entry picker (the satellite's catalogue entries), kind as radio buttons, observation time (UTC) with Change, using the passes screen's date and time pickers limited by `ReportTime.allowed`, the callsign and grid that will be sent (read-only, with a link to Settings), and Send.
+- **Confirmation:** an `AlertDialog`, "Post a public report to AMSAT?", listing satellite and mode, kind, time UTC, callsign and grid, with "This appears on status.amsat.org under your callsign." Buttons Post and Cancel (W6).
+- **Result:** posted (with the correction wording when `correction` is true) returns to the previous screen with a snackbar; a rejection or failure stays on the form with the reason and Try again.
+- **Own last report:** shown under the passes-screen block and on the status-screen row ("You reported Heard at 20:22 UTC").
+
 ## What does not change
 
 Prediction, keps, the transponder database, alerts, the widget, the sky screen, the map, the Contact planner and its search, `PassStore`.
@@ -74,4 +106,6 @@ Prediction, keps, the transponder database, alerts, the widget, the sky screen, 
 - **Wrong matches.** A NORAD number is never overridden, and an ambiguous alias, designation or name matches nothing; tests cover a two-candidate name.
 - **Reading too much into the numbers.** The words describe reports, not satellite health (S5); a satellite AMSAT does not track shows nothing rather than "no reports".
 - **Other people's data.** Reports carry callsigns and grids; the app only counts grids in memory (Requirement 4.7), and the committed test fixture has callsigns replaced.
-- **Privacy.** A new server is contacted; the release is gated on the privacy policy and data safety answers (Requirement 5.2).
+- **Privacy.** A new server is contacted; stage 1 is gated on the privacy policy and data safety answers (Requirement 5.2), and stage 2 again, since it sends the operator's callsign and grid (Requirement 5.3).
+- **A report sent by mistake.** Only a confirmed tap sends one, and AMSAT treats a second report from the same callsign in the same 15-minute period as a correction of the first, so a wrong report can be fixed by posting the right one straight away.
+- **Testing against the live board.** Never done: tests use a fake transport, and end-to-end checks use AMSAT's local stack (Requirement 10).

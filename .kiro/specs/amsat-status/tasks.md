@@ -1,10 +1,12 @@
-# Implementation Plan: AMSAT satellite status reports (stage 1, read-only)
+# Implementation Plan: AMSAT satellite status reports
 
 Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after each task, and `:app:assembleRelease` for the tasks that add classes (R8 is on in release builds). Every task must leave the app building and runnable.
 
-Branch per task group, one PR at a time; review with the two-model semantic review while Copilot is unavailable; merge on green CI and David's "merge N". Order: after the pass-card layout (S8), unless David says otherwise. S1 is decided (D1: off by default) and D2 sets the scope; S2 to S8 are confirmed before task 2 starts.
+Branch per task group, one PR at a time; review with the two-model semantic review while Copilot is unavailable; merge on green CI and David's "merge N". Order: after the pass-card layout (S8), unless David says otherwise. S1 is decided (D1: off by default) and D2 sets the scope (read and write); S2 to S8 are confirmed before task 2 starts, and W1 to W7 before task 6 starts.
 
-No build with the feature goes to a Play track before task 5.1 (privacy policy and data safety) is published.
+Stage 1 (tasks 1 to 5) is released before stage 2 (tasks 6 to 8) is started.
+
+No build with stage 1 goes to a Play track before task 5.1 is published, and none with stage 2 before task 8.1.
 
 - [ ] 1. Parsing and matching
   - [ ] 1.1 Capture the summary, the catalogue, a reports page (callsigns replaced) and the 99-satellite Amateur elements into `app/src/test/resources/`; `AmsatStatusParsing` with `ParseResult` (four report kinds, mode from the display name, no-mode entries, grid counts with "more", `Ok(empty)` against `Unreadable`) and tests
@@ -36,3 +38,27 @@ No build with the feature goes to a Play track before task 5.1 (privacy policy a
   - [ ] 5.3 Manual checklist, including TalkBack on the A6 by David
   - [ ] 5.4 Wiki Help, README feature line, CHANGELOG, version bump
     - _Requirements: 5.1_
+
+## Stage 2: posting reports
+
+- [ ] 6. Building a report
+  - [ ] 6.1 `CallsignCheck`, `ReportSubmission.from` (kinds, 4- and 6-character grids, UTC with `Z`), `ReportTime` (default from the last ended pass, allowed range), `ReportKinds.offered` (Crew active only for Crew entries) and `AmsatPostParsing` (201 with and without `correction`, each 422 code, other answers), with tests
+    - _Requirements: 8.1, 8.2, 9.2, 9.4 to 9.6_
+  - [ ] 6.2 `HttpsJsonPoster`, `AmsatStatusRepository.submit` (one request per call, summary marked due after a post, own last report stored, nothing logged), the debug-only base address and network security config; tests with a fake poster
+    - _Requirements: 8.3, 9.4, 9.5, 9.7, 10.1, 10.2_
+- [ ] 7. Screens
+  - [ ] 7.1 Settings: "AMSAT status reports" section with the callsign field and the 6-character choice
+    - _Requirements: 8.1, 8.2_
+  - [ ] 7.2 The Report button (enabled or disabled with the reason) on the passes-screen block and the status-screen rows; `AmsatReportScreen`, `Routes.AMSAT_REPORT`, the confirmation dialog, the result messages, the own last report line
+    - _Requirements: 9.1 to 9.7_
+- [ ] 8. Privacy, quality and release
+  - [ ] 8.1 Privacy policy (wiki) and Play data safety answers for stage 2 (callsign, grid, report sent to AMSAT on the user's action); published before any Play upload with stage 2
+    - _Requirements: 5.3_
+  - [ ] 8.2 End-to-end against AMSAT's local stack (`docker compose up` from github.com/AMSAT-NA/satellite-status) from the emulator with the debug base address: each kind, a correction within 15 minutes, each 422 case, the network off. Never against status.amsat.org
+    - _Requirements: 10.2_
+  - [ ] 8.3 Layouts of the form and confirmation on the A6 and the emulator, portrait, landscape and red night; the release build (R8) on a device, up to the confirmation and Cancel
+    - _Requirements: 7_
+  - [ ] 8.4 Manual checklist (stage 2), and David's first real report from his callsign after a real pass
+    - _Requirements: 10.3_
+  - [ ] 8.5 Wiki Help (reporting), README, CHANGELOG, version bump
+
