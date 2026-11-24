@@ -5,7 +5,7 @@
 ## Switch
 - [ ] On a fresh install the switch is off and no request is made (network log); the status screen explains the feature and offers "Turn on"
 - [ ] Turning it on from the status screen or Settings fetches and shows reports straight away
-- [ ] Turning it off removes the block, the marks and the board at once and stops requests
+- [ ] Turning it off removes the block, the marks and the board at once, stops requests, and deletes the stored reports (the app's files) while keeping the callsign
 
 ## Status screen
 - [ ] The rows match status.amsat.org for the same window at the same time: names, heard of total, last heard
@@ -44,7 +44,7 @@
 Run against AMSAT's local stack with the debug base address, never against status.amsat.org, except the last item.
 
 ## Settings
-- [ ] "Your callsign" is empty by default; a bad callsign (for example "G4" or "AB/CD/EF") is flagged as you type with the reason; a good one is upper-cased and saved
+- [ ] "Your callsign" is empty by default; a callsign AMSAT would reject (for example "G4", "123" or "ABC") is flagged as you type with the reason; G4DPZ, G4DPZ/P and M0ABC/MM are accepted and upper-cased
 - [ ] "Send 6-character grid in reports" is off by default
 
 ## Report button
@@ -61,6 +61,8 @@ Run against AMSAT's local stack with the debug base address, never against statu
 - [ ] Post sends one report; the local board shows it with the right fields and time
 - [ ] A second report for the same entry within the same 15 minutes says it replaced the earlier one
 - [ ] With the network off, the form stays filled in with the reason and Try again
+- [ ] Turning the switch off while the form is open: Send does nothing and the form says why
+- [ ] Changing the callsign clears "You reported ..."
 - [ ] A rejected report (for example an entry the local stack does not know) shows a plain reason and keeps the form
 - [ ] After posting, the status screen and the block show the new report at the next refresh, and "You reported Heard at 20:22 UTC" appears
 
