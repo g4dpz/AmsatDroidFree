@@ -343,7 +343,9 @@ private fun PassesPane(
     onOpenSky: (() -> Unit)? = null,
 ) {
     BoxWithConstraints(modifier) {
-        val minElevation by viewModel.minElevation.collectAsStateWithLifecycle()
+                val minElevation by viewModel.minElevation.collectAsStateWithLifecycle()
+        // The cards change colour and count down to AOS, so the list is redrawn once a second while it is on screen
+        val tick by uk.me.g4dpz.HamSatDroid.ui.components.rememberTicker(1_000L)
         val stackPickers = PassesPaneLayout.stackPickers(maxWidth.value)
         // The banner adds height the layout rule does not count, so scroll the whole pane while it shows: nothing is clipped
         val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value) || choice.showPrompt
@@ -365,17 +367,35 @@ private fun PassesPane(
                     )
                 }
             }
-            items(visible, key = { it.id }) { pass ->
-                PassCard(
-                    pass, formats,
+                        // A heading above the first pass of each day, then the cards (Peter's OscarWatch layout)
+            var lastDay: java.time.LocalDate? = null
+            for (pass in visible) {
+                val day = formats.localDate(pass.start)
+                if (day != lastDay) {
+                    lastDay = day
+                    // The key names the satellite too: a heading shared between two satellites' lists would keep the list scrolled to it
+                    item(key = "day-${pass.catnum}-$day") {
+                        Text(
+                            formats.dayHeading(pass.start),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                    }
+                }
+                item(key = pass.id) {
+                PassCardView(
+                    pass, formats, now = java.time.Instant.ofEpochMilli(tick),
                     selected = highlightSelection && pass.id == state.selectedPassId,
                     belowMinimum = minElevation.takeIf { PassFilter.isBelowMinimum(pass, it) },
                     hasAlert = alerts.hasAlert(pass),
-                    onClick = { onPassClick(pass) },
+                                        onClick = { onPassClick(pass) },
                     onLongClick = { onPassLongClick(pass) },
                 )
+                }
             }
         }
+
 
         if (scrollWholePane) {
             LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -524,47 +544,6 @@ private fun PassesControls(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun PassCard(
-    pass: PassSummary,
-    formats: DisplayFormats,
-    selected: Boolean,
-    hasAlert: Boolean,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
-    /** The minimum elevation this pass is below, when it is listed only because it is selected; else null. */
-    belowMinimum: Int? = null,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = onLongClick),
-        colors = if (selected) {
-            CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-        } else {
-            CardDefaults.cardColors()
-        },
-    ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                for (line in pass.lines(formats)) Text(line, style = MaterialTheme.typography.bodyMedium)
-                if (belowMinimum != null) {
-                    Text(
-                        stringResource(R.string.pass_below_minimum, belowMinimum),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            if (hasAlert) {
-                Icon(
-                    Icons.Filled.Notifications,
-                    contentDescription = stringResource(R.string.alert_bell),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            }
-        }
-    }
-}
 
 /** Two steps: pick the date, then the time. The result is in the device's time zone. */
 @OptIn(ExperimentalMaterial3Api::class)

@@ -225,7 +225,10 @@
     <string name="header_error">Could not calculate passes: %1$s</string>
 
     <!-- A pass in the list -->
-    <string name="pass_date">Date: %1$s</string>
+        <string name="pass_date">Date: %1$s</string>
+    <string name="pass_card_times">%1$s to %2$s</string>
+    <string name="pass_card_passing">Passing</string>
+    <string name="pass_card_aos_in">AOS in %1$s</string>
     <string name="pass_start_time">Start time: %1$s</string>
     <string name="pass_duration">Duration: %1$s min</string>
     <string name="pass_aos_azimuth">AOS azimuth: %1$d°</string>

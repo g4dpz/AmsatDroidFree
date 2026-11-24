@@ -20,7 +20,8 @@ import java.util.Locale
  * Date, time and number formats for display, in the user's language and time zone. Stored values never use these.
  */
 class DisplayFormats(val locale: Locale, val zone: ZoneId = ZoneId.systemDefault()) {
-    private val date = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale).withZone(zone)
+        private val date = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale).withZone(zone)
+    private val dayHeading = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(locale).withZone(zone)
     private val time = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale).withZone(zone)
     private val timeSeconds = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(locale).withZone(zone)
     private val utcTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale).withZone(java.time.ZoneOffset.UTC)
@@ -45,7 +46,13 @@ class DisplayFormats(val locale: Locale, val zone: ZoneId = ZoneId.systemDefault
     /** A number with up to two decimals, such as a latitude. */
     fun twoDecimals(value: Double): String = twoDecimals.format(value)
 
-    fun date(instant: Instant): String = date.format(instant)
+        fun date(instant: Instant): String = date.format(instant)
+
+    /** A day heading such as "Friday, 20 November 2026". */
+    fun dayHeading(instant: Instant): String = dayHeading.format(instant)
+
+    /** The calendar day of [instant] in the user's time zone, for grouping passes under day headings. */
+    fun localDate(instant: Instant): java.time.LocalDate = instant.atZone(zone).toLocalDate()
 
     /** The time of day in UTC, for times two stations in different time zones both need (the contact planner). */
     fun utcTime(instant: Instant): String = utcTime.format(instant)
