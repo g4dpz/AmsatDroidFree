@@ -2,7 +2,7 @@
 
 Run `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` after each task, and `:app:assembleRelease` for the tasks that add classes (R8 is on in release builds). Every task must leave the app building and runnable.
 
-Branch per task group, one PR at a time; review with the two-model semantic review while Copilot is unavailable; merge on green CI and David's "merge N". Order: after the pass-card layout (S8), unless David says otherwise. Assumptions S1 to S8 are confirmed before task 2 starts.
+Branch per task group, one PR at a time; review with the two-model semantic review while Copilot is unavailable; merge on green CI and David's "merge N". Order: after the pass-card layout (S8), unless David says otherwise. S1 is decided (D1: off by default); S2 to S8 are confirmed before task 2 starts.
 
 No build with the feature goes to a Play track before task 4.1 (privacy policy and data safety) is published.
 
@@ -14,7 +14,7 @@ No build with the feature goes to a Play track before task 4.1 (privacy policy a
 - [ ] 2. Fetching
   - [ ] 2.1 `AmsatStatusRepository` and its factory: single-flight lock, per-endpoint 5-minute rule counting every attempt, 15-minute summary, daily catalogue, 24-hour stop after a permanent refusal, `Ok(empty)` stored and `Unreadable` not, the User-Agent with the project URL; tests with a fake downloader and clock, including two concurrent calls making one request
     - _Requirements: 1.2 to 1.6, 1.8_
-  - [ ] 2.2 `showAmsatStatus` setting and its Settings row; `HamSatDroidApp.amsatStatus` and `requestAmsatStatus()`; tests that off makes no request
+  - [ ] 2.2 `showAmsatStatus` setting (off by default) and its Settings row; `HamSatDroidApp.amsatStatus` and `requestAmsatStatus()`; tests that off makes no request
     - _Requirements: 1.7, 5.3_
 - [ ] 3. Showing
   - [ ] 3.1 `AppViewModel.statusBySatellite` (setting, age and satellites as inputs) and the request on screen start and on switching the setting on, with tests; `RequestAmsatStatusEffect` in the three screens

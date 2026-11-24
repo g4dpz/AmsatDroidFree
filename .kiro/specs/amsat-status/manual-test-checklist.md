@@ -1,6 +1,6 @@
 # Manual test checklist: AMSAT satellite status reports
 
-- [ ] With the switch on and the network up, the passes screen shows a block for the selected satellite within a few seconds, for example "AMSAT reports, last 24 h · FM: heard 12 times, last 20:22 UTC"
+- [ ] On a fresh install the switch is off and no request is made; once it is on, with the network up, the passes screen shows a block for the selected satellite within a few seconds, for example "AMSAT reports, last 24 h · FM: heard 12 times, last 20:22 UTC"
 - [ ] The ISS shows each of its modes on its own line (Crew, FM, SSTV), with "crew active" where that is the report
 - [ ] A satellite on the board with no reports shows "No AMSAT reports in the last 24 hours", and nothing suggests it is not working
 - [ ] A satellite AMSAT does not list shows nothing

@@ -42,7 +42,7 @@ Test fixtures in `app/src/test/resources/`: `amsat_status_summary_20261124.json`
 
 ### Setting
 
-`SettingsRepository.showAmsatStatus` (`Setting<Boolean>`, key `showAmsatStatus`, default per S1). A Settings row in the Display section: "Show AMSAT status reports", with the line "From AMSAT's Live OSCAR Satellite Status board".
+`SettingsRepository.showAmsatStatus` (`Setting<Boolean>`, key `showAmsatStatus`, default off per D1). A Settings row in the Display section: "Show AMSAT status reports", with the line "From AMSAT's Live OSCAR Satellite Status board".
 
 ### Wiring
 

@@ -14,11 +14,13 @@ The source is AMSAT's public status API, `https://status.amsat.org/api/v1/` (ver
 
 ## Decisions made
 
-None yet. S1 to S8 below must be confirmed or changed by David before task 2 starts.
+- D1 (S1). **Off by default, with a switch** (David, 24 Nov 2026). A Settings row, "Show AMSAT status reports", off until the user turns it on. Until then the app makes no request to the status API. No build with the feature reaches a Play track before the privacy policy and data safety answers name the new server (Requirement 4.2).
+
+S2 to S8 below must be confirmed or changed by David before task 2 starts.
 
 ## Assumptions (please confirm or change)
 
-- S1. **On by default, with a switch.** A Settings row, "Show AMSAT status reports", on by default. Like the keps download it fetches public data and sends nothing about the user beyond the IP address and the user agent, but it is a new server, so the user can turn it off. (Alternative: off until switched on.) Either way, no build with the feature reaches a Play track before the privacy policy and data safety answers name the new server (Requirement 4.2).
+
 - S2. **Where it shows.** On the passes screen, a short block under the pickers for the selected satellite; on the All satellites overview and in the chooser, a short tag on each satellite's row. Not on the pass cards, the sky screen, the map, the widget or in alerts.
 - S3. **The last 24 hours.** One window, 24 hours, everywhere. No setting.
 - S4. **Fresh enough, never too often.** The summary is fetched when a screen that shows reports comes into view and the stored copy is older than 15 minutes, and never more often than every 5 minutes (the API's guideline). The catalogue changes rarely and is fetched at most once a day.
@@ -31,7 +33,7 @@ None yet. S1 to S8 below must be confirmed or changed by David before task 2 sta
 
 **User story:** As an operator, I want the app to know what other operators have reported about each satellite recently.
 
-1. WHEN the switch (S1) is on and the passes screen, the All satellites overview or the chooser comes into view, or the switch is turned on while one of them is in view, THEN the app SHALL fetch the 24-hour summary if its stored copy is older than 15 minutes.
+1. WHEN the switch (D1) is on and the passes screen, the All satellites overview or the chooser comes into view, or the switch is turned on while one of them is in view, THEN the app SHALL fetch the 24-hour summary if its stored copy is older than 15 minutes.
 2. The app SHALL make no more than one request to each endpoint in any 5 minutes, counting every attempt (successful or not), however many screens ask at once.
 3. The app SHALL fetch the catalogue when none is stored or the stored one is more than 24 hours old. WHEN the catalogue cannot be fetched and none is stored THEN the app SHALL still show the summary's reports, matched by the rules in Requirement 2 that do not need the catalogue, and SHALL NOT show the "no reports" line (Requirement 3.2), since it cannot tell which satellites are on the board.
 4. Requests SHALL use https only, no redirects, a size limit and timeouts, as the keps and transponder downloads do, and a User-Agent that names the app, its version and the project URL: `AmsatDroid/<version> (+https://github.com/g4dpz/AmsatDroidFree; Android <release>; amateur radio satellite tracker)`.
