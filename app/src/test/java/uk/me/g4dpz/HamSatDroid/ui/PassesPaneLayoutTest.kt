@@ -63,9 +63,10 @@ class PassesPaneLayoutTest {
         assertFalse(PassesPaneLayout.scrollWholePane(560f, 360f))
     }
     @Test
-    fun theListRoomBoundaryIs200() {
-        assertTrue(PassesPaneLayout.scrollWholePane(800f, 600.1f))
-        assertFalse(PassesPaneLayout.scrollWholePane(800f, 600f))
+        fun theListRoomBoundaryIs200AfterTheGap() {
+        // 800 dp of pane less 588 dp of controls less the 12 dp gap leaves the list exactly 200 dp
+        assertTrue(PassesPaneLayout.scrollWholePane(800f, 588.1f))
+        assertFalse(PassesPaneLayout.scrollWholePane(800f, 588f))
     }
     @Test
     fun beforeTheControlsAreMeasuredOnlyThePaneHeightCounts() {

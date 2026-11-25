@@ -392,7 +392,7 @@ private fun PassesPane(
                 passes()
             }
         } else {
-            Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(PassesPaneLayout.PINNED_GAP_DP.dp)) {
                 controls()
                 LazyColumn(
                     modifier = Modifier.weight(1f).fillMaxWidth(),

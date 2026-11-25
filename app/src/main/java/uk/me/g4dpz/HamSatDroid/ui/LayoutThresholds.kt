@@ -87,12 +87,17 @@ object PassesPaneLayout {
      * this (a phone a little over [SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP] tall, with the stale-elements warning or a larger
      * display size) left a strip too thin to see or scroll the passes, so the whole pane scrolls instead.
      */
-    const val MIN_LIST_HEIGHT_DP = 200f
+        const val MIN_LIST_HEIGHT_DP = 200f
+
+    /** The gap, in dp, between pinned controls and the list below them; it is not room for the list. */
+    const val PINNED_GAP_DP = 12f
+
 
     /**
      * Whether the controls scroll away with the list: on a short pane, or when the controls, [controlsHeightDp] as last
      * measured (0 before the first measure), would leave the list less than [MIN_LIST_HEIGHT_DP].
      */
     fun scrollWholePane(paneHeightDp: Float, controlsHeightDp: Float = 0f): Boolean =
-        paneHeightDp < SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP || paneHeightDp - controlsHeightDp < MIN_LIST_HEIGHT_DP
+                paneHeightDp < SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP ||
+            paneHeightDp - controlsHeightDp - PINNED_GAP_DP < MIN_LIST_HEIGHT_DP
 }
