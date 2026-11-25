@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -352,7 +353,10 @@ private fun PassesPane(
                 // The controls' height is measured, so pinned controls never leave the list too thin to scroll; they are the
         // same height in both arrangements, so switching does not change the measure. The banner is counted as before.
         val density = LocalDensity.current
-        var controlsHeightDp by remember { mutableFloatStateOf(0f) }
+        // Measured afresh when the pane is resized (rotation, a fold, split screen)
+        var controlsHeightDp by remember(maxWidth, maxHeight) { mutableFloatStateOf(0f) }
+        // One list state for both arrangements, so switching between them keeps the scroll position
+        val listState = rememberLazyListState()
         val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value, controlsHeightDp) || choice.showPrompt
         val controls: @Composable () -> Unit = {
             Box(Modifier.onSizeChanged { controlsHeightDp = with(density) { it.height.toDp().value } }) {
@@ -387,7 +391,7 @@ private fun PassesPane(
         }
 
         if (scrollWholePane) {
-            LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            LazyColumn(Modifier.fillMaxSize(), state = listState, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 item(key = "controls") { controls() }
                 passes()
             }
@@ -396,6 +400,7 @@ private fun PassesPane(
                 controls()
                 LazyColumn(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
+                    state = listState,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) { passes() }
             }

@@ -53,17 +53,17 @@ class PassesPaneLayoutTest {
     @Test
     fun theScrollBoundaryIs520() {
         assertTrue(PassesPaneLayout.scrollWholePane(519.9f))
-                assertFalse(PassesPaneLayout.scrollWholePane(520f))
+        assertFalse(PassesPaneLayout.scrollWholePane(520f))
     }
     @Test
     fun tallControlsThatLeaveTheListTooLittleScrollTheWholePane() {
         // a 680 dp phone: about 560 dp of pane, and stacked pickers with the heading took about 460 dp, leaving the
         // list 100 dp (a tester could not scroll the passes)
         assertTrue(PassesPaneLayout.scrollWholePane(560f, 460f))
-        assertFalse(PassesPaneLayout.scrollWholePane(560f, 360f))
+        assertFalse(PassesPaneLayout.scrollWholePane(560f, 340f))
     }
     @Test
-        fun theListRoomBoundaryIs200AfterTheGap() {
+    fun theListRoomBoundaryIs200AfterTheGap() {
         // 800 dp of pane less 588 dp of controls less the 12 dp gap leaves the list exactly 200 dp
         assertTrue(PassesPaneLayout.scrollWholePane(800f, 588.1f))
         assertFalse(PassesPaneLayout.scrollWholePane(800f, 588f))

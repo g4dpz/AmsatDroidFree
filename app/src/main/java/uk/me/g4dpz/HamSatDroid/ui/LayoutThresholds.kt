@@ -82,12 +82,12 @@ object PassesPaneLayout {
 
     fun stackPickers(paneWidthDp: Float): Boolean = paneWidthDp < STACK_PICKERS_BELOW_WIDTH_DP
 
-        /**
+    /**
      * The least height, in dp, the pass list may be left below pinned controls: about one and a half cards. Less than
      * this (a phone a little over [SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP] tall, with the stale-elements warning or a larger
      * display size) left a strip too thin to see or scroll the passes, so the whole pane scrolls instead.
      */
-        const val MIN_LIST_HEIGHT_DP = 200f
+    const val MIN_LIST_HEIGHT_DP = 200f
 
     /** The gap, in dp, between pinned controls and the list below them; it is not room for the list. */
     const val PINNED_GAP_DP = 12f
@@ -98,6 +98,6 @@ object PassesPaneLayout {
      * measured (0 before the first measure), would leave the list less than [MIN_LIST_HEIGHT_DP].
      */
     fun scrollWholePane(paneHeightDp: Float, controlsHeightDp: Float = 0f): Boolean =
-                paneHeightDp < SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP ||
+        paneHeightDp < SCROLL_WHOLE_PANE_BELOW_HEIGHT_DP ||
             paneHeightDp - controlsHeightDp - PINNED_GAP_DP < MIN_LIST_HEIGHT_DP
 }
