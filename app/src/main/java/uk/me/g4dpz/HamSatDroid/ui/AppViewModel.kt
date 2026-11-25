@@ -387,11 +387,14 @@ class AppViewModel(
             passStore.clear()
         } else {
             passStore.load()?.let { stored ->
-                rawPasses = stored.passes
+                // Passes that ended while the app was closed are not passes to come; a list with none left shows nothing
+                val now = clock()
+                val toCome = stored.passes.filter { p -> p.endTime.time > now }
+                rawPasses = toCome
                 _state.update {
                     it.copy(
-                        passes = stored.passes.map { p -> PassSummary.from(p, stored.catnum, stored.satName) },
-                        header = if (stored.passes.isEmpty()) null
+                        passes = toCome.map { p -> PassSummary.from(p, stored.catnum, stored.satName) },
+                        header = if (toCome.isEmpty()) null
                         else PassHeader.Restored(stored.satName, Instant.ofEpochMilli(stored.computedAtMillis)),
                     )
                 }
