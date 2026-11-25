@@ -4,6 +4,12 @@ What changed in each version of AmsatDroid, newest first. Each entry says what a
 
 The bullet points of the newest entry are also what goes into the Play Console release notes (500 characters per language, plain text, without the version heading or the `###` lines), so keep each release's bullets short, under about 450 characters, and in plain words.
 
+## [2.3.1] - 2026-11-25 (versionCode 2310)
+### Fixed
+- On some phones the passes ran off the bottom of the screen and could not be scrolled; the whole screen now scrolls when the list would be too short.
+### Changed
+- The "Pass predictions for satellite..." paragraph is gone; the satellite, range and start time are already shown above the list.
+- Smaller download and faster start-up.
 ## [2.3.0] - 2026-11-22 (versionCode 2300)
 ### Added
 - Choose satellites (Settings, or the end of the Satellite list): the picker, All satellites and the Contact planner then offer only those. Until you choose, only the ISS is offered.
