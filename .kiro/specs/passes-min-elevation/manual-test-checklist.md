@@ -12,4 +12,6 @@
 - [ ] A selected pass stays in the list and in the sky view when the filter would hide it, and is marked below the minimum
 - [ ] Setting an alert on a listed pass works as before; the overview, planner and widget are unchanged
 - [ ] No clipping on the A6 (360 dp) in portrait and landscape
+- [ ] On a phone about 680 dp tall the whole passes screen scrolls and the last pass can be reached; on a tall phone the pickers stay pinned and the list scrolls
+- [ ] After Calculate pass no "Pass predictions for ..." paragraph is shown; a restored list, "no passes" and error messages still are
 - [ ] Red night mode: the picker looks like the others
