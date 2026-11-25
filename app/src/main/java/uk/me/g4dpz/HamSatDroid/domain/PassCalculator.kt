@@ -47,10 +47,10 @@ open class PassCalculator {
         } else {
             val predictor = PassPredictor(tle, GroundStationPosition(latitude, longitude, 0.0))
             // Winding back (a quarter orbit, so a pass already in progress is found) can also find a pass that was
-            // over before [start]; it is not one of the passes to come, so it is dropped. Should that leave nothing,
-            // the search is made again from [start] without winding back.
+            // over before [start]; it is not one of the passes to come, so it is dropped. This never leaves the list
+            // empty: the predictor goes on until a pass starts at or after the end of the range, and that pass ends
+            // after [start]. The library's "nothing found" marker (maximum elevation 0) is kept for the check below.
             val passes = predictor.getPasses(start, hoursAhead, true).filter { it.maxEl == 0.0 || it.endTime.after(start) }
-                .ifEmpty { predictor.getPasses(start, hoursAhead, false) }
             // The library reports "nothing found" as a single pass with zero maximum elevation.
             if (passes.isEmpty() || passes.first().maxEl == 0.0) CalcResult.NoPasses else CalcResult.Passes(passes)
         }
