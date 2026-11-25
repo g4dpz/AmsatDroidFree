@@ -142,6 +142,33 @@ class PassCalculatorTest {
     }
 
     @Test
+    fun aRangeNeverListsAPassThatWasOverBeforeTheStartTime() {
+        // A pass that ended a few minutes before the start was listed first (seen 25 Nov 2026: RS-44, ended 13:02,
+        // calculated 13:10). For every range, start just after each pass has ended.
+        for (ended in passesIn24Hours("AO-07").take(6)) {
+            val from = Date(ended.endTime.time + 2 * 60_000L)
+            for (hours in listOf(0, 6, 12, 24)) {
+                val passes = (PassCalculator().calculate(sat("AO-07"), 51.5, -0.1, from, hours) as CalcResult.Passes).passes
+                assertTrue("started $from, $hours h: got none", passes.isNotEmpty())
+                assertTrue(
+                    "started $from, $hours h: got a pass that ended ${passes.first().endTime}",
+                    passes.all { it.endTime.after(from) },
+                )
+            }
+        }
+    }
+
+    @Test
+    fun aRangeStillListsAPassInProgressAtTheStartTime() {
+        for (inProgress in passesIn24Hours("AO-07").take(6)) {
+            for (hours in listOf(0, 6, 24)) {
+                val passes = (PassCalculator().calculate(sat("AO-07"), 51.5, -0.1, inProgress.tca, hours) as CalcResult.Passes).passes
+                assertSamePass(inProgress, passes.first())
+            }
+        }
+    }
+
+    @Test
     fun aPassInProgressAtTheStartTimeIsStillTheNextPass() {
         // start in the middle of each pass (its closest approach): that pass is under way, so it counts, whether the
         // minimum is 1 degree or exactly its own maximum elevation
