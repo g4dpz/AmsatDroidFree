@@ -8,6 +8,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -53,13 +54,16 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
@@ -345,12 +349,17 @@ private fun PassesPane(
     BoxWithConstraints(modifier) {
         val minElevation by viewModel.minElevation.collectAsStateWithLifecycle()
         val stackPickers = PassesPaneLayout.stackPickers(maxWidth.value)
-        // The banner adds height the layout rule does not count, so scroll the whole pane while it shows: nothing is clipped
-        val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value) || choice.showPrompt
+                // The controls' height is measured, so pinned controls never leave the list too thin to scroll; they are the
+        // same height in both arrangements, so switching does not change the measure. The banner is counted as before.
+        val density = LocalDensity.current
+        var controlsHeightDp by remember { mutableFloatStateOf(0f) }
+        val scrollWholePane = PassesPaneLayout.scrollWholePane(maxHeight.value, controlsHeightDp) || choice.showPrompt
         val controls: @Composable () -> Unit = {
-            PassesControls(
-                viewModel, state, formats, stackPickers, minElevation, onChangeStartTime, locationSet, onOpenSetup, onOpenSky, choice,
-            )
+            Box(Modifier.onSizeChanged { controlsHeightDp = with(density) { it.height.toDp().value } }) {
+                PassesControls(
+                    viewModel, state, formats, stackPickers, minElevation, onChangeStartTime, locationSet, onOpenSetup, onOpenSky, choice,
+                )
+            }
         }
         val passes: LazyListScope.() -> Unit = {
             // Only the passes that reach the minimum elevation, plus the selected one; nothing is removed from the state.
@@ -510,8 +519,11 @@ private fun PassesControls(
 
         when {
             state.loading -> Text(stringResource(R.string.passes_loading))
-            state.header != null -> {
-                Text(state.header.text(formats), style = MaterialTheme.typography.bodyMedium)
+                        state.header != null -> {
+                // A fresh calculation needs no paragraph: the satellite, the range and the start time are in the controls
+                if (state.header !is PassHeader.Predictions) {
+                    Text(state.header.text(formats), style = MaterialTheme.typography.bodyMedium)
+                }
                 if (minElevation > 0 && (state.header is PassHeader.Predictions || state.header is PassHeader.Restored)) {
                     Text(
                         stringResource(R.string.passes_min_elevation_filter, minElevation),
