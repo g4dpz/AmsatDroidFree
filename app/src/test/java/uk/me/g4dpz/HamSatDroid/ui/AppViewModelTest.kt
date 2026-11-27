@@ -542,6 +542,28 @@ class AppViewModelTest {
     }
 
     @Test
+    fun passesThatEndedWhileTheAppWasClosedAreNotRestored() {
+        val old = listOf(
+            SatPassTime(Date(now - 1_800_000), Date(now - 600_000), Date(now - 1_200_000), "north", 10, 200, 40.0), // over
+            SatPassTime(Date(now - 300_000), Date(now + 300_000), Date(now), "none", 20, 190, 25.0), // in progress
+            SatPassTime(Date(now + 6000_000), Date(now + 6600_000), Date(now + 6300_000), "none", 20, 190, 12.5),
+        )
+        passStore().save(StoredPasses(7530, "AO-07", now - 2_400_000, 12, old))
+        val s = viewModel().state.value
+        assertEquals(listOf(25.0, 12.5), s.passes.map { it.maxElevationDeg })
+        assertEquals(PassHeader.Restored("AO-07", Instant.ofEpochMilli(now - 2_400_000)), s.header)
+    }
+
+    @Test
+    fun aStoredListWhosePassesHaveAllEndedShowsNothing() {
+        val old = listOf(SatPassTime(Date(now - 1_800_000), Date(now - 600_000), Date(now - 1_200_000), "north", 10, 200, 40.0))
+        passStore().save(StoredPasses(7530, "AO-07", now - 2_400_000, 12, old))
+        val s = viewModel().state.value
+        assertTrue(s.passes.isEmpty())
+        assertNull(s.header)
+    }
+
+    @Test
     fun anEmptyStoredListShowsNoHeader() {
         passStore().save(StoredPasses(7530, "AO-07", now, 0, emptyList()))
         val vm = viewModel()

@@ -1,7 +1,7 @@
 # Design: Minimum elevation filter on the passes screen
 
 ## Where things are today
-- `AppViewModel.calculate()` calls `PassCalculator.calculate(tle, lat, lon, start, hours)`, which calls `PassPredictor.getPasses(start, hoursAhead, true)`; `hoursAhead` 0 returns the next pass only. The result is kept in `rawPasses` and in `AppUiState.passes` (a list of `PassSummary`, each with `maxElevationDeg`), and saved by `PassStore`.
+- `AppViewModel.calculate()` calls `PassCalculator.calculate(tle, lat, lon, start, hours)`, which calls `PassPredictor.getPasses(start, hoursAhead, true)` and (since 25 Nov 2026) drops any pass that ended before `start`, which winding back can find; `hoursAhead` 0 returns the next pass only. The result is kept in `rawPasses` and in `AppUiState.passes` (a list of `PassSummary`, each with `maxElevationDeg`), and saved by `PassStore`.
 - `OverviewRows.upcoming(results, minElevation, now)` already filters by maximum elevation as a pure function with tests; the Contact planner does it inside its search.
 - Pickers: `DropdownField` (a long value wraps over two lines; a long label has an ellipsis). `PassesPaneLayout` stacks the range and satellite pickers in narrow panes (under 480 dp). Large font sizes are not supported (David, 20 Nov 2026), so nothing here depends on the font scale.
 
